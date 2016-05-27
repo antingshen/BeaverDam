@@ -19,17 +19,21 @@ Shape.prototype.contains = function(mx, my) {
 
 Shape.prototype.border = function (mx, my) {
   //Checks if within border
-  if ((this.y + 2 >= my) && (this.y - 4 <= my)) {
-    console.log("Top");
+  if ((this.y + 2 >= my) && (this.y - 4 <= my) && (this.x + 2 >= mx) && (this.x - 4 <= mx)) {
+    return Shape.prototype.borderenum.TOPLEFT;
+  } else if ((this.y + 2 >= my) && (this.y - 4 <= my) && (this.x + this.w + 2 >= mx) && (this.x + this.w - 4 <= mx)) {
+    return Shape.prototype.borderenum.TOPRIGHT;
+  } else if ((this.y + this.h + 2 >= my) && (this.y + this.h - 4 <= my) && (this.x + this.w + 2 >= mx) && (this.x + this.w - 4 <= mx)) {
+    return Shape.prototype.borderenum.BOTTOMRIGHT;
+  } else if ((this.y + this.h + 2 >= my) && (this.y + this.h - 4 <= my) && (this.x + 2 >= mx) && (this.x - 4 <= mx)) {
+    return Shape.prototype.borderenum.BOTTOMLEFT;
+  } else if ((this.y + 2 >= my) && (this.y - 4 <= my)) {
     return Shape.prototype.borderenum.TOP;
   } else if ((this.x + 2 >= mx) && (this.x - 4 <= mx)) {
-    console.log("Left");
     return Shape.prototype.borderenum.LEFT;
   } else if ((this.x + this.w + 2 >= mx) && (this.x + this.w - 4 <= mx)) {
-    console.log("Right");
     return Shape.prototype.borderenum.RIGHT;
   } else if ((this.y + this.h + 2 >= my) && (this.y + this.h - 4 <= my)) {
-    console.log("Bottom");
     return Shape.prototype.borderenum.BOTTOM;
   } else {
     return false; 
@@ -37,10 +41,14 @@ Shape.prototype.border = function (mx, my) {
 }
 
 Shape.prototype.borderenum = {
-  TOP : 0,
-  LEFT : 1,
-  RIGHT : 2,
-  BOTTOM : 3
+  TOP : 1,
+  LEFT : 2,
+  RIGHT : 3,
+  BOTTOM : 4,
+  TOPLEFT : 5,
+  TOPRIGHT : 6,
+  BOTTOMLEFT : 7,
+  BOTTOMRIGHT : 8
 
 }
 
@@ -117,18 +125,52 @@ function CanvasState(frame) {
     if (myState.selection) {
       myState.selection = null;
       myState.valid = false; // Need to clear the old selection border
+    } else {
+      var mouse = myState.getMouse(e);
+      var new_shape = new Shape(mouse.x, mouse.y, 1, 1, 'rgba(0,255,0,.6)');
+      myState.addShape(new_shape); 
+      myState.selection = new_shape;
+      myState.enlarging = Shape.prototype.borderenum.BOTTOMRIGHT;
     }
 
   }, true);
   frame.addEventListener('mousemove', function(e) {
+    var mouse = myState.getMouse(e);
     if (myState.enlarging == Shape.prototype.borderenum.RIGHT) {
-      console.log("Test");
-      var mouse = myState.getMouse(e);
       myState.selection.w = mouse.x - myState.selection.x;  
       myState.valid = false; // Something's dragging so we must redraw 
-    }
-    else if (myState.dragging){
-      var mouse = myState.getMouse(e);
+    } else if (myState.enlarging == Shape.prototype.borderenum.LEFT) {
+      myState.selection.w += myState.selection.x - mouse.x; 
+      myState.selection.x = mouse.x; 
+      myState.valid = false; // Something's dragging so we must redraw 
+    } else if (myState.enlarging == Shape.prototype.borderenum.TOP) {
+      myState.selection.h += myState.selection.y - mouse.y; 
+      myState.selection.y = mouse.y; 
+      myState.valid = false; // Something's dragging so we must redraw 
+    } else if (myState.enlarging == Shape.prototype.borderenum.BOTTOM) {
+      myState.selection.h = mouse.y - myState.selection.y;  
+      myState.valid = false; // Something's dragging so we must redraw 
+    } else if (myState.enlarging == Shape.prototype.borderenum.BOTTOMRIGHT) {
+      myState.selection.w = mouse.x - myState.selection.x; 
+      myState.selection.h = mouse.y - myState.selection.y;  
+      myState.valid = false; // Something's dragging so we must redraw 
+    } else if (myState.enlarging == Shape.prototype.borderenum.BOTTOMLEFT) {
+      myState.selection.w += myState.selection.x - mouse.x; 
+      myState.selection.x = mouse.x;
+      myState.selection.h = mouse.y - myState.selection.y;   
+      myState.valid = false; // Something's dragging so we must redraw 
+    } else if (myState.enlarging == Shape.prototype.borderenum.TOPLEFT) {
+      myState.selection.w += myState.selection.x - mouse.x; 
+      myState.selection.x = mouse.x;
+      myState.selection.h += myState.selection.y - mouse.y; 
+      myState.selection.y = mouse.y;    
+      myState.valid = false; // Something's dragging so we must redraw 
+    } else if (myState.enlarging == Shape.prototype.borderenum.TOPRIGHT) {
+      myState.selection.h += myState.selection.y - mouse.y; 
+      myState.selection.y = mouse.y;    
+      myState.selection.w = mouse.x - myState.selection.x; 
+      myState.valid = false; // Something's dragging so we must redraw 
+    } else if (myState.dragging){
       // We don't want to drag the object by its top-left corner, we want to drag it
       // from where we clicked. Thats why we saved the offset and use it here
       myState.selection.x = mouse.x - myState.dragoffx;
@@ -141,10 +183,10 @@ function CanvasState(frame) {
     myState.enlarging = false;
   }, true);
   // double click for making new shapes
-  frame.addEventListener('dblclick', function(e) {
-    var mouse = myState.getMouse(e);
-    myState.addShape(new Shape(mouse.x - 10, mouse.y - 10, 20, 20, 'rgba(0,255,0,.6)'));
-  }, true);
+  // frame.addEventListener('dblclick', function(e) {
+  //   var mouse = myState.getMouse(e);
+  //   myState.addShape(new Shape(mouse.x - 10, mouse.y - 10, 20, 20, 'rgba(0,255,0,.6)'));
+  // }, true);
   
   // **** Options! ****
   myState.valid = false;
