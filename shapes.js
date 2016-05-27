@@ -121,11 +121,10 @@ function CanvasState(frame) {
 
   }, true);
   frame.addEventListener('mousemove', function(e) {
-    if (myState.enlarging) {
+    if (myState.enlarging == Shape.prototype.borderenum.RIGHT) {
       console.log("Test");
       var mouse = myState.getMouse(e);
-      myState.selection.w += 1;
-      myState.selection.h += 1;   
+      myState.selection.w = mouse.x - myState.selection.x;  
       myState.valid = false; // Something's dragging so we must redraw 
     }
     else if (myState.dragging){
