@@ -215,8 +215,11 @@ function CanvasState(frame) {
         myState.selection.x -= 1;
       } else if (event.keyCode == 39) {
         myState.selection.x += 1;
+      } else if (event.keyCode == 68) {
+        myState.removeShape(myState.selection);
+        myState.selection = null;
       }
-       myState.valid = false;
+      myState.valid = false;
     }
 
   }, true);
@@ -231,11 +234,6 @@ function CanvasState(frame) {
       }
     }
   }, true);
-  // double click for making new shapes
-  // frame.addEventListener('dblclick', function(e) {
-  //   var mouse = myState.getMouse(e);
-  //   myState.addShape(new Shape(mouse.x - 10, mouse.y - 10, 20, 20, 'rgba(0,255,0,.6)'));
-  // }, true);
   frame.addEventListener('dblclick', function(e) { e.preventDefault(); return false; },false);
   
   // **** Options! ****
