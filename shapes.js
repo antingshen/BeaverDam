@@ -195,14 +195,30 @@ function CanvasState(frame) {
     }
   }, true);
   html.addEventListener("keypress", function(event) {
+    console.log(myState.selection);
     if (event.keyCode == 32) {
-        if (myState.shapes.length > 0) {
-          myState.shapeNum = (myState.shapeNum + 1) % myState.shapes.length
-          myState.selection = myState.shapes[myState.shapeNum % myState.shapes.length];
-          console.log(myState.shapeNum);
-          myState.valid = false;
-        }
+      if (myState.shapes.length > 0) {
+        myState.shapeNum = (myState.shapeNum + 1) % myState.shapes.length
+        myState.selection = myState.shapes[myState.shapeNum % myState.shapes.length];
+        console.log(myState.shapeNum);
+        myState.valid = false;
       }
+    }
+  }, true);
+  html.addEventListener("keydown", function(event) {
+    if (myState.selection != null) {
+      if (event.keyCode == 38) {
+        myState.selection.y -= 1;
+      } else if (event.keyCode == 40) {
+        myState.selection.y += 1;
+      } else if (event.keyCode == 37) {
+        myState.selection.x -= 1;
+      } else if (event.keyCode == 39) {
+        myState.selection.x += 1;
+      }
+       myState.valid = false;
+    }
+
   }, true);
   frame.addEventListener('mouseup', function(e) {
     myState.dragging = false;
