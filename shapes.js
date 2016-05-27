@@ -6,19 +6,19 @@ function Shape(x, y, w, h, fill) {
   this.fill = fill || '#AAAAAA';
 }
 function within_top (shape, mx, my) {
-  return (shape.y + 2 >= my) && (shape.y - 4 <= my)
+  return (shape.y + 4 >= my) && (shape.y - 4 <= my)
 }
 
 function within_bottom (shape, mx, my) {
-  return (shape.y + shape.h + 2 >= my) && (shape.y + shape.h - 4 <= my)
+  return (shape.y + shape.h + 4 >= my) && (shape.y + shape.h - 4 <= my)
 }
 
 function within_right (shape, mx, my) {
-  return (shape.x + shape.w + 2 >= mx) && (shape.x + shape.w - 4 <= mx);
+  return (shape.x + shape.w + 4 >= mx) && (shape.x + shape.w - 4 <= mx);
 }
 
 function within_left(shape, mx, my) {
-  return (shape.x + 2 >= mx) && (shape.x - 4 <= mx);
+  return (shape.x + 4 >= mx) && (shape.x - 4 <= mx);
 }
 Shape.prototype.draw = function(ctx) {
   ctx.fillStyle = this.fill;
@@ -37,29 +37,21 @@ Shape.prototype.contains = function(mx, my) {
 Shape.prototype.border = function (mx, my) {
   //Checks if within border
   if (within_top(this, mx, my) && within_left(this, mx, my)) {
-    console.log("TL");
     return Shape.prototype.borderenum.TOPLEFT;
   } else if (within_top(this, mx , my) && within_right (this, mx, my)) {
-    console.log("TR");
     return Shape.prototype.borderenum.TOPRIGHT;
   } else if (within_bottom(this, mx, my) && within_right(this, mx, my)) {
-    console.log("BR");
     return Shape.prototype.borderenum.BOTTOMRIGHT;
   } else if (within_bottom(this, mx, my) && within_left(this, mx, my)) {
-    console.log("BL");
     return Shape.prototype.borderenum.BOTTOMLEFT;
   } else if (within_top(this, mx, my)) {
-    console.log("T");
     return Shape.prototype.borderenum.TOP;
   } else if (within_left(this, mx, my)) {
-    console.log("L");
     return Shape.prototype.borderenum.LEFT;
   } else if (within_right(this, mx, my)) {
-    console.log("R");
     return Shape.prototype.borderenum.RIGHT;
   } else if (within_bottom(this, mx, my)) {
     return Shape.prototype.borderenum.BOTTOM;
-    console.log("B");
   } else {
     return false; 
   }
@@ -78,8 +70,6 @@ Shape.prototype.borderenum = {
 }
 
 function CanvasState(frame) {
-  // **** First some setup! ****
-  
   this.frame = frame;
   this.width = frame.width;
   this.height = frame.height;
@@ -104,11 +94,12 @@ function CanvasState(frame) {
   this.valid = false; // when set to false, the frame will redraw everything
   this.shapes = [];  // the collection of things to be drawn
   this.dragging = false; // Keep track of when we are dragging
-  this.enlarging = false;
+  this.enlarging = false; // If enlarging the shape
   // the current selected object. In the future we could turn this into an array for multiple selection
   this.selection = null;
   this.dragoffx = 0; // See mousedown and mousemove events for explanation
   this.dragoffy = 0;
+  this.shapeNum = -1;
   
   // **** Then events! ****
   
@@ -131,7 +122,6 @@ function CanvasState(frame) {
     for (var i = l-1; i >= 0; i--) {
       var border = shapes[i].border(mx, my);
       if (shapes[i].contains(mx, my)) {
-        console.log("select?");
         var mySel = shapes[i];
         // Keep track of where in the object we clicked
         // so we can move it smoothly (see mousemove)
@@ -206,10 +196,12 @@ function CanvasState(frame) {
   }, true);
   html.addEventListener("keypress", function(event) {
     if (event.keyCode == 32) {
-        var num = Math.floor(Math.random() * myState.shapes.length + 1) 
-        myState.selection = myState.shapes[num];
-        console.log(num);
-        myState.valid = false;
+        if (myState.shapes.length > 0) {
+          myState.shapeNum = (myState.shapeNum + 1) % myState.shapes.length
+          myState.selection = myState.shapes[myState.shapeNum % myState.shapes.length];
+          console.log(myState.shapeNum);
+          myState.valid = false;
+        }
       }
   }, true);
   frame.addEventListener('mouseup', function(e) {
@@ -244,7 +236,7 @@ CanvasState.prototype.addShape = function(shape) {
 }
 CanvasState.prototype.removeShape = function(shape) {
   var index = this.shapes.indexOf(shape);
-  this.shapes.splice(index, 1);
+  this.shapes.splice(index, 1); 
   this.valid = false;
 }
 
