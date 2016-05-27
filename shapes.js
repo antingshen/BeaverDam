@@ -1,3 +1,4 @@
+// Credits to http://simonsarris.com/blog/510-making-html5-canvas-useful
 function Shape(x, y, w, h, fill) {
   this.x = x || 0;
   this.y = y || 0;
@@ -14,6 +15,33 @@ Shape.prototype.draw = function(ctx) {
 Shape.prototype.contains = function(mx, my) {
   return  (this.x <= mx) && (this.x + this.w >= mx) &&
           (this.y <= my) && (this.y + this.h >= my);
+}
+
+Shape.prototype.border = function (mx, my) {
+  //Checks if within border
+  if ((this.y + 2 >= my) && (this.y - 4 <= my)) {
+    console.log("Top");
+    return Shape.prototype.borderenum.TOP;
+  } else if ((this.x + 2 >= mx) && (this.x - 4 <= mx)) {
+    console.log("Left");
+    return Shape.prototype.borderenum.LEFT;
+  } else if ((this.x + this.w + 2 >= mx) && (this.x + this.w - 4 <= mx)) {
+    console.log("Right");
+    return Shape.prototype.borderenum.RIGHT;
+  } else if ((this.y + this.h + 2 >= my) && (this.y + this.h - 4 <= my)) {
+    console.log("Bottom");
+    return Shape.prototype.borderenum.BOTTOM;
+  } else {
+    return false; 
+  }
+}
+
+Shape.prototype.borderenum = {
+  TOP : 0,
+  LEFT : 1,
+  RIGHT : 2,
+  BOTTOM : 3
+
 }
 
 function CanvasState(frame) {
@@ -43,6 +71,7 @@ function CanvasState(frame) {
   this.valid = false; // when set to false, the frame will redraw everything
   this.shapes = [];  // the collection of things to be drawn
   this.dragging = false; // Keep track of when we are dragging
+  this.enlarging = false;
   // the current selected object. In the future we could turn this into an array for multiple selection
   this.selection = null;
   this.dragoffx = 0; // See mousedown and mousemove events for explanation
@@ -67,17 +96,21 @@ function CanvasState(frame) {
     var shapes = myState.shapes;
     var l = shapes.length;
     for (var i = l-1; i >= 0; i--) {
-      if (shapes[i].contains(mx, my)) {
+      var border = shapes[i].border(mx, my);
+      if (shapes[i].contains(mx, my) || border) {
         var mySel = shapes[i];
         // Keep track of where in the object we clicked
         // so we can move it smoothly (see mousemove)
         myState.dragoffx = mx - mySel.x;
         myState.dragoffy = my - mySel.y;
         myState.dragging = true;
-        myState.selection = mySel;
+        myState.selection = mySel; /* Sets which border to enlarge. */
+        if (border) {
+          myState.enlarging = border;
+        }
         myState.valid = false;
         return;
-      }
+      } 
     }
     // havent returned means we have failed to select anything.
     // If there was an object selected, we deselect it
@@ -85,9 +118,17 @@ function CanvasState(frame) {
       myState.selection = null;
       myState.valid = false; // Need to clear the old selection border
     }
+
   }, true);
   frame.addEventListener('mousemove', function(e) {
-    if (myState.dragging){
+    if (myState.enlarging) {
+      console.log("Test");
+      var mouse = myState.getMouse(e);
+      myState.selection.w += 1;
+      myState.selection.h += 1;   
+      myState.valid = false; // Something's dragging so we must redraw 
+    }
+    else if (myState.dragging){
       var mouse = myState.getMouse(e);
       // We don't want to drag the object by its top-left corner, we want to drag it
       // from where we clicked. Thats why we saved the offset and use it here
@@ -98,6 +139,7 @@ function CanvasState(frame) {
   }, true);
   frame.addEventListener('mouseup', function(e) {
     myState.dragging = false;
+    myState.enlarging = false;
   }, true);
   // double click for making new shapes
   frame.addEventListener('dblclick', function(e) {
@@ -106,7 +148,7 @@ function CanvasState(frame) {
   }, true);
   
   // **** Options! ****
-  
+  myState.valid = false;
   this.selectionColor = '#CC0000';
   this.selectionWidth = 2;  
   this.interval = 30;
@@ -150,6 +192,13 @@ CanvasState.prototype.draw = function() {
       ctx.lineWidth = this.selectionWidth;
       var mySel = this.selection;
       ctx.strokeRect(mySel.x,mySel.y,mySel.w,mySel.h);
+
+      /* Handles corners. */
+      ctx.fillStyle="#000000";
+      ctx.fillRect(mySel.x - 2, mySel.y - 2, 5, 5);
+      ctx.fillRect(mySel.x - 3 + mySel.w, mySel.y - 2, 5, 5);
+      ctx.fillRect(mySel.x - 2, mySel.y - 2 + mySel.h, 5, 5);
+      ctx.fillRect(mySel.x - 3 + mySel.w, mySel.y - 2 + mySel.h, 5, 5);
     }
     
     // ** Add stuff you want drawn on top all the time here **
@@ -184,12 +233,7 @@ CanvasState.prototype.getMouse = function(e) {
   return {x: mx, y: my};
 }
 
-// If you dont want to use <body onLoad='init()'>
-// You could uncomment this init() reference and place the script reference inside the body tag
-init();
-
-function init() {
+document.addEventListener("DOMContentLoaded", function(event) {
   var s = new CanvasState(document.getElementById('frame'));
-}
+});
 
-// Now go make something amazing!
