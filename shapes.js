@@ -69,19 +69,19 @@ Shape.prototype.borderenum = {
 
 }
 
-function CanvasState(frame) {
-  this.frame = frame;
-  this.width = frame.width;
-  this.height = frame.height;
-  this.ctx = frame.getContext('2d');
+function CanvasState(canvas) {
+  this.canvas = canvas;
+  this.width = canvas.width;
+  this.height = canvas.height;
+  this.ctx = canvas.getContext('2d');
   // This complicates things a little but but fixes mouse co-ordinate problems
   // when there's a border or padding. See getMouse for more detail
   var stylePaddingLeft, stylePaddingTop, styleBorderLeft, styleBorderTop;
   if (document.defaultView && document.defaultView.getComputedStyle) {
-    this.stylePaddingLeft = parseInt(document.defaultView.getComputedStyle(frame, null)['paddingLeft'], 10)      || 0;
-    this.stylePaddingTop  = parseInt(document.defaultView.getComputedStyle(frame, null)['paddingTop'], 10)       || 0;
-    this.styleBorderLeft  = parseInt(document.defaultView.getComputedStyle(frame, null)['borderLeftWidth'], 10)  || 0;
-    this.styleBorderTop   = parseInt(document.defaultView.getComputedStyle(frame, null)['borderTopWidth'], 10)   || 0;
+    this.stylePaddingLeft = parseInt(document.defaultView.getComputedStyle(canvas, null)['paddingLeft'], 10)      || 0;
+    this.stylePaddingTop  = parseInt(document.defaultView.getComputedStyle(canvas, null)['paddingTop'], 10)       || 0;
+    this.styleBorderLeft  = parseInt(document.defaultView.getComputedStyle(canvas, null)['borderLeftWidth'], 10)  || 0;
+    this.styleBorderTop   = parseInt(document.defaultView.getComputedStyle(canvas, null)['borderTopWidth'], 10)   || 0;
   }
   // Some pages have fixed-position bars (like the stumbleupon bar) at the top or left of the page
   // They will mess up mouse coordinates and this fixes that
@@ -91,7 +91,7 @@ function CanvasState(frame) {
 
   // **** Keep track of state! ****
   
-  this.valid = false; // when set to false, the frame will redraw everything
+  this.valid = false; // when set to false, the canvas will redraw everything
   this.shapes = [];  // the collection of things to be drawn
   this.dragging = false; // Keep track of when we are dragging
   this.enlarging = false; // If enlarging the shape
@@ -99,21 +99,21 @@ function CanvasState(frame) {
   this.selection = null;
   this.dragoffx = 0; // See mousedown and mousemove events for explanation
   this.dragoffy = 0;
-  this.shapeNum = -1;
+  this.frame = 0;
   
   // **** Then events! ****
   
   // This is an example of a closure!
   // Right here "this" means the CanvasState. But we are making events on the Canvas itself,
-  // and when the events are fired on the frame the variable "this" is going to mean the frame!
+  // and when the events are fired on the canvas the variable "this" is going to mean the canvas!
   // Since we still want to use this particular CanvasState in the events we have to save a reference to it.
   // This is our reference!
   var myState = this;
   
-  //fixes a problem where double clicking causes text to get selected on the frame
-  frame.addEventListener('selectstart', function(e) { e.preventDefault(); return false; }, false);
+  //fixes a problem where double clicking causes text to get selected on the canvas
+  canvas.addEventListener('selectstart', function(e) { e.preventDefault(); return false; }, false);
   // Up, down, and move are for dragging
-  frame.addEventListener('mousedown', function(e) {
+  canvas.addEventListener('mousedown', function(e) {
     var mouse = myState.getMouse(e);
     var mx = mouse.x;
     var my = mouse.y;
@@ -150,7 +150,7 @@ function CanvasState(frame) {
     
 
   }, true);
-  frame.addEventListener('mousemove', function(e) {
+  canvas.addEventListener('mousemove', function(e) {
     var mouse = myState.getMouse(e);
     if (myState.enlarging == Shape.prototype.borderenum.RIGHT) {
       myState.selection.w = mouse.x - myState.selection.x;  
@@ -219,11 +219,17 @@ function CanvasState(frame) {
         myState.removeShape(myState.selection);
         myState.selection = null;
       }
-      myState.valid = false;
+    } else if (event.keyCode == 37) {
+      if (myState.frame > 0) {
+        canvas.style.backgroundImage = frame_url(--(myState.frame));
+      }
+    } else if (event.keyCode == 39) {
+      canvas.style.backgroundImage = frame_url(++(myState.frame));
     }
+    myState.valid = false;
 
   }, true);
-  frame.addEventListener('mouseup', function(e) {
+  canvas.addEventListener('mouseup', function(e) {
     myState.dragging = false;
     myState.enlarging = false;
     for (var i = 0; i < myState.shapes.length; i++) {
@@ -234,7 +240,7 @@ function CanvasState(frame) {
       }
     }
   }, true);
-  frame.addEventListener('dblclick', function(e) { e.preventDefault(); return false; },false);
+  canvas.addEventListener('dblclick', function(e) { e.preventDefault(); return false; },false);
   
   // **** Options! ****
   myState.valid = false;
@@ -259,7 +265,7 @@ CanvasState.prototype.clear = function() {
 }
 
 // While draw is called as often as the INTERVAL variable demands,
-// It only ever does something if the frame gets invalidated by our code
+// It only ever does something if the canvas gets invalidated by our code
 CanvasState.prototype.draw = function() {
   // if our state is invalid, redraw and validate!
   if (!this.valid) {
@@ -302,10 +308,10 @@ CanvasState.prototype.draw = function() {
 }
 
 
-// Creates an object with x and y defined, set to the mouse position relative to the state's frame
+// Creates an object with x and y defined, set to the mouse position relative to the state's canvas
 // If you wanna be super-correct this can be tricky, we have to worry about padding and borders
 CanvasState.prototype.getMouse = function(e) {
-  var element = this.frame, offsetX = 0, offsetY = 0, mx, my;
+  var element = this.canvas, offsetX = 0, offsetY = 0, mx, my;
   
   // Compute the total offset
   if (element.offsetParent !== undefined) {
@@ -325,6 +331,15 @@ CanvasState.prototype.getMouse = function(e) {
   
   // We return a simple javascript object (a hash) with x and y defined
   return {x: mx, y: my};
+}
+
+video_name = "test_vid"
+total_frames = 99
+
+function frame_url(frame) {
+    block_0 = Math.floor(frame / 10000)
+    block_1 = Math.floor(frame / 100)
+    return `url('videos/${video_name}/${block_0}/${block_1}/${frame}.jpg')`
 }
 
 document.addEventListener("DOMContentLoaded", function(event) {
