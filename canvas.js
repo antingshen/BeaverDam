@@ -53,7 +53,7 @@ class Canvas {
             var shapes = myState.shapes;
             var l = shapes.length;
             for (var i = l - 1; i >= 0; i--) {
-                var border = shapes[i].border(mx, my);
+                var border = shapes[i].withinBorder(mx, my);
                 if (shapes[i].contains(mx, my)) {
                     var mySel = shapes[i];
                     // Keep track of where in the object we clicked
@@ -68,6 +68,7 @@ class Canvas {
                     myState.valid = false;
                     return;
                 }
+
             }
             // havent returned means we have failed to select anything.
             // If there was an object selected, we deselect it
@@ -76,10 +77,10 @@ class Canvas {
                 myState.valid = false; // Need to clear the old selection border
             }
             var mouse = myState.getMouse(e);
-            var new_shape = new Shape(mouse.x, mouse.y, 1, 1, 'rgba(0,255,0,.6)');
-            myState.addShape(new_shape);
-            myState.selection = new_shape;
-            myState.enlargeDirection = Shape.prototype.borderenum.BOTTOMRIGHT;
+            var newShape = new Shape(mouse.x, mouse.y, 1, 1, 'rgba(0,255,0,.6)');
+            myState.addShape(newShape);
+            myState.selection = newShape;
+            myState.enlargeDirection = Shape.border.BOTTOMRIGHT;
 
 
         }, true);
@@ -87,26 +88,26 @@ class Canvas {
             var mouse = myState.getMouse(e);
             if (!myState.enlargeDirection && !myState.dragging) {
                 return;
-            } else if (myState.enlargeDirection == Shape.prototype.borderenum.RIGHT) {
-                myState.selection.move_right(mouse.x);
-            } else if (myState.enlargeDirection == Shape.prototype.borderenum.LEFT) {
-                myState.selection.move_left(mouse.x);
-            } else if (myState.enlargeDirection == Shape.prototype.borderenum.TOP) {
-                myState.selection.move_top(mouse.y);
-            } else if (myState.enlargeDirection == Shape.prototype.borderenum.BOTTOM) {
-                myState.selection.move_down(mouse.y);
-            } else if (myState.enlargeDirection == Shape.prototype.borderenum.BOTTOMRIGHT) {
-                myState.selection.move_down(mouse.y);
-                myState.selection.move_right(mouse.x);
-            } else if (myState.enlargeDirection == Shape.prototype.borderenum.BOTTOMLEFT) {
-                myState.selection.move_down(mouse.y);
-                myState.selection.move_left(mouse.x);
-            } else if (myState.enlargeDirection == Shape.prototype.borderenum.TOPLEFT) {
-                myState.selection.move_left(mouse.x);
-                myState.selection.move_top(mouse.y);
-            } else if (myState.enlargeDirection == Shape.prototype.borderenum.TOPRIGHT) {
-                myState.selection.move_top(mouse.y);
-                myState.selection.move_right(mouse.x);
+            } else if (myState.enlargeDirection === Shape.border.RIGHT) {
+                myState.selection.moveRight(mouse.x);
+            } else if (myState.enlargeDirection === Shape.border.LEFT) {
+                myState.selection.moveLeft(mouse.x);
+            } else if (myState.enlargeDirection === Shape.border.TOP) {
+                myState.selection.moveTop(mouse.y);
+            } else if (myState.enlargeDirection === Shape.border.BOTTOM) {
+                myState.selection.moveDown(mouse.y);
+            } else if (myState.enlargeDirection === Shape.border.BOTTOMRIGHT) {
+                myState.selection.moveDown(mouse.y);
+                myState.selection.moveRight(mouse.x);
+            } else if (myState.enlargeDirection === Shape.border.BOTTOMLEFT) {
+                myState.selection.moveDown(mouse.y);
+                myState.selection.moveLeft(mouse.x);
+            } else if (myState.enlargeDirection === Shape.border.TOPLEFT) {
+                myState.selection.moveLeft(mouse.x);
+                myState.selection.moveTop(mouse.y);
+            } else if (myState.enlargeDirection === Shape.border.TOPRIGHT) {
+                myState.selection.moveTop(mouse.y);
+                myState.selection.moveRight(mouse.x);
             } else if (myState.dragging) {
                 myState.selection.x = mouse.x - myState.dragoffx;
                 myState.selection.y = mouse.y - myState.dragoffy;
@@ -115,7 +116,7 @@ class Canvas {
         }, true);
         html.addEventListener("keypress", function (event) {
             /* Shifts through selection of shapes using spacebar. */
-            if (event.keyCode == 32) {
+            if (event.keyCode === 32) {
                 if (myState.shapes.length > 0) {
                     myState.shapeNum = (myState.shapeNum + 1) % myState.shapes.length
                     myState.selection = myState.shapes[myState.shapeNum % myState.shapes.length];
@@ -126,8 +127,8 @@ class Canvas {
         }, true);
         html.addEventListener("keydown", function (event) {
             /* Adds controls for arrow keys. KEY CODES:
-             38 == down arrow, 40 == up arrow, 37 == left arrow,
-             39 == right arrow, 68 == 'd'. */
+             38 === down arrow, 40 === up arrow, 37 === left arrow,
+             39 === right arrow, 68 === 'd'. */
             if (myState.selection != null) {
                 switch (event.keyCode) {
                     case 38:     /* Moves down. */
@@ -148,12 +149,12 @@ class Canvas {
                         break;
                 }
                 /* In the event no shape is selected, use frames. */
-            } else if (event.keyCode == 37) { /* Moves left a frame. */
+            } else if (event.keyCode === 37) { /* Moves left a frame. */
                 if (myState.frame > 0) {
                     var frame = myState.frame--;
                     canvas.style.backgroundImage = frame_url(frame);
                 }
-            } else if (event.keyCode == 39) { /* Moves right a frame. */
+            } else if (event.keyCode === 39) { /* Moves right a frame. */
                 var frame = myState.frame++;
                 canvas.style.backgroundImage = frame_url(frame);
             }
@@ -164,7 +165,7 @@ class Canvas {
             myState.dragging = false;
             myState.enlargeDirection = false;
             for (var i = 0; i < myState.shapes.length; i++) {
-                if (myState.shapes[i].w == 1 || myState.shapes[i].h == 1) {
+                if (myState.shapes[i].w === 1 || myState.shapes[i].h === 1) {
                     myState.removeShape(myState.shapes[i]);
                     myState.selection = null;
                     myState.valid = false;
@@ -192,7 +193,7 @@ class Canvas {
         this.valid = false;
     }
 
-    clear(shape) {
+    clear() {
         this.ctx.clearRect(0, 0, this.width, this.height);
     }
 
@@ -207,10 +208,6 @@ class Canvas {
             // draw all shapes
             var l = shapes.length;
             for (var i = 0; i < l; i++) {
-                var shape = shapes[i];
-                // We can skip the drawing of elements that have moved off the screen:
-                if (shape.x > this.width || shape.y > this.height ||
-                    shape.x + shape.w < 0 || shape.y + shape.h < 0) continue;
                 shapes[i].draw(ctx);
             }
 
