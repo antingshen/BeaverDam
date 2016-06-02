@@ -1,63 +1,87 @@
 class Canvas {
+    /**
+     * Over all constructor of the canvas. Sets up the event listeners and records the state
+     * of the overall canvas. Adapted from a guide by Simon Sarris.
+     * @param canvas The canvas element to be passed in.
+     */
     constructor(canvas) {
-        this.canvas = canvas;
-        this.width = canvas.width;
-        this.height = canvas.height;
-        this.ctx = canvas.getContext('2d');
-        // This complicates things a little but but fixes mouse co-ordinate problems
-        // when there's a border or padding. See getMouse for more detail
-        var stylePaddingLeft, stylePaddingTop, styleBorderLeft, styleBorderTop;
+        this.canvas = canvas;               // Canvas passed in.
+        this.width = canvas.width;          // Width of the canvas.
+        this.height = canvas.height;        // Height of the canvas.
+        this.ctx = canvas.getContext('2d'); // Canvas to be modified.
+        this.selectionColor = '#CC0000';    // Border color of selected shapes.
+        this.selectionWidth = 2;            // Border fillSize of selected shapes.
+        this.selectionCorner = 5;           // Corner fillSize of selected shapes.
+        this.interval = 30;                 // Frequency to be redrawn.
+
+        /* Fixes mouse co-ordinate problems when there's a border or padding. See getMouse for more
+         details.  */
+
         if (document.defaultView && document.defaultView.getComputedStyle) {
-            this.stylePaddingLeft = parseInt(document.defaultView.getComputedStyle(canvas, null)['paddingLeft'], 10) || 0;
-            this.stylePaddingTop = parseInt(document.defaultView.getComputedStyle(canvas, null)['paddingTop'], 10) || 0;
-            this.styleBorderLeft = parseInt(document.defaultView.getComputedStyle(canvas, null)['borderLeftWidth'], 10) || 0;
-            this.styleBorderTop = parseInt(document.defaultView.getComputedStyle(canvas, null)['borderTopWidth'], 10) || 0;
+            this.stylePaddingLeft = parseInt(document.defaultView.getComputedStyle(canvas, null)
+                    ['paddingLeft'], 10) || 0;
+            this.stylePaddingTop = parseInt(document.defaultView.getComputedStyle(canvas, null)
+                    ['paddingTop'], 10) || 0;
+            this.styleBorderLeft = parseInt(document.defaultView.getComputedStyle(canvas, null)
+                    ['borderLeftWidth'], 10) || 0;
+            this.styleBorderTop = parseInt(document.defaultView.getComputedStyle(canvas, null)
+                    ['borderTopWidth'], 10) || 0;
         }
-        // Some pages have fixed-position bars (like the stumbleupon bar) at the top or left of the page
-        // They will mess up mouse coordinates and this fixes that
+        /* Used to recalculate mouse coordinates in the event of fixed-position bars throughout
+         the page. */
+
         var html = document.body.parentNode;
         this.htmlTop = html.offsetTop;
         this.htmlLeft = html.offsetLeft;
 
-        // **** Keep track of state! ****
+        /* Maintains the state of the canvas. */
 
-        this.valid = false; // when set to false, the canvas will redraw everything
-        this.shapes = [];  // the collection of things to be drawn
-        this.dragging = false; // Keep track of when we are dragging
-        this.enlargeDirection = false; // If enlargeDirection the shape
-        // the current selected object. In the future we could turn this into an array for multiple selection
-        this.selection = null;
-        this.dragoffx = 0; // See mousedown and mousemove events for explanation
+        this.valid = false;             // When false, the canvas will be redrawn.
+        this.shapes = [];               // Collection of shapes to be drawn.
+        this.dragging = false;          // Keeps track of when we are dragging.
+        this.enlargeDirection = null;   // Keeps the direction being dragged when enlarging.
+        this.selection = null;          // Keeps the selected shape that was clicked on.
+
+        /* Used for keepign track where  the mouse was clicked to create a smooth drag. */
+
+        this.dragoffx = 0;
         this.dragoffy = 0;
+
+        /* Keeps track of the current frame that is being annotated. */
+
         this.frame = 0;
 
-        // **** Then events! ****
-
-        // This is an example of a closure!
-        // Right here "this" means the Canvas. But we are making events on the Canvas itself,
-        // and when the events are fired on the canvas the variable "this" is going to mean the canvas!
-        // Since we still want to use this particular Canvas in the events we have to save a reference to it.
-        // This is our reference!
+        /* Since we want to modify the state of the canvas, we use closure in order
+        * to access its variables. */
         var myState = this;
 
-        //fixes a problem where double clicking causes text to get selected on the canvas
+        /* Fixes a problem where double clicking causes text to get selected on the canvas. */
         canvas.addEventListener('selectstart', function (e) {
             e.preventDefault();
             return false;
         }, false);
-        // Up, down, and move are for dragging
+
+        /* Events for mouse down.*/
+
         canvas.addEventListener('mousedown', function (e) {
             var mouse = myState.getMouse(e);
             var mx = mouse.x;
             var my = mouse.y;
             var shapes = myState.shapes;
             var l = shapes.length;
+
+            /* Checks if within border. If not, checks if it is within the shape. If it's in the
+             border, enlargingDirection is set to the border that was clicked. If it's in the
+             shape or its border, we set the selection to that shape and record where it was
+             clicked. */
+
             for (var i = l - 1; i >= 0; i--) {
                 var border = shapes[i].withinBorder(mx, my);
                 if (shapes[i].contains(mx, my)) {
                     var mySel = shapes[i];
-                    // Keep track of where in the object we clicked
-                    // so we can move it smoothly (see mousemove)
+
+                    /* Used for smooth transition in mouseMove. */
+
                     myState.dragoffx = mx - mySel.x;
                     myState.dragoffy = my - mySel.y;
                     myState.dragging = true;
@@ -68,22 +92,24 @@ class Canvas {
                     myState.valid = false;
                     return;
                 }
-
             }
-            // havent returned means we have failed to select anything.
-            // If there was an object selected, we deselect it
+            /* Haven't found any shape. This deselects any previously selected shapes. */
+
             if (myState.selection) {
                 myState.selection = null;
-                myState.valid = false; // Need to clear the old selection border
+                myState.valid = false;
             }
-            var mouse = myState.getMouse(e);
+
+            /* Creates a new shape with different colors. Continues to enlarge it as the user
+             continues to drag. */
             var newShape = new Shape(mouse.x, mouse.y, 1, 1, 'rgba(0,255,0,.6)');
             myState.addShape(newShape);
             myState.selection = newShape;
             myState.enlargeDirection = Shape.border.BOTTOMRIGHT;
 
-
         }, true);
+
+        /* Event for moving the mouse. Primarily used for enlarging a shape and moving it. */
         canvas.addEventListener('mousemove', function (e) {
             var mouse = myState.getMouse(e);
             if (!myState.enlargeDirection && !myState.dragging) {
@@ -114,22 +140,24 @@ class Canvas {
             }
             myState.valid = false;
         }, true);
+
+        /* Shifts through selection of shapes using spacebar. */
         html.addEventListener("keypress", function (event) {
-            /* Shifts through selection of shapes using spacebar. */
             if (event.keyCode === 32) {
-                if (myState.shapes.length > 0) {
-                    myState.shapeNum = (myState.shapeNum + 1) % myState.shapes.length
+                if (myState.shapes.length > 0) {    // In case nothing is drawn.
+                    myState.shapeNum = (myState.shapeNum + 1) % myState.shapes.length;
                     myState.selection = myState.shapes[myState.shapeNum % myState.shapes.length];
-                    console.log(myState.shapeNum);
                     myState.valid = false;
                 }
             }
         }, true);
+
+        /* Adds controls for moving shapes with arrow keys as well as deleting them with the 'd'.
+           38: down arrow, 40: up arrow, 37: left arrow, 39: right arrow, 68: 'd'. In the event no
+           shape is selected, we use the arrow keys to transition frames.*/
+
         html.addEventListener("keydown", function (event) {
-            /* Adds controls for arrow keys. KEY CODES:
-             38 === down arrow, 40 === up arrow, 37 === left arrow,
-             39 === right arrow, 68 === 'd'. */
-            if (myState.selection != null) {
+            if (myState.selection != null) { /* Handles shape. */
                 switch (event.keyCode) {
                     case 38:     /* Moves down. */
                         myState.selection.y -= 1;
@@ -148,7 +176,7 @@ class Canvas {
                         myState.selection = null;
                         break;
                 }
-                /* In the event no shape is selected, use frames. */
+                myState.valid = false;
             } else if (event.keyCode === 37) { /* Moves left a frame. */
                 if (myState.frame > 0) {
                     var frame = myState.frame--;
@@ -161,6 +189,9 @@ class Canvas {
             myState.valid = false;
 
         }, true);
+
+        /* Modifies state to prevent dragging. If the shape is too small, delete it. */
+
         canvas.addEventListener('mouseup', function (e) {
             myState.dragging = false;
             myState.enlargeDirection = false;
@@ -173,46 +204,57 @@ class Canvas {
             }
         }, true);
 
-        myState.valid = false;
-        this.selectionColor = '#CC0000';
-        this.selectionWidth = 2;
-        this.interval = 30;
+
+
+        /* Redraws canvas. */
+
         setInterval(function () {
             myState.draw();
         }, myState.interval);
     }
 
+    /**
+     * Adds shape onto list of shapes.
+     * @param shape Shape to be added.
+     */
     addShape(shape) {
         this.shapes.push(shape);
         this.valid = false;
     }
 
+    /**
+     * Removes shape from list of shapes and redraws it.
+     * @param shape The shape to be removed.
+     */
     removeShape(shape) {
         var index = this.shapes.indexOf(shape);
         this.shapes.splice(index, 1);
         this.valid = false;
     }
 
+    /**
+     * Clears the canvas.
+     */
     clear() {
         this.ctx.clearRect(0, 0, this.width, this.height);
     }
 
+    /**
+     * Draws the state of the canvas if it's invalid.
+     */
     draw() {
         if (!this.valid) {
             var ctx = this.ctx;
             var shapes = this.shapes;
             this.clear();
 
-            // ** Add stuff you want drawn in the background all the time here **
-
-            // draw all shapes
+            /* Draws all shapes. */
             var l = shapes.length;
             for (var i = 0; i < l; i++) {
                 shapes[i].draw(ctx);
             }
 
-            // draw selection
-            // right now this is just a stroke along the edge of the selected Shape
+            /*Draws border for selected shape. */
             if (this.selection != null) {
                 ctx.strokeStyle = this.selectionColor;
                 ctx.lineWidth = this.selectionWidth;
@@ -220,25 +262,27 @@ class Canvas {
                 ctx.strokeRect(mySel.x, mySel.y, mySel.w, mySel.h);
 
                 /* Handles corners. */
+                var fillSize = this.selectionCorner;
                 ctx.fillStyle = "#000000";
-                ctx.fillRect(mySel.x - 2, mySel.y - 2, 5, 5);
-                ctx.fillRect(mySel.x - 3 + mySel.w, mySel.y - 2, 5, 5);
-                ctx.fillRect(mySel.x - 2, mySel.y - 2 + mySel.h, 5, 5);
-                ctx.fillRect(mySel.x - 3 + mySel.w, mySel.y - 2 + mySel.h, 5, 5);
+                ctx.fillRect(mySel.x - 2, mySel.y - 2, fillSize, fillSize);
+                ctx.fillRect(mySel.x - 3 + mySel.w, mySel.y - 2, fillSize, fillSize);
+                ctx.fillRect(mySel.x - 2, mySel.y - 2 + mySel.h, fillSize, fillSize);
+                ctx.fillRect(mySel.x - 3 + mySel.w, mySel.y - 2 + mySel.h, fillSize, fillSize);
             }
-
-            // ** Add stuff you want drawn on top all the time here **
-
             this.valid = true;
         }
     }
 
-// Creates an object with x and y defined, set to the mouse position relative to the state's canvas
-// If you wanna be super-correct this can be tricky, we have to worry about padding and borders
+    /**
+     * Creates a modified x and y coordinate for a mouse event to allow for smooth transitioning.
+     * This takes into consideration fixed borders and other objects within the page.
+     * @param e
+     * @returns {{x: (number|*), y: (number|*)}}
+     */
     getMouse(e) {
         var element = this.canvas, offsetX = 0, offsetY = 0, mx, my;
 
-        // Compute the total offset
+        /* Compute the total offset. */
         if (element.offsetParent !== undefined) {
             do {
                 offsetX += element.offsetLeft;
@@ -246,15 +290,14 @@ class Canvas {
             } while ((element = element.offsetParent));
         }
 
-        // Add padding and border style widths to offset
-        // Also add the <html> offsets in case there's a position:fixed bar
+        /* Add padding and border style widths to offset. Also add the <html> offsets in case
+         there's a fixed position bar. */
         offsetX += this.stylePaddingLeft + this.styleBorderLeft + this.htmlLeft;
         offsetY += this.stylePaddingTop + this.styleBorderTop + this.htmlTop;
 
         mx = e.pageX - offsetX;
         my = e.pageY - offsetY;
 
-        // We return a simple javascript object (a hash) with x and y defined
         return {x: mx, y: my};
     }
 }
