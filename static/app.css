@@ -1,7 +1,7 @@
 
 #frame {
     display: inline-block; 
-    background-image: url('videos/test_vid/0/0/0.jpg');
+    background-image: url('/static/videos/test_vid/0/0/0.jpg');
     transition: background 1s linear;
     margin: 50px;
 }

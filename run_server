@@ -1,2 +1,8 @@
 #!/bin/sh
-python3 -m http.server 8000
+if [[ "$VIRTUAL_ENV" == "" ]]
+then
+    echo "Must be inside virtual env"
+    echo "To do so, run \"source venv/bin/activate\""
+    exit 1
+fi
+python3 app.py

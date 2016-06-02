@@ -4,6 +4,6 @@ total_frames = 99
 function frame_url(frame) {
     block_0 = Math.floor(frame / 10000)
     block_1 = Math.floor(frame / 100)
-    return `url(videos/${video_name}/${block_0}/${block_1}/${frame}.jpg)`
+    return `url(/static/videos/${video_name}/${block_0}/${block_1}/${frame}.jpg)`
 }
 
