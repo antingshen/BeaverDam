@@ -5,14 +5,24 @@ class Canvas {
      * @param canvas The canvas element to be passed in.
      */
     constructor(canvas) {
-        this.canvas = canvas;               // Canvas passed in.
-        this.width = canvas.width;          // Width of the canvas.
-        this.height = canvas.height;        // Height of the canvas.
-        this.ctx = canvas.getContext('2d'); // Canvas to be modified.
-        this.selectionColor = '#CC0000';    // Border color of selected shapes.
-        this.selectionWidth = 2;            // Border fillSize of selected shapes.
-        this.selectionCorner = 5;           // Corner fillSize of selected shapes.
-        this.interval = 30;                 // Frequency to be redrawn.
+        this.canvas = canvas;                              // Canvas passed in.
+        this.padding = 200;                                // White padding outside of background image.
+
+        /* Gets the first frame's height and width and sets up canvas to it. */
+
+        var img = new Image();
+        img.src = frame_path(0);
+        canvas.width = img.naturalWidth + this.padding;
+        canvas.height = img.naturalHeight + this.padding;
+
+
+        this.width = canvas.width;                         // Width of the canvas.
+        this.height = canvas.height;                       // Height of the canvas.
+        this.ctx = canvas.getContext('2d');                // Canvas to be modified.
+        this.selectionColor = '#CC0000';                   // Border color of selected shapes.
+        this.selectionWidth = 2;                           // Border fillSize of selected shapes.
+        this.selectionCorner = 5;                          // Corner fillSize of selected shapes.
+        this.interval = 30;                                // Frequency to be redrawn.
 
         /* Fixes mouse co-ordinate problems when there's a border or padding. See getMouse for more
          details.  */
