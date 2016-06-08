@@ -6,4 +6,12 @@
     background-position: center;
     transition: background 10s linear;
     margin: 50px;
+    border: solid;
+}
+.center-div
+{
+    margin: 0 auto;
+    width: 300px;
+    background-color: #ccc;
+    border-radius: 3px;
 }

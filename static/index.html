@@ -6,11 +6,31 @@
     <script src="/static/thing.js"></script>
     <script src="/static/canvas.js"></script>
     <script src="/static/frame.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
   </head>
+
+
+
   <body style="text-align:center">
+    <div class="btn-group" data-toggle="buttons">
+      <label class="btn btn-primary active">
+        <input type="radio" name="options" id="option1" checked> Radio 1 (preselected)
+      </label>
+      <label class="btn btn-primary">
+        <input type="radio" name="options" id="option2"> Radio 2
+      </label>
+      <label class="btn btn-primary">
+        <input type="radio" name="options" id="option3"> Radio 3
+      </label>
+    </div>
     <canvas id="frame">
 
     </canvas>
+
+
+
   </body>
 
 </html>

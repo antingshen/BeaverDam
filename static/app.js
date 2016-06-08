@@ -1,3 +1,5 @@
+var LABELS_LIST = ["Car", "Truck", "Tree", "Human"];
+
 document.addEventListener("DOMContentLoaded", function(event) {
   var img = new Image();
   img.src = frame_path(0);
