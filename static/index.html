@@ -1,12 +1,10 @@
 <html>
   <head>
     <link rel="stylesheet" type="text/css" href="/static/app.css" />
-    <script src="/static/app.js"></script>
     <script src="/static/box.js"></script>
     <script src="/static/thing.js"></script>
     <script src="/static/canvas.js"></script>
     <script src="/static/frame.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
   </head>
@@ -14,6 +12,11 @@
 
 
   <body style="text-align:center">
+
+
+
+
+
     <div class="btn-group" data-toggle="buttons">
       <label class="btn btn-primary active">
         <input type="radio" name="options" id="option1" checked> Radio 1 (preselected)
@@ -28,6 +31,10 @@
     <canvas id="frame">
 
     </canvas>
+
+    <input id ="scroll-bar" type="range" min="0" max="500" value="0" step="1" />
+    <span id="range">0</span>
+
 
 
 
