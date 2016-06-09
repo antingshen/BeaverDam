@@ -72,6 +72,7 @@ class Box {
      */
     draw(ctx) {
         ctx.fillStyle = this.thing.fill;
+        ctx.globalAlpha = 0.6;
         ctx.fillRect(this.x, this.y, this.w, this.h);
     }
 

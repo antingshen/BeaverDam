@@ -1,7 +1,9 @@
 class Thing {
     constructor(fill = Thing.getRandomColor()) {
         this.keyframes = []; // List of boxes corresponding to keyframes
-        this.fill = fill
+        this.fill = fill;
+        document.getElementById("shape-list").innerHTML +=
+            `<li class="list-group-item col-xs-6" id="var" style="color: azure; background-color: ${this.fill}; width: 57px">Car</li>`;
     }
 
     static getRandomColor() {
