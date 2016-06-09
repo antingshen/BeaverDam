@@ -142,6 +142,11 @@ class Box {
     moveDown(y_offset) {
         this.h = y_offset - this.y;
     }
+
+    /* returns a copy of this with frame = new_frame */
+    interpolated_copy(new_frame) {
+        return new Box(this.thing, new_frame, this._x, this._y, this._w, this._h, true);
+    }
 }
 
 /**

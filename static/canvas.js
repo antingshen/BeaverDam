@@ -57,10 +57,10 @@ class Canvas {
          * Getters and setters will update the boxes for the frame if this is changed */
         this._frame = 0;
 
-        this.setUpListeners(canvas);
+        this.setUpListeners(canvas, html);
     }
 
-    setUpListeners(canvas) {
+    setUpListeners(canvas, html) {
         /* Since we want to modify the state of the canvas, we use closure in order
         * to access its variables. */
         var myState = this;
@@ -110,7 +110,7 @@ class Canvas {
             /* Creates a new thing & box. Continues to enlarge it as the user
                continues to drag. */
             var newThing = new Thing();
-            var newBox = new Box(newThing, myState.frame, mouse.x, mouse.y, 1, 1);
+            var newBox = new Box(newThing, myState.frame, mouse.x, mouse.y, 1, 1, true);
             myState.things.push(newThing);
             myState.boxes.push(newBox);
             myState.valid = false;
@@ -209,13 +209,20 @@ class Canvas {
     get frame() {return this._frame;}
     set frame(value) {
         this._frame = value;
-        this.boxes = getBoxes(frame);
+        this.boxes = this.getBoxes(value);
         this.valid = false;
     }
 
     /* Retrieves a list of box objects that belong in the current frame */
     getBoxes(frame) {
-        // TODO
+        var boxes = [];
+        for (var thing of this.things) {
+            var box = thing.getKeyframe(frame);
+            if (box != null) {
+                boxes.push(box);
+            }
+        }
+        return boxes;
     }
 
     /**
