@@ -29,6 +29,9 @@ function update_frame(state, val) {
     document.getElementById("frame").style.backgroundImage = frame_url(state.frame);
     state.valid = false;
 }
+
+
+
 document.addEventListener("DOMContentLoaded", function() {
     var img = frame_preload(PREFETCH_NUMBER);
     img.onload = function () {
@@ -48,11 +51,6 @@ document.addEventListener("DOMContentLoaded", function() {
             }
         });
 
-
-        $('body').on('click', '.btn-group button', function (e) {
-            $(this).addClass('active');
-            $(this).siblings().removeClass('active');
-        });
     };
 
 

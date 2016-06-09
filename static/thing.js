@@ -1,7 +1,18 @@
 class Thing {
-    constructor(fill = 'rgba(0,255,0,.6)') {
+    constructor(fill = Thing.getRandomColor()) {
         this.keyframes = []; // List of boxes corresponding to keyframes
         this.fill = fill
+    }
+
+    static getRandomColor() {
+        var letters = '012345'.split('');
+        var color = '#';
+        color += letters[Math.round(Math.random() * 5)];
+        letters = '0123456789ABCDEF'.split('');
+        for (var i = 0; i < 5; i++) {
+            color += letters[Math.round(Math.random() * 15)];
+        }
+        return color;
     }
 
     /* gets keyframe for current frame if exists, otherwise construct a fake/interpolated one */
