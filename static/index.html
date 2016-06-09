@@ -14,26 +14,22 @@
   <body style="text-align:center">
 
 
+  <div class="btn-group" data-toggle="buttons">
+    <button type="button" class="btn btn-default" style="border: none"><span class="label label-default">Car</span></button>
+    <button type="button" class="btn btn-default" style="border: none"><span class="label label-primary">Human</span></button>
+    <button type="button" class="btn btn-default" style="border: none"><span class="label label-success">Tree</span></button>
+    <button type="button" class="btn btn-default" style="border: none"><span class="label label-info">Animal</span></button>
+    <button type="button" class="btn btn-default" style="border: none"><span class="label label-warning">Vehicle</span></button>
+    <button type="button" class="btn btn-default" style="border: none"><span class="label label-danger">Other</span></button>
+  </div>
 
-
-
-    <div class="btn-group" data-toggle="buttons">
-      <label class="btn btn-primary active">
-        <input type="radio" name="options" id="option1" checked> Radio 1 (preselected)
-      </label>
-      <label class="btn btn-primary">
-        <input type="radio" name="options" id="option2"> Radio 2
-      </label>
-      <label class="btn btn-primary">
-        <input type="radio" name="options" id="option3"> Radio 3
-      </label>
-    </div>
     <canvas id="frame">
 
     </canvas>
 
     <input id ="scroll-bar" type="range" min="0" max="5000" value="0" step="1" />
-    <span id="range">0</span>
+
+  <input class="form-control" id="frame-number" placeholder="0">
 
 
 

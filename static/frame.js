@@ -23,7 +23,8 @@ function frame_preload(endFrame) {
 }
 function update_frame(state, val) {
     frame_preload(val);
-    document.getElementById("range").innerHTML=val;
+    var num = document.getElementById("frame-number");
+    num.setAttribute("value", val)
     state.frame = val;
     document.getElementById("frame").style.backgroundImage = frame_url(state.frame);
     state.valid = false;
@@ -41,11 +42,17 @@ document.addEventListener("DOMContentLoaded", function() {
             scroll = true;
             update_frame(canvas, scrollBar.value);
         });
-        scrollBar.addEventListener("mousemove", function() {
+        document.addEventListener("mousemove", function() {
             if (scroll) {
                 update_frame(canvas, scrollBar.value);
             }
         });
+        document.addEventListener("keypress", function(event) {
+            if (event.keyCode === 13) { //If Enter is pressed
+                scrollBar.value = document.getElementById("frame-number").value;
+                update_frame(canvas, scrollBar.value);
+            }
+        })
     };
 
 

@@ -7,10 +7,7 @@
     margin: 50px;
     border: solid;
 }
-.center-div
+#scoll-bar
 {
-    margin: 0 auto;
-    width: 300px;
-    background-color: #ccc;
-    border-radius: 3px;
+    padding: 10px;
 }
