@@ -30,22 +30,16 @@ function update_frame(state, val) {
     state.valid = false;
 }
 document.addEventListener("DOMContentLoaded", function() {
-    var scroll = false;
     var img = frame_preload(PREFETCH_NUMBER);
     img.onload = function () {
         var canvas = new Canvas(document.getElementById('frame'));
         var scrollBar = document.getElementById("scroll-bar");
-        scrollBar.addEventListener("mouseup", function(){
-            scroll = false;
-        });
+
         scrollBar.addEventListener("click", function(){
-            scroll = true;
             update_frame(canvas, scrollBar.value);
         });
-        document.addEventListener("mousemove", function() {
-            if (scroll) {
-                update_frame(canvas, scrollBar.value);
-            }
+        scrollBar.addEventListener("mousemove", function() {
+            update_frame(canvas, scrollBar.value);
         });
         document.addEventListener("keypress", function(event) {
             if (event.keyCode === 13) { //If Enter is pressed

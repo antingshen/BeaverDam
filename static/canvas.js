@@ -6,7 +6,7 @@ class Canvas {
      */
     constructor(canvas) {
         this.canvas = canvas;                              // Canvas passed in.
-        this.padding = 200;                                // White padding outside of background image.
+        this.padding = 100;                                // White padding outside of background image.
 
         /* Gets the first frame's height and width and sets up canvas to it. */
         var img = new Image();

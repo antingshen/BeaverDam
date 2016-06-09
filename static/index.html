@@ -13,23 +13,37 @@
 
   <body style="text-align:center">
 
+    <div class="panel panel-default">
+      <div class="panel-heading">Object Selection</div>
+      <div class="panel-body">
+        <div class="btn-group" data-toggle="buttons">
+          <button type="button" class="btn btn-default" style="border: none"><span class="label label-default">Car</span></button>
+          <button type="button" class="btn btn-default" style="border: none"><span class="label label-primary">Human</span></button>
+          <button type="button" class="btn btn-default" style="border: none"><span class="label label-success">Tree</span></button>
+          <button type="button" class="btn btn-default" style="border: none"><span class="label label-info">Animal</span></button>
+          <button type="button" class="btn btn-default" style="border: none"><span class="label label-warning">Vehicle</span></button>
+          <button type="button" class="btn btn-default" style="border: none"><span class="label label-danger">Other</span></button>
+        </div>
+      </div>
+    </div>
 
-  <div class="btn-group" data-toggle="buttons">
-    <button type="button" class="btn btn-default" style="border: none"><span class="label label-default">Car</span></button>
-    <button type="button" class="btn btn-default" style="border: none"><span class="label label-primary">Human</span></button>
-    <button type="button" class="btn btn-default" style="border: none"><span class="label label-success">Tree</span></button>
-    <button type="button" class="btn btn-default" style="border: none"><span class="label label-info">Animal</span></button>
-    <button type="button" class="btn btn-default" style="border: none"><span class="label label-warning">Vehicle</span></button>
-    <button type="button" class="btn btn-default" style="border: none"><span class="label label-danger">Other</span></button>
-  </div>
+
 
     <canvas id="frame">
 
     </canvas>
+    <div class="container">
+  <div class="panel panel-primary">
+    <div class="panel-heading">Frame Controller</div>
+    <div class="panel-body">
+      <input id ="scroll-bar" type="range" min="0" max="5000" value="0" step="1" />
+      <input class="form-control" id="frame-number" placeholder="0">
+    </div>
+  </div>
+      </div>
 
-    <input id ="scroll-bar" type="range" min="0" max="5000" value="0" step="1" />
 
-  <input class="form-control" id="frame-number" placeholder="0">
+
 
 
 
