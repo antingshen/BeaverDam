@@ -235,7 +235,10 @@ class Canvas {
         this.boxes.splice(index, 1);
         if (box.thing.deleteKeyframe(box)) {
             let index = this.things.indexOf(box.thing);
-            this.things.splice(index, 1);
+
+            var element = document.getElementById(this.things.splice(index, 1)[0].id);
+            element.parentNode.removeChild(element);
+
         }
         this.valid = false;
     }
