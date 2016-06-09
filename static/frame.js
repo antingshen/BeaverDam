@@ -11,13 +11,16 @@ function frame_url(frame) {
     return `url(` + frame_path(frame) + `)`;
 }
 function frame_preload(endFrame) {
-    for (var i = 0; i < endFrame; i++) {
-        images[i] = new Image();
-        images[i].src = frame_path(i);
+    if (!images[endFrame]) {
+        for (var i = endFrame - 500; i < endFrame; i++) {
+            images[i] = new Image();
+            images[i].src = frame_path(i);
+        }
     }
     return images[0];
 }
 function update_frame(state, val) {
+    frame_preload(val);
     document.getElementById("range").innerHTML=val;
     state.frame = val;
     document.getElementById("frame").style.backgroundImage = frame_url(state.frame);
