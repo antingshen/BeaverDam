@@ -24,8 +24,8 @@ function frame_preload(endFrame) {
 function update_frame(state, val) {
     frame_preload(val);
     var num = document.getElementById("frame-number");
-    num.setAttribute("value", val)
-    state.frame = val;
+    num.setAttribute("value", val);
+    state.frame = parseInt(val);
     document.getElementById("frame").style.backgroundImage = frame_url(state.frame);
     state.valid = false;
 }
