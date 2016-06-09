@@ -1,7 +1,9 @@
 video_name = "test_vid";
 total_frames = 99;
+PREFETCH_NUMBER = 500;
 
 var images = [];
+
 function frame_path(frame) {
     block_0 = Math.floor(frame / 10000);
     block_1 = Math.floor(frame / 100);
@@ -11,8 +13,8 @@ function frame_url(frame) {
     return `url(` + frame_path(frame) + `)`;
 }
 function frame_preload(endFrame) {
-    if (!images[endFrame]) {
-        for (var i = endFrame - 500; i < endFrame; i++) {
+    if (!images[endFrame - endFrame % PREFETCH_NUMBER]) {
+        for (var i = endFrame - PREFETCH_NUMBER; i < endFrame; i++) {
             images[i] = new Image();
             images[i].src = frame_path(i);
         }
@@ -28,7 +30,7 @@ function update_frame(state, val) {
 }
 document.addEventListener("DOMContentLoaded", function() {
     var scroll = false;
-    var img = frame_preload(500);
+    var img = frame_preload(PREFETCH_NUMBER);
     img.onload = function () {
         var canvas = new Canvas(document.getElementById('frame'));
         var scrollBar = document.getElementById("scroll-bar");
