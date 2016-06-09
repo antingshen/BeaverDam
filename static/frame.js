@@ -46,8 +46,15 @@ document.addEventListener("DOMContentLoaded", function() {
                 scrollBar.value = document.getElementById("frame-number").value;
                 update_frame(canvas, scrollBar.value);
             }
-        })
+        });
+
+
+        $('body').on('click', '.btn-group button', function (e) {
+            $(this).addClass('active');
+            $(this).siblings().removeClass('active');
+        });
     };
+
 
 
 });

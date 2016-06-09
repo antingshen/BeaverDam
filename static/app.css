@@ -1,11 +1,15 @@
 
 #frame {
-    display: inline-block; 
+    display: block;
     background-image: url('/static/videos/test_vid/0/0/0.jpg');
     background-repeat: no-repeat;
     background-position: center;
-    margin: 50px;
     border: solid;
+
+    padding-top: 10px;
+    margin-top: 10px;
+
+    margin-right: auto;
 }
 #scoll-bar
 {
