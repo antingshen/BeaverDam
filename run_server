@@ -1,5 +1,5 @@
 #!/bin/sh
-if [[ "$VIRTUAL_ENV" == "" ]]
+if [ "$VIRTUAL_ENV" = "" ]
 then
     echo "Must be inside virtual env"
     echo "To do so, run \"source venv/bin/activate\""
