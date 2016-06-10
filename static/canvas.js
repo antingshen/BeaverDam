@@ -23,7 +23,7 @@ class Canvas {
         this.selectionColor = '#CC0000';                   // Border color of selected boxes.
         this.selectionWidth = 2;                           // Border fillSize of selected boxes.
         this.selectionCorner = 5;                          // Corner fillSize of selected boxes.
-        this.interval = 30;                                // Frequency to be redrawn.
+        this.interval = 40;                                // Frequency to be redrawn.
         this.play = false;                                 // Playing frames.
 
         /* Fixes mouse co-ordinate problems when there's a border or padding. See getMouse for more
