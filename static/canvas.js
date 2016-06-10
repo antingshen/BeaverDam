@@ -24,6 +24,7 @@ class Canvas {
         this.selectionWidth = 2;                           // Border fillSize of selected boxes.
         this.selectionCorner = 5;                          // Corner fillSize of selected boxes.
         this.interval = 30;                                // Frequency to be redrawn.
+        this.play = false;                                 // Playing frames.
 
         /* Fixes mouse co-ordinate problems when there's a border or padding. See getMouse for more
          details.  */
@@ -206,6 +207,10 @@ class Canvas {
         /* Redraws canvas every interval seconds */
         setInterval(function () {
             myState.draw();
+            if (myState.play) {
+                myState.frame+=1;
+                update_frame(myState, myState.frame);
+            }
         }, myState.interval);
     }
 
