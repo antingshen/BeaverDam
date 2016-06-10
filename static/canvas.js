@@ -16,7 +16,9 @@ class Canvas {
         this.width = canvas.width;                         // Width of the canvas.
         this.height = canvas.height;                       // Height of the canvas.
         this.ctx = canvas.getContext('2d');                // Canvas to be modified.
-        document.getElementById("fixed-panel").style.width = this.width + this.padding;
+
+        document.getElementById("fixed-panel").style.width = this.width + 20;
+        document.getElementById("frame-controller").style.width = this.width + 7;
 
         this.selectionColor = '#CC0000';                   // Border color of selected boxes.
         this.selectionWidth = 2;                           // Border fillSize of selected boxes.

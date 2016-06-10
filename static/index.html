@@ -1,55 +1,54 @@
 <html>
-<head>
-    <link rel="stylesheet" type="text/css" href="/static/app.css"/>
-    <script src="/static/box.js"></script>
-    <script src="/static/thing.js"></script>
-    <script src="/static/canvas.js"></script>
-    <script src="/static/frame.js"></script>
-    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
-</head>
+    <head>
+        <link rel="stylesheet" type="text/css" href="/static/app.css"/>
+        <script src="/static/box.js"></script>
+        <script src="/static/thing.js"></script>
+        <script src="/static/canvas.js"></script>
+        <script src="/static/frame.js"></script>
+        <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+    </head>
 
 
-<body style="text-align:center">
+    <body style="text-align:center">
+        <div class="panel panel-default panel-space">
+            <div class="row">
 
-<div id="fixed-panel" class="panel panel-default" style="text-align: left; margin-right: 0" >
-    <div class="panel-body">
-        <div class="btn-group" data-toggle="buttons">
-            <span class="label label-default">Car <input type="radio" name="object" value="car" checked></span>
-            <span class="label label-primary">Human <input type="radio" name="object" value="human"></span>
-            <span class="label label-success">Tree <input type="radio" name="object" value="tree"></span>
-            <span class="label label-info">Animal <input type="radio" name="object" value="animal"></span>
-            <span class="label label-warning">Vehicle <input type="radio" name="object" value="vehicle"></span>
-            <span class="label label-danger">Other <input type="radio" name="object" value="other"> </span>
-        </div>
+                <div id="fixed-panel" class="col-xs-6">
+                    <div class="panel-body">
 
+                        <div class="btn-group" data-toggle="buttons">
+                            <span class="label label-default">Car <input type="radio" name="object" value="car" checked></span>
+                            <span class="label label-primary">Human <input type="radio" name="object" value="human"></span>
+                            <span class="label label-success">Tree <input type="radio" name="object" value="tree"></span>
+                            <span class="label label-info">Animal <input type="radio" name="object" value="animal"></span>
+                            <span class="label label-warning">Vehicle <input type="radio" name="object" value="vehicle"></span>
+                            <span class="label label-danger">Other <input type="radio" name="object" value="other"> </span>
+                        </div>
 
+                        <canvas id="frame">
+                        </canvas>
 
-    <canvas id="frame">
+                        <div class="left-container" >
+                            <div id="frame-controller" class="panel panel-primary">
+                                <div class="panel-heading">Frame Controller</div>
+                                <div class="panel-body">
+                                    <input id="scroll-bar" type="range" min="0" max="5000" value="0" step="1"/>
+                                    <input class="form-control" id="frame-number" placeholder="0">
+                                </div>
+                            </div>
+                        </div>
 
-    </canvas>
+                    </div>
+                </div>
 
+                <div class="col-xs-6 col-md-4">
+                    <ul id="shape-list" class="list-group row">
+                    </ul>
+                </div>
 
-    <div class="container" style="padding-left: 0px; margin-left: 0px; width: 841px">
-        <div class="panel panel-primary" style="margin-bottom: 0px">
-            <div class="panel-heading">Frame Controller</div>
-            <div class="panel-body" >
-                <input id="scroll-bar" type="range" min="0" max="5000" value="0" step="1"/>
-                <input class="form-control" id="frame-number" placeholder="0">
             </div>
         </div>
-    </div>
-    </div>
-
-    <div style="display:inline-block; padding-left: 30px; padding-right: 20px;margin-top: 0" >
-
-    <ul id="shape-list" class="list-group row">
-    </ul>
-
-    </div>
-</div>
-
-
-</body>
+    </body>
 
 </html>
