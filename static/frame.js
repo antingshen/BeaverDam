@@ -12,12 +12,10 @@ function frame_path(frame) {
 function frame_url(frame) {
     return `url(` + frame_path(frame) + `)`;
 }
-function frame_preload(endFrame) {
-    if (!images[endFrame - endFrame % PREFETCH_NUMBER]) {
-        for (var i = endFrame - PREFETCH_NUMBER; i < endFrame; i++) {
-            images[i] = new Image();
-            images[i].src = frame_path(i);
-        }
+function frame_preload(startFrame, endFrame) {
+    for (var i = startFrame; i < endFrame; i++) {
+        images[i] = new Image();
+        images[i].src = frame_path(i);
     }
     return images[0];
 }
@@ -32,7 +30,6 @@ function getRandomColor() {
     return color;
 }
 function update_frame(state, val) {
-    frame_preload(val);
     var num = document.getElementById("frame-number");
     document.getElementById("scroll-bar").value = val;
     num.setAttribute("value", val);
@@ -44,7 +41,8 @@ function update_frame(state, val) {
 
 
 document.addEventListener("DOMContentLoaded", function() {
-    var img = frame_preload(PREFETCH_NUMBER);
+
+    var img = frame_preload(0, PREFETCH_NUMBER);
     img.onload = function () {
         var canvas = new Canvas(document.getElementById('frame'));
         var scrollBar = document.getElementById("scroll-bar");
@@ -67,6 +65,7 @@ document.addEventListener("DOMContentLoaded", function() {
         })
 
     };
+    frame_preload(PREFETCH_NUMBER, 5000);
 
 
 

@@ -3,8 +3,6 @@ class Thing {
         this.keyframes = []; // List of boxes corresponding to keyframes
         this.fill = fill;
         this.id = this.fill;
-        document.getElementById("shape-list").innerHTML +=
-            `<li class="list-group-item col-xs-6" id=${this.fill} style="color: azure; background-color: ${this.fill}; width: 57px">Car</li>`;
     }
 
     /* gets keyframe for current frame if exists, otherwise construct a fake/interpolated one */
