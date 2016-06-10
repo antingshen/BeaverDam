@@ -11,6 +11,11 @@
     margin-right: auto;
 }
 
+#scroll-bar {
+    display: inline-block;
+    width: 80%;
+}
+
 #fixed-panel {
     text-align: left;
     margin-right: 0px;
@@ -31,6 +36,16 @@
 
 #frame-controller {
     margin-bottom: 0;
+}
+
+#frame-number {
+    display: inline-block;
+    width: 60px;
+}
+
+#play-button {
+    font-size: 1.2em;
+    padding-right: 5px;
 }
 
 .panel-space {

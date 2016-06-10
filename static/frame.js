@@ -24,6 +24,7 @@ function frame_preload(endFrame) {
 function update_frame(state, val) {
     frame_preload(val);
     var num = document.getElementById("frame-number");
+    document.getElementById("scroll-bar").value = val;
     num.setAttribute("value", val);
     state.frame = parseInt(val);
     document.getElementById("frame").style.backgroundImage = frame_url(state.frame);
@@ -37,11 +38,12 @@ document.addEventListener("DOMContentLoaded", function() {
     img.onload = function () {
         var canvas = new Canvas(document.getElementById('frame'));
         var scrollBar = document.getElementById("scroll-bar");
-
+        var playButton = document.getElementById("play-button");
         scrollBar.addEventListener("click", function(){
             update_frame(canvas, scrollBar.value);
         });
-        scrollBar.addEventListener("mousemove", function() {
+
+        scrollBar.addEventListener("input", function() {
             update_frame(canvas, scrollBar.value);
         });
         document.addEventListener("keypress", function(event) {
@@ -50,6 +52,9 @@ document.addEventListener("DOMContentLoaded", function() {
                 update_frame(canvas, scrollBar.value);
             }
         });
+        playButton.addEventListener("click", function(){
+            canvas.play = !canvas.play;
+        })
 
     };
 
