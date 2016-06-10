@@ -21,6 +21,16 @@ function frame_preload(endFrame) {
     }
     return images[0];
 }
+function getRandomColor() {
+    var letters = '012345'.split('');
+    var color = '#';
+    color += letters[Math.round(Math.random() * 5)];
+    letters = '0123456789ABCDEF'.split('');
+    for (var i = 0; i < 5; i++) {
+        color += letters[Math.round(Math.random() * 15)];
+    }
+    return color;
+}
 function update_frame(state, val) {
     frame_preload(val);
     var num = document.getElementById("frame-number");

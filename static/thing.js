@@ -1,21 +1,10 @@
 class Thing {
-    constructor(fill = Thing.getRandomColor()) {
+    constructor(fill = getRandomColor()) {
         this.keyframes = []; // List of boxes corresponding to keyframes
         this.fill = fill;
         this.id = this.fill;
         document.getElementById("shape-list").innerHTML +=
             `<li class="list-group-item col-xs-6" id=${this.fill} style="color: azure; background-color: ${this.fill}; width: 57px">Car</li>`;
-    }
-
-    static getRandomColor() {
-        var letters = '012345'.split('');
-        var color = '#';
-        color += letters[Math.round(Math.random() * 5)];
-        letters = '0123456789ABCDEF'.split('');
-        for (var i = 0; i < 5; i++) {
-            color += letters[Math.round(Math.random() * 15)];
-        }
-        return color;
     }
 
     /* gets keyframe for current frame if exists, otherwise construct a fake/interpolated one */
