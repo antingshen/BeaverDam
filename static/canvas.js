@@ -218,6 +218,14 @@ class Canvas {
     set frame(value) {
         this._frame = value;
         this.boxes = this.getBoxes(value);
+        if (this.selection != null && this.selection.thing != null) {
+            for (var box of this.boxes) {
+                if (box.thing.id == this.selection.thing.id) {
+                    this.selection = box;
+                    break;
+                }
+            }
+        }
         this.valid = false;
     }
 
