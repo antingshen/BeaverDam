@@ -6,7 +6,7 @@ class Canvas {
      */
     constructor(canvas) {
         this.canvas = canvas;                              // Canvas passed in.
-        this.padding = 200;                                // White padding outside of background image.
+        this.padding = 100;                                // White padding outside of background image.
 
         /* Gets the first frame's height and width and sets up canvas to it. */
         var img = new Image();
@@ -16,6 +16,9 @@ class Canvas {
         this.width = canvas.width;                         // Width of the canvas.
         this.height = canvas.height;                       // Height of the canvas.
         this.ctx = canvas.getContext('2d');                // Canvas to be modified.
+
+        document.getElementById("fixed-panel").style.width = this.width + 20;
+        document.getElementById("frame-controller").style.width = this.width + 7;
 
         this.selectionColor = '#CC0000';                   // Border color of selected boxes.
         this.selectionWidth = 2;                           // Border fillSize of selected boxes.
@@ -234,7 +237,10 @@ class Canvas {
         this.boxes.splice(index, 1);
         if (box.thing.deleteKeyframe(box)) {
             let index = this.things.indexOf(box.thing);
-            this.things.splice(index, 1);
+
+            var element = document.getElementById(this.things.splice(index, 1)[0].id);
+            element.parentNode.removeChild(element);
+
         }
         this.valid = false;
     }

@@ -1,9 +1,38 @@
-
 #frame {
-    display: inline-block; 
+    display: block;
     background-image: url('/static/videos/test_vid/0/0/0.jpg');
     background-repeat: no-repeat;
     background-position: center;
-    transition: background 10s linear;
+    border: solid;
+
+    padding-top: 10px;
+    margin-top: 10px;
+
+    margin-right: auto;
+}
+
+#fixed-panel {
+    text-align: left;
+    margin-right: 0px;
+}
+
+#left-container {
+    padding-left: 0px;
+    margin-left: 0px;
+    width: 841px;
+    display: inline-block;
+
+    margin-top: 0;
+}
+#shape-list {
+    padding-left: 30px;
+    padding-top: 45px;
+}
+
+#frame-controller {
+    margin-bottom: 0;
+}
+
+.panel-space {
     margin: 50px;
 }
