@@ -23,7 +23,7 @@ class Canvas {
         this.selectionColor = '#CC0000';                   // Border color of selected boxes.
         this.selectionWidth = 2;                           // Border fillSize of selected boxes.
         this.selectionCorner = 5;                          // Corner fillSize of selected boxes.
-        this.interval = 10;                                // Frequency to be redrawn.
+        this.interval = 50;                                // Frequency to be redrawn.
         this.play = false;                                 // Playing frames.
 
         /* Fixes mouse co-ordinate problems when there's a border or padding. See getMouse for more
@@ -224,9 +224,9 @@ class Canvas {
             myState.draw();
             if (myState.play) {
                 myState.frame+=1;
-                update_frame(myState, myState.frame);
+                myState.frame = myState.frame;
             }
-            setTimeout(setIntervalTimeout,10)
+            setTimeout(setIntervalTimeout, myState.interval)
         }
         setIntervalTimeout();
 
@@ -234,11 +234,15 @@ class Canvas {
 
     get frame() {return this._frame;}
     set frame(value) {
-        this._frame = value;
+        this._frame = parseInt(value);
         this.boxes = this.getBoxes(value);
         if (this.selection != null && this.selection.thing != null) {
             this.selection = this.getBox(this.selection.thing);
         }
+        var num = document.getElementById("frame-number");
+        document.getElementById("scroll-bar").value = value;
+        num.setAttribute("value", value);
+        document.getElementById("frame").style.backgroundImage = frame_url(value);
         this.valid = false;
     }
 

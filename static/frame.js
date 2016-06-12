@@ -29,15 +29,6 @@ function getRandomColor() {
     }
     return color;
 }
-function update_frame(state, val) {
-    var num = document.getElementById("frame-number");
-    document.getElementById("scroll-bar").value = val;
-    num.setAttribute("value", val);
-    state.frame = parseInt(val);
-    document.getElementById("frame").style.backgroundImage = frame_url(state.frame);
-    state.valid = false;
-}
-
 
 
 document.addEventListener("DOMContentLoaded", function() {
@@ -48,16 +39,16 @@ document.addEventListener("DOMContentLoaded", function() {
         var scrollBar = document.getElementById("scroll-bar");
         var playButton = document.getElementById("play-button");
         scrollBar.addEventListener("click", function(){
-            update_frame(canvas, scrollBar.value);
+            canvas.frame = scrollBar.value;
         });
 
         scrollBar.addEventListener("input", function() {
-            update_frame(canvas, scrollBar.value);
+            canvas.frame = scrollBar.value;
         });
         document.addEventListener("keypress", function(event) {
             if (event.keyCode === 13) { //If Enter is pressed
                 scrollBar.value = document.getElementById("frame-number").value;
-                update_frame(canvas, scrollBar.value);
+                canvas.frame = scrollBar.value;
             } else if (event.keyCode === 32) {
                 canvas.play = !canvas.play;
             }
