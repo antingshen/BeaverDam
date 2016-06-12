@@ -58,6 +58,8 @@ document.addEventListener("DOMContentLoaded", function() {
             if (event.keyCode === 13) { //If Enter is pressed
                 scrollBar.value = document.getElementById("frame-number").value;
                 update_frame(canvas, scrollBar.value);
+            } else if (event.keyCode === 32) {
+                canvas.play = !canvas.play;
             }
         });
         playButton.addEventListener("click", function(){

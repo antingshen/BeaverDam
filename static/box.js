@@ -41,10 +41,10 @@ class Box {
         if (this.interpolated) {
             this.thing.insertKeyframe(this);
             this.interpolated = false;
-            if (document.getElementById(`frame-${this.frame}`) === null) {
-                document.getElementById("key-frames").innerHTML +=
-                    `<li id="frame-${this.frame}" class="list-group-item col-xs-6" style="color: azure; background-color: ${getRandomColor()}; width: 130px">Frame ${this.frame}</li>`;
-            }
+            //if (document.getElementById(`frame-${this.frame}`) === null) {
+            //    document.getElementById("key-frames").innerHTML +=
+            //        `<li id="frame-${this.frame}" class="list-group-item col-xs-6" style="color: azure; background-color: ${getRandomColor()}; width: 130px">Frame ${this.frame}</li>`;
+            //}
         }
     }
 
