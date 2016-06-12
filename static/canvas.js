@@ -52,6 +52,7 @@ class Canvas {
         this.dragging = false;          // Keeps track of when we are dragging.
         this.enlargeDirection = null;   // Keeps the direction being dragged when enlarging.
         this.selection = null;          // Keeps the selected box that was clicked on.
+        this.move = false;              // Keeps track of when we are moving a box.
 
         /* Used for keepign track where  the mouse was clicked to create a smooth drag. */
         this.dragoffx = 0;
@@ -99,6 +100,9 @@ class Canvas {
                     myState.selection = mySel;
                     if (border) {
                         myState.enlargeDirection = border;
+                    } else {
+                        document.body.style.cursor = 'move';
+                        myState.move = true;
                     }
                     myState.valid = false;
                     return;
@@ -126,8 +130,25 @@ class Canvas {
         /* Event for moving the mouse. Primarily used for enlarging a box and moving it. */
         canvas.addEventListener('mousemove', function (e) {
             var mouse = myState.getMouse(e);
-            if (!myState.enlargeDirection && !myState.dragging) {
-                return;
+            var mx = mouse.x;
+            var my = mouse.y;
+            var boxes = myState.boxes;
+            var border = false;
+            // var box = null;
+
+            /* Checks if mouse is hovering over a border. */
+            for (var i = boxes.length - 1; i >= 0; i--) {
+                // box = boxes[i]; 
+                border = boxes[i].withinBorder(mx, my);
+                if (border && !myState.move) {
+                    boxes[i].doubleArrow(mx, my);
+                    break;
+                }
+            }
+
+
+            if (!myState.enlargeDirection && !myState.dragging && !border) {
+                document.body.style.cursor = 'default';
             } else if (myState.enlargeDirection === Box.border.RIGHT) {
                 myState.selection.moveRight(mouse.x);
             } else if (myState.enlargeDirection === Box.border.LEFT) {
@@ -193,6 +214,10 @@ class Canvas {
 
         /* Modifies state to prevent dragging. If the box is too small, delete it. */
         canvas.addEventListener('mouseup', function (e) {
+            if (document.body.style.cursor === 'move') {
+                document.body.style.cursor = 'default';
+            }
+            myState.move = false;
             myState.dragging = false;
             myState.enlargeDirection = false;
             for (var i = 0; i < myState.boxes.length; i++) {

@@ -51,19 +51,19 @@ class Box {
      * @returns {boolean}
      */
     withinTop(my) {
-        return (this.y + 4 >= my) && (this.y - 4 <= my)
+        return (this.y + 2 >= my) && (this.y - 2 <= my)
     }
 
     withinBottom(my) {
-        return (this.y + this.h + 4 >= my) && (this.y + this.h - 4 <= my)
+        return (this.y + this.h + 2 >= my) && (this.y + this.h - 2 <= my)
     }
 
     withinRight(mx) {
-        return (this.x + this.w + 4 >= mx) && (this.x + this.w - 4 <= mx);
+        return (this.x + this.w + 2 >= mx) && (this.x + this.w - 2 <= mx);
     }
 
     withinLeft(mx) {
-        return (this.x + 4 >= mx) && (this.x - 4 <= mx);
+        return (this.x + 2 >= mx) && (this.x - 2 <= mx);
     }
 
     /**
@@ -147,6 +147,33 @@ class Box {
     /* returns a copy of this with frame = new_frame */
     interpolated_copy(new_frame) {
         return new Box(this.thing, new_frame, this._x, this._y, this._w, this._h, true);
+    }
+
+    /**
+     * Changes the cursor to one of the four bidirectional resize cursors, depending on which 
+     * side or corner of a box the mouse is on.
+     * @param mx the x-coordinate of the mouse
+     * @param my the y-coordinate of the mouse.
+     */
+    doubleArrow(mx, my) {
+        var x = this.x; var y = this.y; var w = this.w; var h = this.h;
+        var minX = Math.min(x, x + w);
+        var maxX = Math.max(x, x + w);
+        var minY = Math.min(y, y + h);
+        var maxY = Math.max(y, y + h); 
+        if (((minY + 2 >= my) && (minY - 2 <= my) && (maxX + 2 >= mx) && (maxX - 2 <= mx)) 
+            || ((maxY + 2 >= my) && (maxY - 2 <= my) && (minX + 2 >= mx) && (minX - 2 <= mx))) {
+            document.body.style.cursor = 'nesw-resize';
+        } else if (((minY + 2 >= my) && (minY - 2 <= my) && (minX + 2 >= mx) && (minX - 2 <= mx)) 
+            || ((maxY + 2 >= my) && (maxY - 2 <= my) && (maxX + 2 >= mx) && (maxX - 2 <= mx))) {
+            document.body.style.cursor = 'nwse-resize';
+        } else if (this.withinTop(my) && ((mx > x && mx < x + w) || (mx > x + w && mx < x))
+            || this.withinBottom(my) && ((mx > x && mx < x + w) || (mx > x + w && mx < x))){
+            document.body.style.cursor = 'ns-resize';
+        } else if (this.withinLeft(mx) && ((my > y && my < y + h) || (my > y + h && my < y))
+            || this.withinRight(mx) && ((my > y && my < y + h) || (my > y + h && my < y))) {
+            document.body.style.cursor = 'ew-resize';
+        }
     }
 }
 
