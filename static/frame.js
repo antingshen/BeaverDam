@@ -12,44 +12,45 @@ function frame_path(frame) {
 function frame_url(frame) {
     return `url(` + frame_path(frame) + `)`;
 }
-function frame_preload(endFrame) {
-    if (!images[endFrame - endFrame % PREFETCH_NUMBER]) {
-        for (var i = endFrame - PREFETCH_NUMBER; i < endFrame; i++) {
-            images[i] = new Image();
-            images[i].src = frame_path(i);
-        }
+function frame_preload(startFrame, endFrame) {
+    for (var i = startFrame; i < endFrame; i++) {
+        images[i] = new Image();
+        images[i].src = frame_path(i);
     }
     return images[0];
 }
-function update_frame(state, val) {
-    frame_preload(val);
-    var num = document.getElementById("frame-number");
-    document.getElementById("scroll-bar").value = val;
-    num.setAttribute("value", val);
-    state.frame = parseInt(val);
-    document.getElementById("frame").style.backgroundImage = frame_url(state.frame);
-    state.valid = false;
+function getRandomColor() {
+    var letters = '012345'.split('');
+    var color = '#';
+    color += letters[Math.round(Math.random() * 5)];
+    letters = '0123456789ABCDEF'.split('');
+    for (var i = 0; i < 5; i++) {
+        color += letters[Math.round(Math.random() * 15)];
+    }
+    return color;
 }
 
 
-
 document.addEventListener("DOMContentLoaded", function() {
-    var img = frame_preload(PREFETCH_NUMBER);
+
+    var img = frame_preload(0, PREFETCH_NUMBER);
     img.onload = function () {
         var canvas = new Canvas(document.getElementById('frame'));
         var scrollBar = document.getElementById("scroll-bar");
         var playButton = document.getElementById("play-button");
         scrollBar.addEventListener("click", function(){
-            update_frame(canvas, scrollBar.value);
+            canvas.frame = scrollBar.value;
         });
 
         scrollBar.addEventListener("input", function() {
-            update_frame(canvas, scrollBar.value);
+            canvas.frame = scrollBar.value;
         });
         document.addEventListener("keypress", function(event) {
             if (event.keyCode === 13) { //If Enter is pressed
                 scrollBar.value = document.getElementById("frame-number").value;
-                update_frame(canvas, scrollBar.value);
+                canvas.frame = scrollBar.value;
+            } else if (event.keyCode === 32) {
+                canvas.play = !canvas.play;
             }
         });
         playButton.addEventListener("click", function(){
@@ -57,6 +58,7 @@ document.addEventListener("DOMContentLoaded", function() {
         })
 
     };
+    frame_preload(PREFETCH_NUMBER, 5000);
 
 
 

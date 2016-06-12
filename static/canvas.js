@@ -23,7 +23,7 @@ class Canvas {
         this.selectionColor = '#CC0000';                   // Border color of selected boxes.
         this.selectionWidth = 2;                           // Border fillSize of selected boxes.
         this.selectionCorner = 5;                          // Corner fillSize of selected boxes.
-        this.interval = 30;                                // Frequency to be redrawn.
+        this.interval = 50;                                // Frequency to be redrawn.
         this.play = false;                                 // Playing frames.
 
         /* Fixes mouse co-ordinate problems when there's a border or padding. See getMouse for more
@@ -121,6 +121,20 @@ class Canvas {
             myState.selection = newBox;
             myState.enlargeDirection = Box.border.BOTTOMRIGHT;
 
+            var li = document.createElement('li');
+            li.className = "list-group-item col-xs-6";
+            li.id = newThing.fill.toString();
+            li.style.color = "azure";
+            li.style.backgroundColor = newThing.fill.toString();
+            li.style.width = "57px";
+            li.innerHTML = "car";
+            document.getElementById("shape-list").appendChild(li);
+            document.getElementById(`${newThing.fill}`).addEventListener("click", function(){
+                myState.selection = myState.getBox(newThing);
+                console.log(myState.selection);
+                myState.valid = false;
+            });
+
         }, true);
 
         /* Event for moving the mouse. Primarily used for enlarging a box and moving it. */
@@ -205,19 +219,30 @@ class Canvas {
         }, true);
 
         /* Redraws canvas every interval seconds */
-        setInterval(function () {
+        function setIntervalTimeout()
+        {
             myState.draw();
             if (myState.play) {
                 myState.frame+=1;
-                update_frame(myState, myState.frame);
+                myState.frame = myState.frame;
             }
-        }, myState.interval);
+            setTimeout(setIntervalTimeout, myState.interval)
+        }
+        setIntervalTimeout();
+
     }
 
     get frame() {return this._frame;}
     set frame(value) {
-        this._frame = value;
+        this._frame = parseInt(value);
         this.boxes = this.getBoxes(value);
+        if (this.selection != null && this.selection.thing != null) {
+            this.selection = this.getBox(this.selection.thing);
+        }
+        var num = document.getElementById("frame-number");
+        document.getElementById("scroll-bar").value = value;
+        num.setAttribute("value", value);
+        document.getElementById("frame").style.backgroundImage = frame_url(value);
         this.valid = false;
     }
 
@@ -231,6 +256,17 @@ class Canvas {
             }
         }
         return boxes;
+    }
+    /* Updates selected box if needed. */
+    getBox(thing) {
+
+        for (var box of this.boxes) {
+            if (box.thing.id == thing.id) {
+                return box;
+            }
+        }
+
+
     }
 
     /**
