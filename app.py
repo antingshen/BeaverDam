@@ -2,20 +2,28 @@
 
 import os, json
 
-from flask import Flask, request, send_from_directory
+from flask import Flask, request
+from flask import render_template, send_from_directory
 app = Flask(__name__)
 app.config['DEBUG'] = True
 
 @app.route('/')
 def root():
-    return app.send_static_file('index.html')
+    return video('test_video')
+
+@app.route('/video/<video_name>')
+def video(video_name):
+	video_data = {
+		'name': video_name,
+	}
+	return render_template('video.html', video_data=video_data)
 
 @app.route('/scene/<scene_name>', methods=['GET'])
 def read_scene(scene_name):
     return send_from_directory('scene', scene_name + '.json', mimetype='application/json')
 
 @app.route('/scene/<scene_name>', methods=['POST'])
-def scene(scene_name):
+def write_scene(scene_name):
     scene_json = request.get_json()
     with open(os.path.join('scene', scene_name + '.json'), 'w') as f:
         json.dump(scene_json, f)

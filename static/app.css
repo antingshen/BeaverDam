@@ -1,6 +1,6 @@
 #frame {
     display: block;
-    background-image: url('/static/videos/test_vid/0/0/0.jpg');
+    background-image: url('/static/img/loading.gif');
     background-repeat: no-repeat;
     background-position: center;
     border: solid;
