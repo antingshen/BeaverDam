@@ -1,13 +1,12 @@
 #frame {
     display: block;
+    background-color: #eee;
     background-image: url('/static/img/loading.gif');
     background-repeat: no-repeat;
     background-position: center;
     border: solid;
 
-    padding-top: 10px;
     margin-top: 10px;
-
     margin-right: auto;
 }
 

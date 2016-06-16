@@ -20,11 +20,9 @@ class Canvas {
         document.getElementById("fixed-panel").style.width = this.width + 20;
         document.getElementById("frame-controller").style.width = this.width + 7;
 
-        this.selectionColor = '#CC0000';                   // Border color of selected boxes.
         this.selectionWidth = 2;                           // Border fillSize of selected boxes.
         this.selectionCorner = 5;                          // Corner fillSize of selected boxes.
         this.interval = 30;                                // Frequency to be redrawn.
-        this.play = false;                                 // Playing frames.
 
         /* Fixes mouse co-ordinate problems when there's a border or padding. See getMouse for more
          details.  */
@@ -53,6 +51,7 @@ class Canvas {
         this.enlargeDirection = null;   // Keeps the direction being dragged when enlarging.
         this.selection = null;          // Keeps the selected box that was clicked on.
         this.move = false;              // Keeps track of when we are moving a box.
+        this.play = false;                                 // Playing frames.
 
         /* Used for keepign track where  the mouse was clicked to create a smooth drag. */
         this.dragoffx = 0;
@@ -233,17 +232,23 @@ class Canvas {
         setInterval(function () {
             myState.draw();
             if (myState.play) {
-                myState.frame+=1;
-                update_frame(myState, myState.frame);
+                myState.frame += 1;
             }
         }, myState.interval);
     }
 
     get frame() {return this._frame;}
     set frame(value) {
+        value = parseInt(value);
+        frame_preload(value);
+        var frameNumberBox = document.getElementById("frame-number");
+        document.getElementById("scroll-bar").value = value;
+        frameNumberBox.setAttribute("value", value);
         this._frame = value;
         this.boxes = this.getBoxes(value);
         this.valid = false;
+        this.selection = null;
+        document.getElementById("frame").style.backgroundImage = frame_url(this._frame);
     }
 
     /* Retrieves a list of box objects that belong in the current frame */
@@ -270,16 +275,14 @@ class Canvas {
 
             var element = document.getElementById(this.things.splice(index, 1)[0].id);
             element.parentNode.removeChild(element);
-
         }
         this.valid = false;
     }
 
-    /**
-     * Clears the canvas.
-     */
-    clear() {
-        this.ctx.clearRect(0, 0, this.width, this.height);
+    // Copied from http://stackoverflow.com/questions/5560248/programmatically-lighten-or-darken-a-hex-color-or-rgb-and-blend-colors
+    shadeColor(color, percent) {   
+        var f=parseInt(color.slice(1),16),t=percent<0?0:255,p=percent<0?percent*-1:percent,R=f>>16,G=f>>8&0x00FF,B=f&0x0000FF;
+        return "#"+(0x1000000+(Math.round((t-R)*p)+R)*0x10000+(Math.round((t-G)*p)+G)*0x100+(Math.round((t-B)*p)+B)).toString(16).slice(1);
     }
 
     /**
@@ -288,18 +291,15 @@ class Canvas {
     draw() {
         if (!this.valid) {
             var ctx = this.ctx;
-            var boxes = this.boxes;
-            this.clear();
+            ctx.clearRect(0, 0, this.width, this.height);
 
-            /* Draws all boxes. */
-            var l = boxes.length;
-            for (var i = 0; i < l; i++) {
-                boxes[i].draw(ctx);
+            for (var i = 0; i < this.boxes.length; i++) {
+                this.boxes[i].draw(ctx);
             }
 
             /*Draws border for selected box. */
             if (this.selection != null) {
-                ctx.strokeStyle = this.selectionColor;
+                ctx.strokeStyle = this.shadeColor(this.selection.thing.fill, -20);
                 ctx.lineWidth = this.selectionWidth;
                 var mySel = this.selection;
                 ctx.strokeRect(mySel.x, mySel.y, mySel.w, mySel.h);
@@ -344,9 +344,3 @@ class Canvas {
         return {x: mx, y: my};
     }
 }
-
-
-
-
-
-
