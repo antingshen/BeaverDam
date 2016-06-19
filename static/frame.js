@@ -45,7 +45,7 @@ document.addEventListener("DOMContentLoaded", function() {
         playButton.addEventListener("click", function(){
             canvas.play = !canvas.play;
             playButton.className = `glyphicon glyphicon-${canvas.play ? 'pause' : 'play'}`;
-        })
+        });
         canvas.frame = 0;
     };
 

@@ -128,6 +128,18 @@ class Canvas {
             myState.selection = newBox;
             myState.enlargeDirection = Box.border.BOTTOMRIGHT;
 
+            var thingDom = document.createElement("li");
+            thingDom.className = "list-group-item col-xs-6";
+            thingDom.id = this.fill;
+            thingDom.style = "color: azure; background-color: " + this.fill + "; width: 57px";
+            thingDom.innerText = "Car";
+            thingDom.addEventListener("click", function() {
+                myState.selection = thingDom.id;
+            });
+
+
+            document.getElementById("shape-list").appendChild(thingDom);
+
         }, true);
 
         /* Event for moving the mouse. Primarily used for enlarging a box and moving it. */
@@ -332,7 +344,7 @@ class Canvas {
 
             /* Updates key frames */
 
-            if (this.selection != this.previousSelection) {
+            if (this.selection != this.previousSelection || (this.selection && this.selection.thing.keyFramesChanged)) {
                 var myNode = document.getElementById("key-frames"); //Faster than setting innerHtml to null.
                 while (myNode.firstChild) {
                     myNode.removeChild(myNode.firstChild);
@@ -343,6 +355,7 @@ class Canvas {
                     dot.style = `left: ${box.frame / this.numberOfFrames * this.scrollBarSize}px;`;
                     document.getElementById("key-frames").appendChild(dot);
                 }
+                this.selection.thing.keyFramesChanged = false;
 
             }
             this.valid = true;
