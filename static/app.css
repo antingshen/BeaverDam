@@ -56,8 +56,8 @@
 }
 .dots{
     margin-left: 72px;
-    width: 2px;
-    height: 2px;
+    width: 5px;
+    height: 5px;
     background: #f0ad4e;
     border-radius: 2px;
     display: block;

@@ -346,13 +346,18 @@ class Canvas {
 
             if (this.selection != this.previousSelection || (this.selection && this.selection.thing.keyFramesChanged)) {
                 var myNode = document.getElementById("key-frames"); //Faster than setting innerHtml to null.
+                var myState = this;
                 while (myNode.firstChild) {
                     myNode.removeChild(myNode.firstChild);
                 }
-                for (var box of this.selection.thing.keyframes) {
+                for (var box of myState.selection.thing.keyframes) {
                     var dot = document.createElement("div");
                     dot.className = "dots";
                     dot.style = `left: ${box.frame / this.numberOfFrames * this.scrollBarSize}px;`;
+                    dot.setAttribute("location", box.frame);
+                    dot.addEventListener("click", function() {
+                       myState.frame = this.getAttribute("location");
+                    });
                     document.getElementById("key-frames").appendChild(dot);
                 }
                 this.selection.thing.keyFramesChanged = false;
