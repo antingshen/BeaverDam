@@ -252,6 +252,14 @@ class Canvas {
         this.boxes = this.getBoxes(value);
         this.valid = false;
         document.getElementById("frame").style.backgroundImage = frame_url(this._frame);
+        if (this.selection != null && this.selection.thing != null) {
+            for (var box of this.boxes) {
+                if (box.thing.id == this.selection.thing.id) {
+                    this.selection = box;
+                    break;
+                }
+            }
+        }
     }
 
     /* Retrieves a list of box objects that belong in the current frame */
