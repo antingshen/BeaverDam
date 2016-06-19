@@ -130,11 +130,11 @@ class Canvas {
 
             var thingDom = document.createElement("li");
             thingDom.className = "list-group-item col-xs-6";
-            thingDom.id = this.fill;
-            thingDom.style = "color: azure; background-color: " + this.fill + "; width: 57px";
+            thingDom.id = newThing.fill;
+            thingDom.style = "color: azure; background-color: " + newThing.fill + "; width: 57px";
             thingDom.innerText = "Car";
             thingDom.addEventListener("click", function() {
-                myState.selection = thingDom.id;
+                myState.selection = newThing.id;
             });
 
 
