@@ -7,6 +7,8 @@ class Canvas {
     constructor(canvas) {
         this.canvas = canvas;                              // Canvas passed in.
         this.padding = 100;                                // White padding outside of background image.
+        this.numberOfFrames = 5000;
+        this.scrollBarSize = 636;
 
         /* Gets the first frame's height and width and sets up canvas to it. */
         var img = new Image();
@@ -49,6 +51,7 @@ class Canvas {
         this.boxes = [];                // List of boxes in the current frame
         this.dragging = false;          // Keeps track of when we are dragging.
         this.enlargeDirection = null;   // Keeps the direction being dragged when enlarging.
+        this.previousSelection = null;  // Previous selection used for key frames.
         this.selection = null;          // Keeps the selected box that was clicked on.
         this.move = false;              // Keeps track of when we are moving a box.
         this.play = false;                                 // Playing frames.
@@ -96,6 +99,7 @@ class Canvas {
                     myState.dragoffx = mx - mySel.x;
                     myState.dragoffy = my - mySel.y;
                     myState.dragging = true;
+                    myState.previousSelection = myState.selection;
                     myState.selection = mySel;
                     if (border) {
                         myState.enlargeDirection = border;
@@ -247,7 +251,6 @@ class Canvas {
         this._frame = value;
         this.boxes = this.getBoxes(value);
         this.valid = false;
-        this.selection = null;
         document.getElementById("frame").style.backgroundImage = frame_url(this._frame);
     }
 
@@ -286,7 +289,7 @@ class Canvas {
     }
 
     /**
-     * Draws the state of the canvas if it's invalid.
+     * Draws the state of the canvas if it's invalid and updates key frames.
      */
     draw() {
         if (!this.valid) {
@@ -311,6 +314,21 @@ class Canvas {
                 ctx.fillRect(mySel.x - 3 + mySel.w, mySel.y - 2, fillSize, fillSize);
                 ctx.fillRect(mySel.x - 2, mySel.y - 2 + mySel.h, fillSize, fillSize);
                 ctx.fillRect(mySel.x - 3 + mySel.w, mySel.y - 2 + mySel.h, fillSize, fillSize);
+            }
+
+            /* Updates key frames */
+
+            if (this.selection != this.previousSelection) {
+                var myNode = document.getElementById("key-frames"); //Faster than setting innerHtml to null.
+                while (myNode.firstChild) {
+                    myNode.removeChild(myNode.firstChild);
+                }
+                for (var frame of this.selection.thing.keyframes) {
+                    var dot = document.createElement("div");
+                    dot.className = "dots";
+                    dot.style = `left: ${frame / this.numberOfFrames * this.scrollBarSize}px;`;
+                    document.getElementById("key-frames").appendChild(dot);
+                }
             }
             this.valid = true;
         }
