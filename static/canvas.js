@@ -300,20 +300,26 @@ class Canvas {
                 this.boxes[i].draw(ctx);
             }
 
-            /*Draws border for selected box. */
-            if (this.selection != null) {
-                ctx.strokeStyle = this.shadeColor(this.selection.thing.fill, -20);
-                ctx.lineWidth = this.selectionWidth;
-                var mySel = this.selection;
-                ctx.strokeRect(mySel.x, mySel.y, mySel.w, mySel.h);
+            /* Draws border for selected box. */
 
-                /* Handles corners. */
-                var fillSize = this.selectionCorner;
-                ctx.fillStyle = "#000000";
-                ctx.fillRect(mySel.x - 2, mySel.y - 2, fillSize, fillSize);
-                ctx.fillRect(mySel.x - 3 + mySel.w, mySel.y - 2, fillSize, fillSize);
-                ctx.fillRect(mySel.x - 2, mySel.y - 2 + mySel.h, fillSize, fillSize);
-                ctx.fillRect(mySel.x - 3 + mySel.w, mySel.y - 2 + mySel.h, fillSize, fillSize);
+            if (this.selection != null) {
+                for (var box of this.boxes) {
+                    if (box.thing === this.selection.thing) {
+                        ctx.strokeStyle = this.shadeColor(this.selection.thing.fill, -20);
+                        ctx.lineWidth = this.selectionWidth;
+                        var mySel = this.selection;
+                        ctx.strokeRect(mySel.x, mySel.y, mySel.w, mySel.h);
+
+                        /* Handles corners. */
+                        var fillSize = this.selectionCorner;
+                        ctx.fillStyle = "#000000";
+                        ctx.fillRect(mySel.x - 2, mySel.y - 2, fillSize, fillSize);
+                        ctx.fillRect(mySel.x - 3 + mySel.w, mySel.y - 2, fillSize, fillSize);
+                        ctx.fillRect(mySel.x - 2, mySel.y - 2 + mySel.h, fillSize, fillSize);
+                        ctx.fillRect(mySel.x - 3 + mySel.w, mySel.y - 2 + mySel.h, fillSize, fillSize);
+                    }
+                }
+
             }
 
             /* Updates key frames */
@@ -323,12 +329,13 @@ class Canvas {
                 while (myNode.firstChild) {
                     myNode.removeChild(myNode.firstChild);
                 }
-                for (var frame of this.selection.thing.keyframes) {
+                for (var box of this.selection.thing.keyframes) {
                     var dot = document.createElement("div");
                     dot.className = "dots";
-                    dot.style = `left: ${frame / this.numberOfFrames * this.scrollBarSize}px;`;
+                    dot.style = `left: ${box.frame / this.numberOfFrames * this.scrollBarSize}px;`;
                     document.getElementById("key-frames").appendChild(dot);
                 }
+
             }
             this.valid = true;
         }
