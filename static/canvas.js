@@ -131,7 +131,8 @@ class Canvas {
             var thingDom = document.createElement("li");
             thingDom.className = "list-group-item col-xs-6";
             thingDom.id = newThing.fill;
-            thingDom.style = "color: azure; background-color: " + newThing.fill + "; width: 57px";
+            var length =  newThing.type.length + 70;
+            thingDom.style = "color: azure; background-color: " + newThing.fill + "; width: " + length + "px";
             thingDom.innerText = newThing.type;
             thingDom.addEventListener("click", function() {
                 myState.selection = myState.getBox(newThing);
