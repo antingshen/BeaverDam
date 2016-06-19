@@ -134,7 +134,8 @@ class Canvas {
             thingDom.style = "color: azure; background-color: " + newThing.fill + "; width: 57px";
             thingDom.innerText = newThing.type;
             thingDom.addEventListener("click", function() {
-                myState.selection = newThing.id;
+                myState.selection = myState.getBox(newThing);
+                myState.valid = false;
             });
 
 
@@ -286,6 +287,17 @@ class Canvas {
         return boxes;
     }
 
+    getBox(thing) {
+
+        for (var box of this.boxes) {
+            if (box.thing.id == thing.id) {
+                return box;
+            }
+        }
+
+
+    }
+
     /**
      * Removes box from list of boxes and redraws it. Deletes the Thing if it has no more boxes
      * @param box The box to be removed.
@@ -344,23 +356,25 @@ class Canvas {
 
             /* Updates key frames */
 
-            if (this.selection != this.previousSelection || (this.selection && this.selection.thing.keyFramesChanged)) {
+            if (this.selection != this.previousSelection || (this.selection && this.selection.thing && this.selection.thing.keyFramesChanged)) {
                 var myNode = document.getElementById("key-frames"); //Faster than setting innerHtml to null.
                 var myState = this;
                 while (myNode.firstChild) {
                     myNode.removeChild(myNode.firstChild);
                 }
-                for (var box of myState.selection.thing.keyframes) {
-                    var dot = document.createElement("div");
-                    dot.className = "dots";
-                    dot.style = `left: ${box.frame / this.numberOfFrames * this.scrollBarSize}px;`;
-                    dot.setAttribute("location", box.frame);
-                    dot.addEventListener("click", function() {
-                       myState.frame = this.getAttribute("location");
-                    });
-                    document.getElementById("key-frames").appendChild(dot);
+                if (myState.selection && myState.selection.thing) {
+                    for (var box of myState.selection.thing.keyframes) {
+                        var dot = document.createElement("div");
+                        dot.className = "dots";
+                        dot.style = `left: ${box.frame / this.numberOfFrames * this.scrollBarSize}px;`;
+                        dot.setAttribute("location", box.frame);
+                        dot.addEventListener("click", function () {
+                            myState.frame = this.getAttribute("location");
+                        });
+                        document.getElementById("key-frames").appendChild(dot);
+                    }
+                    this.selection.thing.keyFramesChanged = false;
                 }
-                this.selection.thing.keyFramesChanged = false;
 
             }
             this.valid = true;
