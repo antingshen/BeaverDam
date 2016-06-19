@@ -132,7 +132,7 @@ class Canvas {
             thingDom.className = "list-group-item col-xs-6";
             thingDom.id = newThing.fill;
             thingDom.style = "color: azure; background-color: " + newThing.fill + "; width: 57px";
-            thingDom.innerText = "Car";
+            thingDom.innerText = newThing.type;
             thingDom.addEventListener("click", function() {
                 myState.selection = newThing.id;
             });

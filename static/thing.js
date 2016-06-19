@@ -4,6 +4,7 @@ class Thing {
         this.keyFramesChanged = false;
         this.fill = fill;
         this.id = this.fill;
+        this.type = document.querySelector('input[name = "object"]:checked').value;
     }
 
     static getRandomColor() {
