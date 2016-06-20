@@ -3,8 +3,7 @@ class Thing {
         this.keyframes = []; // List of boxes corresponding to keyframes
         this.fill = fill;
         this.id = this.fill;
-        document.getElementById("shape-list").innerHTML +=
-            `<li class="list-group-item col-xs-6" id=${this.fill} style="color: azure; background-color: ${this.fill}; width: 57px">Car</li>`;
+        this.type = document.querySelector('input[name = "object"]:checked').value;
     }
 
     static getRandomColor() {
@@ -62,6 +61,7 @@ class Thing {
             }
         }
         this.keyframes.push(keyframe);
+
     }
 
     /* returns true if this.keyframes is emptied, else false */
@@ -73,4 +73,6 @@ class Thing {
         }
         return this.keyframes.length == 0;
     }
+
+
 }

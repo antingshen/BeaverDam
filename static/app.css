@@ -47,6 +47,19 @@
     padding-right: 5px;
 }
 
+#key-frames-controller{
+    width: 827px;
+}
+
 .panel-space {
     margin: 50px;
+}
+.dots{
+    margin-left: 72px;
+    width: 5px;
+    height: 5px;
+    background: #f0ad4e;
+    border-radius: 2px;
+    display: block;
+    position: absolute;
 }

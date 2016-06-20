@@ -7,6 +7,8 @@ class Canvas {
     constructor(canvas) {
         this.canvas = canvas;                              // Canvas passed in.
         this.padding = 100;                                // White padding outside of background image.
+        this.numberOfFrames = 5000;
+        this.scrollBarSize = 636;
 
         /* Gets the first frame's height and width and sets up canvas to it. */
         var img = new Image();
@@ -97,6 +99,8 @@ class Canvas {
                     myState.dragoffy = my - mySel.y;
                     myState.dragging = true;
                     myState.selection = mySel;
+                    myState.keyFrameDomUpdate();
+
                     if (border) {
                         myState.enlargeDirection = border;
                     } else {
@@ -124,6 +128,20 @@ class Canvas {
             myState.selection = newBox;
             myState.enlargeDirection = Box.border.BOTTOMRIGHT;
 
+            var thingDom = document.createElement("li");
+            thingDom.className = "list-group-item col-xs-6";
+            thingDom.id = newThing.fill;
+            var length =  newThing.type.length + 70;
+            thingDom.style = "color: azure; background-color: " + newThing.fill + "; width: " + length + "px";
+            thingDom.innerText = newThing.type;
+            thingDom.addEventListener("click", function() {
+                myState.selection = myState.getBox(newThing);
+                myState.valid = false;
+            });
+
+
+            document.getElementById("shape-list").appendChild(thingDom);
+
         }, true);
 
         /* Event for moving the mouse. Primarily used for enlarging a box and moving it. */
@@ -137,7 +155,6 @@ class Canvas {
 
             /* Checks if mouse is hovering over a border. */
             for (var i = boxes.length - 1; i >= 0; i--) {
-                // box = boxes[i]; 
                 border = boxes[i].withinBorder(mx, my);
                 if (border && !myState.move) {
                     boxes[i].doubleArrow(mx, my);
@@ -171,6 +188,11 @@ class Canvas {
             } else if (myState.dragging) {
                 myState.selection.x = mouse.x - myState.dragoffx;
                 myState.selection.y = mouse.y - myState.dragoffy;
+            }
+
+            /* If box moved, update keyframes. */
+            if (myState.enlargeDirection || myState.dragging) {
+                myState.keyFrameDomUpdate();
             }
             myState.valid = false;
         }, true);
@@ -247,8 +269,15 @@ class Canvas {
         this._frame = value;
         this.boxes = this.getBoxes(value);
         this.valid = false;
-        this.selection = null;
         document.getElementById("frame").style.backgroundImage = frame_url(this._frame);
+        if (this.selection) {
+            for (var box of this.boxes) {
+                if (box.thing === this.selection.thing) {
+                    this.selection = box;
+                    break;
+                }
+            }
+        }
     }
 
     /* Retrieves a list of box objects that belong in the current frame */
@@ -261,6 +290,14 @@ class Canvas {
             }
         }
         return boxes;
+    }
+
+    getBox(thing) {
+        for (var box of this.boxes) {
+            if (box.thing.id == thing.id) {
+                return box;
+            }
+        }
     }
 
     /**
@@ -286,7 +323,7 @@ class Canvas {
     }
 
     /**
-     * Draws the state of the canvas if it's invalid.
+     * Draws the state of the canvas if it's invalid and updates key frames.
      */
     draw() {
         if (!this.valid) {
@@ -297,21 +334,30 @@ class Canvas {
                 this.boxes[i].draw(ctx);
             }
 
-            /*Draws border for selected box. */
-            if (this.selection != null) {
-                ctx.strokeStyle = this.shadeColor(this.selection.thing.fill, -20);
-                ctx.lineWidth = this.selectionWidth;
-                var mySel = this.selection;
-                ctx.strokeRect(mySel.x, mySel.y, mySel.w, mySel.h);
+            /* Draws border for selected box. */
 
-                /* Handles corners. */
-                var fillSize = this.selectionCorner;
-                ctx.fillStyle = "#000000";
-                ctx.fillRect(mySel.x - 2, mySel.y - 2, fillSize, fillSize);
-                ctx.fillRect(mySel.x - 3 + mySel.w, mySel.y - 2, fillSize, fillSize);
-                ctx.fillRect(mySel.x - 2, mySel.y - 2 + mySel.h, fillSize, fillSize);
-                ctx.fillRect(mySel.x - 3 + mySel.w, mySel.y - 2 + mySel.h, fillSize, fillSize);
+            if (this.selection != null) {
+                for (var box of this.boxes) {
+                    if (box.thing === this.selection.thing) {
+                        ctx.strokeStyle = this.shadeColor(this.selection.thing.fill, -20);
+                        ctx.lineWidth = this.selectionWidth;
+                        var mySel = this.selection;
+                        ctx.strokeRect(mySel.x, mySel.y, mySel.w, mySel.h);
+
+                        /* Handles corners. */
+                        var fillSize = this.selectionCorner;
+                        ctx.fillStyle = "#000000";
+                        ctx.fillRect(mySel.x - 2, mySel.y - 2, fillSize, fillSize);
+                        ctx.fillRect(mySel.x - 3 + mySel.w, mySel.y - 2, fillSize, fillSize);
+                        ctx.fillRect(mySel.x - 2, mySel.y - 2 + mySel.h, fillSize, fillSize);
+                        ctx.fillRect(mySel.x - 3 + mySel.w, mySel.y - 2 + mySel.h, fillSize, fillSize);
+                    }
+                }
+
             }
+
+            /* Updates key frames */
+
             this.valid = true;
         }
     }
@@ -342,5 +388,24 @@ class Canvas {
         my = e.pageY - offsetY;
 
         return {x: mx, y: my};
+    }
+    keyFrameDomUpdate() {
+        var myNode = document.getElementById("key-frames"); //Faster than setting innerHtml to null.
+        while (myNode.firstChild) {
+            myNode.removeChild(myNode.firstChild);
+        }
+        if (this.selection) {
+            for (var box of this.selection.thing.keyframes) {
+                var dot = document.createElement("div");
+                dot.className = "dots";
+                dot.style = `left: ${box.frame / this.numberOfFrames * this.scrollBarSize}px;`;
+                dot.setAttribute("location", box.frame);
+                dot.addEventListener("click", function () {
+                    this.frame = this.getAttribute("location");
+                });
+                document.getElementById("key-frames").appendChild(dot);
+            }
+        }
+
     }
 }
