@@ -1,7 +1,6 @@
 class Thing {
     constructor(fill = Thing.getRandomColor()) {
         this.keyframes = []; // List of boxes corresponding to keyframes
-        this.keyFramesChanged = false;
         this.fill = fill;
         this.id = this.fill;
         this.type = document.querySelector('input[name = "object"]:checked').value;
@@ -51,7 +50,6 @@ class Thing {
     /* replace existing ones if necessary */
     insertKeyframe(keyframe) {
         var prevFrame = null;
-        this.keyFramesChanged = true;
         for (let [idx, box] of this.keyframes.entries()) {
             if (box.frame == keyframe.frame) {
                 this.keyframes[idx] = keyframe;
@@ -63,6 +61,7 @@ class Thing {
             }
         }
         this.keyframes.push(keyframe);
+
     }
 
     /* returns true if this.keyframes is emptied, else false */
@@ -70,9 +69,10 @@ class Thing {
         for (let [idx, box] of this.keyframes.entries()) {
             if (box === keyframe) {
                 this.keyframes.splice(idx, 1);
-                this.keyFramesChanged = true;
             }
         }
         return this.keyframes.length == 0;
     }
+
+
 }

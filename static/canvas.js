@@ -51,7 +51,6 @@ class Canvas {
         this.boxes = [];                // List of boxes in the current frame
         this.dragging = false;          // Keeps track of when we are dragging.
         this.enlargeDirection = null;   // Keeps the direction being dragged when enlarging.
-        this.previousSelection = null;  // Previous selection used for key frames.
         this.selection = null;          // Keeps the selected box that was clicked on.
         this.move = false;              // Keeps track of when we are moving a box.
         this.play = false;                                 // Playing frames.
@@ -99,8 +98,9 @@ class Canvas {
                     myState.dragoffx = mx - mySel.x;
                     myState.dragoffy = my - mySel.y;
                     myState.dragging = true;
-                    myState.previousSelection = myState.selection;
                     myState.selection = mySel;
+                    myState.keyFrameDomUpdate();
+
                     if (border) {
                         myState.enlargeDirection = border;
                     } else {
@@ -155,7 +155,6 @@ class Canvas {
 
             /* Checks if mouse is hovering over a border. */
             for (var i = boxes.length - 1; i >= 0; i--) {
-                // box = boxes[i]; 
                 border = boxes[i].withinBorder(mx, my);
                 if (border && !myState.move) {
                     boxes[i].doubleArrow(mx, my);
@@ -189,6 +188,11 @@ class Canvas {
             } else if (myState.dragging) {
                 myState.selection.x = mouse.x - myState.dragoffx;
                 myState.selection.y = mouse.y - myState.dragoffy;
+            }
+
+            /* If box moved, update keyframes. */
+            if (myState.enlargeDirection || myState.dragging) {
+                myState.keyFrameDomUpdate();
             }
             myState.valid = false;
         }, true);
@@ -266,9 +270,9 @@ class Canvas {
         this.boxes = this.getBoxes(value);
         this.valid = false;
         document.getElementById("frame").style.backgroundImage = frame_url(this._frame);
-        if (this.selection != null && this.selection.thing != null) {
+        if (this.selection) {
             for (var box of this.boxes) {
-                if (box.thing.id == this.selection.thing.id) {
+                if (box.thing === this.selection.thing) {
                     this.selection = box;
                     break;
                 }
@@ -289,14 +293,11 @@ class Canvas {
     }
 
     getBox(thing) {
-
         for (var box of this.boxes) {
             if (box.thing.id == thing.id) {
                 return box;
             }
         }
-
-
     }
 
     /**
@@ -357,27 +358,6 @@ class Canvas {
 
             /* Updates key frames */
 
-            if (this.selection != this.previousSelection || (this.selection && this.selection.thing && this.selection.thing.keyFramesChanged)) {
-                var myNode = document.getElementById("key-frames"); //Faster than setting innerHtml to null.
-                var myState = this;
-                while (myNode.firstChild) {
-                    myNode.removeChild(myNode.firstChild);
-                }
-                if (myState.selection && myState.selection.thing) {
-                    for (var box of myState.selection.thing.keyframes) {
-                        var dot = document.createElement("div");
-                        dot.className = "dots";
-                        dot.style = `left: ${box.frame / this.numberOfFrames * this.scrollBarSize}px;`;
-                        dot.setAttribute("location", box.frame);
-                        dot.addEventListener("click", function () {
-                            myState.frame = this.getAttribute("location");
-                        });
-                        document.getElementById("key-frames").appendChild(dot);
-                    }
-                    this.selection.thing.keyFramesChanged = false;
-                }
-
-            }
             this.valid = true;
         }
     }
@@ -408,5 +388,24 @@ class Canvas {
         my = e.pageY - offsetY;
 
         return {x: mx, y: my};
+    }
+    keyFrameDomUpdate() {
+        var myNode = document.getElementById("key-frames"); //Faster than setting innerHtml to null.
+        while (myNode.firstChild) {
+            myNode.removeChild(myNode.firstChild);
+        }
+        if (this.selection) {
+            for (var box of this.selection.thing.keyframes) {
+                var dot = document.createElement("div");
+                dot.className = "dots";
+                dot.style = `left: ${box.frame / this.numberOfFrames * this.scrollBarSize}px;`;
+                dot.setAttribute("location", box.frame);
+                dot.addEventListener("click", function () {
+                    this.frame = this.getAttribute("location");
+                });
+                document.getElementById("key-frames").appendChild(dot);
+            }
+        }
+
     }
 }
