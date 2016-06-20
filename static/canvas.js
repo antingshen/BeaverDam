@@ -136,6 +136,13 @@ class Canvas {
             thingDom.innerText = newThing.type;
             thingDom.addEventListener("click", function() {
                 myState.selection = myState.getBox(newThing);
+                if (!myState.selection) {
+                    var firstBox = newThing.keyframes[0];
+                    var previousBox = new Box(newThing, myState.frame, firstBox.x, firstBox.y, firstBox.w, firstBox.h);
+
+                    myState.boxes.push(previousBox);
+                    myState.selection = previousBox;
+                }
                 myState.valid = false;
             });
 
@@ -298,6 +305,7 @@ class Canvas {
                 return box;
             }
         }
+        return null;
     }
 
     /**
