@@ -22,6 +22,4 @@ Download `https://s3-us-west-2.amazonaws.com/beaverdam/test_vid.zip` and extract
 ## Running the Server
 
 `./run_server.sh`
-Then navigate to `localhost:5000` in your browser.
-
-
+Then navigate to `localhost:5000/video/test_vid` in your browser.

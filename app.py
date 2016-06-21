@@ -9,7 +9,7 @@ app.config['DEBUG'] = True
 
 @app.route('/')
 def root():
-    return video('test_video')
+    return video('test_vid')
 
 @app.route('/video/<video_name>')
 def video(video_name):
