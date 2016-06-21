@@ -6,6 +6,20 @@ class Thing {
         this.type = document.querySelector('input[name = "object"]:checked').value;
     }
 
+    static fromJson(json) {
+        var thing = new Thing();
+        thing.keyframes = json.keyframes.map(boxJson => Box.fromJson(boxJson, thing));
+        thing.type = json.type;
+        return thing;
+    }
+
+    static toJson(thing) {
+        return {
+            keyframes: thing.keyframes.map(Box.toJson),
+            type: thing.type,
+        };
+    }
+
     static getRandomColor() {
         var letters = '012345'.split('');
         var color = '#';
