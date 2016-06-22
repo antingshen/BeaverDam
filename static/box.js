@@ -14,6 +14,23 @@ class Box {
         this.interpolated = interpolated;
     }
 
+    static toJson(box) {
+        if (box.interpolated) {
+            return undefined;
+        }
+        return {
+            x: box.x,
+            y: box.y,
+            w: box.w,
+            h: box.h,
+            frame: box.frame,
+        };
+    }
+
+    static fromJson(json, thing) {
+        return new Box(thing, json.frame, json.x, json.y, json.w, json.h, false);
+    }
+
     // These getters and setters allow us to insert the keyframe into its parent
     // thing if it's modified
     get x() {return this._x;}

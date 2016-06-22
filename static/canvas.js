@@ -1,3 +1,4 @@
+c = null;
 class Canvas {
     /**
      * Over all constructor of the canvas. Sets up the event listeners and records the state
@@ -5,7 +6,8 @@ class Canvas {
      * @param canvas The canvas element to be passed in.
      */
     constructor(canvas) {
-        this.canvas = canvas;                              // Canvas passed in.
+        c = this;   // Debugging purposes
+        this.canvas = canvas;                              // Canvas HTML element passed in.
         this.padding = 100;                                // White padding outside of background image.
         this.numberOfFrames = 5000;
         this.scrollBarSize = 636;
@@ -63,7 +65,34 @@ class Canvas {
          * Getters and setters will update the boxes for the frame if this is changed */
         this._frame = 0;
 
+        this.fetchState();
         this.setUpListeners(canvas, html);
+    }
+
+    fetchState() {
+        var myState = this;
+        fetch(`/scene/${video.name}`, {
+            method: 'get'
+        }).then((response) => {
+            return response.json();
+        }).then((json) => {
+            myState.things = json.map(Thing.fromJson);
+            myState.valid = false;
+            myState.frame = myState.frame; // trigger reload of frame
+        });
+    }
+
+    saveState() {
+        var state = JSON.stringify(this.things.map(Thing.toJson));
+        fetch(`/scene/${video.name}`, {
+            headers: new Headers({'Content-Type': 'application/json'}),
+            method: 'post',
+            body: state,
+        }).then((response) => {
+            if (response.status == 200) {
+                console.log('State saved successfully.');
+            }
+        });
     }
 
     setUpListeners(canvas, html) {

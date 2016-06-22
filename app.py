@@ -3,7 +3,7 @@
 import os, json
 
 from flask import Flask, request
-from flask import render_template, send_from_directory
+from flask import render_template, send_from_directory, abort
 app = Flask(__name__)
 app.config['DEBUG'] = True
 
@@ -25,6 +25,8 @@ def read_scene(scene_name):
 @app.route('/scene/<scene_name>', methods=['POST'])
 def write_scene(scene_name):
     scene_json = request.get_json()
+    if scene_json is None:
+        abort(400) 
     with open(os.path.join('scene', scene_name + '.json'), 'w') as f:
         json.dump(scene_json, f)
     return 'successfully saved to {}.json'.format(scene_name)
