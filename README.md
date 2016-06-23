@@ -11,7 +11,7 @@ Clone the repository
 cd BeaverDam
 virtualenv -p python3 venv
 . venv/bin/activate
-pip3 install flask
+pip3 install -r requirements.txt
 ```
 
 ## Downloading Sample Data

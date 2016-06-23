@@ -32,4 +32,4 @@ def write_scene(scene_name):
     return 'successfully saved to {}.json'.format(scene_name)
 
 if __name__ == '__main__':
-    app.run()
+    app.run(host='0.0.0.0')
