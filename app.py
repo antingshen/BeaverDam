@@ -13,10 +13,10 @@ def root():
 
 @app.route('/video/<video_name>')
 def video(video_name):
-	video_data = {
-		'name': video_name,
-	}
-	return render_template('video.html', video_data=video_data)
+    video_data = {
+        'name': video_name,
+    }
+    return render_template('video.html', video_data=video_data)
 
 @app.route('/scene/<scene_name>', methods=['GET'])
 def read_scene(scene_name):
