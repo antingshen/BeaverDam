@@ -13,8 +13,13 @@ def root():
 
 @app.route('/video/<video_name>')
 def video(video_name):
+    if os.path.exists(os.path.join('static', 'videos', video_name)):
+        video_location = 'static'
+    else:
+        video_location = 's3'
     video_data = {
         'name': video_name,
+        'location': video_location,
     }
     return render_template('video.html', video_data=video_data)
 

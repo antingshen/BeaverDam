@@ -14,7 +14,7 @@ virtualenv -p python3 venv
 pip3 install -r requirements.txt
 ```
 
-## Downloading Sample Data
+### (Optional) Downloading Sample Data
 
 Download `https://s3-us-west-2.amazonaws.com/beaverdam/test_vid.zip` and extract into
 `BeaverDam/static/videos/test_vid`

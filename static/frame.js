@@ -4,9 +4,16 @@ PREFETCH_NUMBER = 500;
 var images = [];
 
 function frame_path(frame) {
+    if (video.location == 'static') {
+        var urlRoot = '/static';
+    } else if (video.location == 's3') {
+        var urlRoot = 'https://s3-us-west-2.amazonaws.com/beaverdam';
+    } else {
+        var urlRoot = video.location;
+    }
     block_0 = Math.floor(frame / 10000);
     block_1 = Math.floor(frame / 100);
-    return `/static/videos/${video.name}/${block_0}/${block_1}/${frame}.jpg`;
+    return `${urlRoot}/videos/${video.name}/${block_0}/${block_1}/${frame}.jpg`;
 }
 
 function frame_url(frame) {
