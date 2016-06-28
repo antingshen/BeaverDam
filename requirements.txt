@@ -1,2 +1,2 @@
-Flask==0.11
+Django==1.9
 uWSGI

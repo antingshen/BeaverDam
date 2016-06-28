@@ -77,7 +77,7 @@ class Canvas {
 
     fetchState() {
         var myState = this;
-        fetch(`/scene/${video.name}`, {
+        fetch(`/annotation/${video.name}`, {
             method: 'get'
         }).then((response) => {
             return response.json();
@@ -90,7 +90,7 @@ class Canvas {
 
     saveState() {
         var state = JSON.stringify(this.things.map(Thing.toJson));
-        fetch(`/scene/${video.name}`, {
+        fetch(`/annotation/${video.name}`, {
             headers: new Headers({'Content-Type': 'application/json'}),
             method: 'post',
             body: state,
