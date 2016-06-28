@@ -8,7 +8,7 @@ class Canvas {
         this.canvas = canvas;                              // Canvas passed in.
         this.padding = 100;                                // White padding outside of background image.
         this.numberOfFrames = 5000;
-        this.scrollBarSize = 636;
+
 
         /* Gets the first frame's height and width and sets up canvas to it. */
         var img = new Image();
@@ -18,8 +18,14 @@ class Canvas {
         this.width = canvas.width;                         // Width of the canvas.
         this.height = canvas.height;                       // Height of the canvas.
         this.ctx = canvas.getContext('2d');                // Canvas to be modified.
+        document.getElementById("scroll-bar").style.width = canvas.width - 200;
+        this.scrollBarSize = canvas.width - 215;
+        this.diamondHeight = img.naturalHeight + 212;
+
 
         document.getElementById("fixed-panel").style.width = this.width + 20;
+        document.getElementById("key-frames-controller").style.width = this.width + 7;
+        document.getElementById("frame-controller").style.width = this.width + 7;
         document.getElementById("frame-controller").style.width = this.width + 7;
 
         this.selectionWidth = 2;                           // Border fillSize of selected boxes.
@@ -408,6 +414,7 @@ class Canvas {
                 dot.className = "dots";
                 dot.style = `left: ${box.frame / this.numberOfFrames * this.scrollBarSize}px;`;
                 dot.setAttribute("location", box.frame);
+                dot.style.marginTop = this.diamondHeight;
                 dot.addEventListener("click", function () {
                     this.frame = this.getAttribute("location");
                 });

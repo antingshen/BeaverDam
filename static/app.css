@@ -12,7 +12,6 @@
 
 #scroll-bar {
     display: inline-block;
-    width: 80%;
 }
 
 #fixed-panel {
@@ -63,7 +62,7 @@
     border-bottom: 7px solid #f0ad4e;
     position: absolute;
     margin-left: 72px;
-    margin-top: 617px;
+
     top: -5px;
 }
 .dots:after {
