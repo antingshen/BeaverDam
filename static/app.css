@@ -12,7 +12,6 @@
 
 #scroll-bar {
     display: inline-block;
-    width: 80%;
 }
 
 #fixed-panel {
@@ -54,12 +53,24 @@
 .panel-space {
     margin: 50px;
 }
-.dots{
-    margin-left: 72px;
-    width: 5px;
-    height: 5px;
-    background: #f0ad4e;
-    border-radius: 2px;
-    display: block;
+
+
+.dots {
+    width: 0;
+    height: 0;
+    border: 5px solid transparent;
+    border-bottom: 7px solid #f0ad4e;
     position: absolute;
+    margin-left: 72px;
+
+    top: -5px;
+}
+.dots:after {
+    content: '';
+    position: absolute;
+    left: -5px; top: 7px;
+    width: 0;
+    height: 0;
+    border: 5px solid transparent;
+    border-top: 7px solid #f0ad4e;
 }

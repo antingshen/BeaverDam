@@ -10,7 +10,7 @@ class Canvas {
         this.canvas = canvas;                              // Canvas HTML element passed in.
         this.padding = 100;                                // White padding outside of background image.
         this.numberOfFrames = 5000;
-        this.scrollBarSize = 636;
+
 
         /* Gets the first frame's height and width and sets up canvas to it. */
         var img = new Image();
@@ -20,8 +20,14 @@ class Canvas {
         this.width = canvas.width;                         // Width of the canvas.
         this.height = canvas.height;                       // Height of the canvas.
         this.ctx = canvas.getContext('2d');                // Canvas to be modified.
+        document.getElementById("scroll-bar").style.width = canvas.width - 200;
+        this.scrollBarSize = canvas.width - 215;
+        this.diamondHeight = img.naturalHeight + 212;
+
 
         document.getElementById("fixed-panel").style.width = this.width + 20;
+        document.getElementById("key-frames-controller").style.width = this.width + 7;
+        document.getElementById("frame-controller").style.width = this.width + 7;
         document.getElementById("frame-controller").style.width = this.width + 7;
 
         this.selectionWidth = 2;                           // Border fillSize of selected boxes.
@@ -165,6 +171,13 @@ class Canvas {
             thingDom.innerText = newThing.type;
             thingDom.addEventListener("click", function() {
                 myState.selection = myState.getBox(newThing);
+                if (!myState.selection) {
+                    var firstBox = newThing.keyframes[0];
+                    var previousBox = new Box(newThing, myState.frame, firstBox.x, firstBox.y, firstBox.w, firstBox.h);
+
+                    myState.boxes.push(previousBox);
+                    myState.selection = previousBox;
+                }
                 myState.valid = false;
             });
 
@@ -327,6 +340,7 @@ class Canvas {
                 return box;
             }
         }
+        return null;
     }
 
     /**
@@ -429,9 +443,14 @@ class Canvas {
                 dot.className = "dots";
                 dot.style = `left: ${box.frame / this.numberOfFrames * this.scrollBarSize}px;`;
                 dot.setAttribute("location", box.frame);
-                dot.addEventListener("click", function () {
-                    this.frame = this.getAttribute("location");
-                });
+                dot.style.marginTop = this.diamondHeight;
+                (function (myState) {
+                    dot.addEventListener("click", function () {
+                        myState.frame = this.getAttribute("location");
+
+                    });
+                })(this);
+
                 document.getElementById("key-frames").appendChild(dot);
             }
         }
