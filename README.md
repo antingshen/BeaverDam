@@ -14,12 +14,15 @@ virtualenv -p python3 venv
 pip3 install -r requirements.txt
 ```
 
-### (Optional) Downloading Sample Data
+#### Download Sample Database
+`wget https://s3-us-west-2.amazonaws.com/beaverdam/db.sqlite3 db.sqlite3`
+
+#### Download Sample Data (Optional)
 
 Download `https://s3-us-west-2.amazonaws.com/beaverdam/test_vid.zip` and extract into
 `BeaverDam/static/videos/test_vid`
 
 ## Running the Server
 
-`./run_server.sh`
+`./run_server`
 Then navigate to `localhost:5000/video/test_vid` in your browser.

@@ -2,7 +2,7 @@
     <head>
         <link rel="stylesheet" type="text/css" href="/static/app.css"/>
         <script>
-            video = {{ video_data|tojson }};
+            video = {{ video_data|safe }};
         </script>
         <script src="/static/box.js"></script>
         <script src="/static/thing.js"></script>

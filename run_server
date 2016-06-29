@@ -5,4 +5,4 @@ then
     echo "To do so, run \"source venv/bin/activate\""
     exit 1
 fi
-python3 app.py
+./manage.py runserver 0.0.0.0:5000
