@@ -415,9 +415,13 @@ class Canvas {
                 dot.style = `left: ${box.frame / this.numberOfFrames * this.scrollBarSize}px;`;
                 dot.setAttribute("location", box.frame);
                 dot.style.marginTop = this.diamondHeight;
-                dot.addEventListener("click", function () {
-                    this.frame = this.getAttribute("location");
-                });
+                (function (myState) {
+                    dot.addEventListener("click", function () {
+                        myState.frame = this.getAttribute("location");
+
+                    });
+                })(this);
+
                 document.getElementById("key-frames").appendChild(dot);
             }
         }
