@@ -22,7 +22,7 @@ class Canvas {
         this.ctx = canvas.getContext('2d');                // Canvas to be modified.
         document.getElementById("scroll-bar").style.width = canvas.width - 200;
         this.scrollBarSize = canvas.width - 215;
-        this.diamondHeight = img.naturalHeight + 212;
+        this.diamondHeight = img.naturalHeight + 226;
 
 
         document.getElementById("fixed-panel").style.width = this.width + 20;
@@ -287,6 +287,10 @@ class Canvas {
                 myState.frame += 1;
             }
         }, myState.interval);
+
+        document.getElementById("submit").addEventListener("click", function() {
+            myState.saveState();
+        })
     }
 
     get frame() {return this._frame;}
