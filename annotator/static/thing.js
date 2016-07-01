@@ -88,7 +88,7 @@ class Thing {
         return this.keyframes.length == 0;
     }
 
-    drawBox(myState) {
+    drawButton(myState) {
         var thingDom = document.createElement("li");
         thingDom.className = "list-group-item col-xs-6";
         thingDom.id = this.fill;

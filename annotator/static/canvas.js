@@ -86,7 +86,7 @@ class Canvas {
             myState.valid = false;
             myState.frame = myState.frame; // trigger reload of frame
             for (var thing of myState.things) {
-                thing.drawBox(myState);
+                thing.drawButton(myState);
             }
         });
 
@@ -167,7 +167,7 @@ class Canvas {
             myState.selection = newBox;
             myState.enlargeDirection = Box.border.BOTTOMRIGHT;
 
-            newThing.drawBox(myState);
+            newThing.drawButton(myState);
 
 
 
