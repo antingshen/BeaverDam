@@ -101,6 +101,10 @@ class Canvas {
         }).then((response) => {
             if (response.status == 200) {
                 console.log('State saved successfully.');
+                document.getElementById("response").innerHTML = 'State saved successfully.';
+            } else {
+                document.getElementById("response").innerHTML = response.statusText;
+                console.log(response);
             }
         });
     }
