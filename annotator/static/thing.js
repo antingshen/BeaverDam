@@ -88,5 +88,26 @@ class Thing {
         return this.keyframes.length == 0;
     }
 
+    drawBox(myState) {
+        var thingDom = document.createElement("li");
+        thingDom.className = "list-group-item col-xs-6";
+        thingDom.id = this.fill;
+        var length =  this.type.length + 70;
+        thingDom.style = "color: azure; background-color: " + this.fill + "; width: " + length + "px";
+        thingDom.innerText = this.type;
+        thingDom.addEventListener("click", function() {
+            myState.selection = myState.getBox(this);
+            if (!myState.selection) {
+                var firstBox = this.keyframes[0];
+                var previousBox = new Box(this, myState.frame, firstBox.x, firstBox.y, firstBox.w, firstBox.h);
+
+                myState.boxes.push(previousBox);
+                myState.selection = previousBox;
+            }
+            myState.valid = false;
+        });
+        document.getElementById("shape-list").appendChild(thingDom);
+    }
+
 
 }

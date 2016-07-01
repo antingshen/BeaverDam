@@ -85,7 +85,11 @@ class Canvas {
             myState.things = json.map(Thing.fromJson);
             myState.valid = false;
             myState.frame = myState.frame; // trigger reload of frame
+            for (var thing of myState.things) {
+                thing.drawBox(myState);
+            }
         });
+
     }
 
     saveState() {
@@ -163,26 +167,10 @@ class Canvas {
             myState.selection = newBox;
             myState.enlargeDirection = Box.border.BOTTOMRIGHT;
 
-            var thingDom = document.createElement("li");
-            thingDom.className = "list-group-item col-xs-6";
-            thingDom.id = newThing.fill;
-            var length =  newThing.type.length + 70;
-            thingDom.style = "color: azure; background-color: " + newThing.fill + "; width: " + length + "px";
-            thingDom.innerText = newThing.type;
-            thingDom.addEventListener("click", function() {
-                myState.selection = myState.getBox(newThing);
-                if (!myState.selection) {
-                    var firstBox = newThing.keyframes[0];
-                    var previousBox = new Box(newThing, myState.frame, firstBox.x, firstBox.y, firstBox.w, firstBox.h);
-
-                    myState.boxes.push(previousBox);
-                    myState.selection = previousBox;
-                }
-                myState.valid = false;
-            });
+            newThing.drawBox(myState);
 
 
-            document.getElementById("shape-list").appendChild(thingDom);
+
 
         }, true);
 
