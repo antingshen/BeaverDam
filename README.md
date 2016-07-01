@@ -22,6 +22,15 @@ pip3 install -r requirements.txt
 Download `https://s3-us-west-2.amazonaws.com/beaverdam/test_vid.zip` and extract into
 `BeaverDam/static/videos/test_vid`
 
+#### Export mturk Keys (only required for mturk module)
+
+Replace the credentials below with your own
+```
+export MTURK_ID="AKIAAAAYOURIDHERE"
+export MTURK_KEY="YOURmturkKEYhere5DyUrkm/81SRSMG+5174"
+```
+Then edit `settings.py` MTURK_HOST to point at real mturk instead of sandbox when ready.
+
 ## Running the Server
 
 `./run_server`

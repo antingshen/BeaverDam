@@ -3,6 +3,7 @@ from django.conf import settings
 from django.http import HttpResponse, Http404
 from django.views.generic import View
 from django.contrib.staticfiles import finders
+from django.views.decorators.clickjacking import xframe_options_exempt
 
 import os
 import json
@@ -13,6 +14,7 @@ from .models import *
 def home(request):
     return video(request, 'test_vid')
 
+@xframe_options_exempt
 def video(request, video_name):
     try:
         video = Video.objects.get(name=video_name)
