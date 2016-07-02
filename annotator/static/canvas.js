@@ -22,7 +22,7 @@ class Canvas {
         this.ctx = canvas.getContext('2d');                // Canvas to be modified.
         document.getElementById("scroll-bar").style.width = canvas.width - 200;
         this.scrollBarSize = canvas.width - 215;
-        this.diamondHeight = img.naturalHeight + 212;
+        this.diamondHeight = img.naturalHeight + 226;
 
 
         document.getElementById("fixed-panel").style.width = this.width + 20;
@@ -85,7 +85,11 @@ class Canvas {
             myState.things = json.map(Thing.fromJson);
             myState.valid = false;
             myState.frame = myState.frame; // trigger reload of frame
+            for (var thing of myState.things) {
+                thing.drawButton(myState);
+            }
         });
+
     }
 
     saveState() {
@@ -97,6 +101,10 @@ class Canvas {
         }).then((response) => {
             if (response.status == 200) {
                 console.log('State saved successfully.');
+                document.getElementById("response").innerHTML = 'State saved successfully.';
+            } else {
+                document.getElementById("response").innerHTML = response.statusText;
+                console.log(response);
             }
         });
     }
@@ -163,26 +171,10 @@ class Canvas {
             myState.selection = newBox;
             myState.enlargeDirection = Box.border.BOTTOMRIGHT;
 
-            var thingDom = document.createElement("li");
-            thingDom.className = "list-group-item col-xs-6";
-            thingDom.id = newThing.fill;
-            var length =  newThing.type.length + 70;
-            thingDom.style = "color: azure; background-color: " + newThing.fill + "; width: " + length + "px";
-            thingDom.innerText = newThing.type;
-            thingDom.addEventListener("click", function() {
-                myState.selection = myState.getBox(newThing);
-                if (!myState.selection) {
-                    var firstBox = newThing.keyframes[0];
-                    var previousBox = new Box(newThing, myState.frame, firstBox.x, firstBox.y, firstBox.w, firstBox.h);
-
-                    myState.boxes.push(previousBox);
-                    myState.selection = previousBox;
-                }
-                myState.valid = false;
-            });
+            newThing.drawButton(myState);
 
 
-            document.getElementById("shape-list").appendChild(thingDom);
+
 
         }, true);
 
@@ -299,6 +291,10 @@ class Canvas {
                 myState.frame += 1;
             }
         }, myState.interval);
+
+        document.getElementById("submit").addEventListener("click", function() {
+            myState.saveState();
+        })
     }
 
     get frame() {return this._frame;}

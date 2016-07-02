@@ -9,6 +9,7 @@
         <script src="/static/canvas.js"></script>
         <script src="/static/frame.js"></script>
         <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.js"></script>
     </head>
 
@@ -28,6 +29,30 @@
                             <span class="label label-warning">Vehicle <input type="radio" name="object" value="vehicle"></span>
                             <span class="label label-danger">Other <input type="radio" name="object" value="other"> </span>
                         </div>
+
+                        <button id="submit" type="button"  class="btn btn-primary" data-toggle="modal" data-target="#myModal" style="margin-left: 300px">Submit</button>
+
+                        <!-- Modal -->
+                        <div class="modal fade" id="myModal" role="dialog">
+                            <div class="modal-dialog">
+
+                                <!-- Modal content-->
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                        <h4 class="modal-title">Notification</h4>
+                                    </div>
+                                    <div class="modal-body">
+                                        <p id="response"></p>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
 
                         <canvas id="frame">
                         </canvas>
@@ -60,7 +85,9 @@
                 </div>
 
             </div>
+
         </div>
+
     </body>
 
 </html>
