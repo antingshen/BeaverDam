@@ -1,0 +1,40 @@
+{
+  "node": true,
+  "esnext": true,
+  "bitwise": true,
+  "camelcase": true,
+  // "curly": true,
+  "eqeqeq": false,
+  "eqnull": true,
+  "immed": true,
+  "indent": 4,
+  "latedef": true,
+  "newcap": true,
+  "noarg": true,
+  "predef": [
+    // browser
+    "document",
+    "window",
+    "navigator",
+    "Headers",
+    "fetch",
+
+    // plugins
+    "Raphael",
+    "$",
+
+    // app
+    "Bounds",
+    "ThingDrawing",
+    "Thing",
+    "Player"
+  ],
+  // "quotmark": "double",
+  "regexp": true,
+  "undef": true,
+  "unused": true,
+  "strict": true,
+  "trailing": true,
+  "smarttabs": true,
+  "white": true
+}
