@@ -1,3 +1,19 @@
+.player-screen {
+  position: relative;
+  overflow: hidden;
+}
+
+.player-video {
+    // position: absolute;
+    top: 0;
+}
+
+.player-paper {
+    position: absolute;
+    top: 0;
+}
+
+
 #frame {
     display: block;
     background-color: #eee;
@@ -39,11 +55,6 @@
 #frame-number {
     display: inline-block;
     width: 60px;
-}
-
-#play-button {
-    font-size: 1.2em;
-    padding-right: 5px;
 }
 
 #key-frames-controller{
