@@ -3,6 +3,8 @@ from django.contrib import admin
 
 from annotator.views import *
 
+admin.site.site_header = 'BeaverDam Admin'
+
 urlpatterns = [
     url(r'^$', home),
     url(r'^video/(\w+)', video, name='video'),

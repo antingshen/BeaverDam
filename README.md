@@ -29,9 +29,10 @@ Replace the credentials below with your own
 export MTURK_ID="AKIAAAAYOURIDHERE"
 export MTURK_KEY="YOURmturkKEYhere5DyUrkm/81SRSMG+5174"
 ```
-Then edit `settings.py` MTURK_HOST to point at real mturk instead of sandbox when ready.
+When ready for real turkers, edit `MTURK_SANDBOX` to `False` in `settings.py`.
 
 ## Running the Server
 
 `./run_server`
 Then navigate to `localhost:5000/video/test_vid` in your browser.
+

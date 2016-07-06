@@ -10,8 +10,8 @@ mturk = Server(settings.MTURK_ID, settings.MTURK_KEY, settings.URL_ROOT, setting
 
 
 class Task(models.Model):
-    hit_id = models.CharField(max_length=64)
-    hit_group = models.CharField(max_length=64)
+    hit_id = models.CharField(max_length=64, blank=True)
+    hit_group = models.CharField(max_length=64, blank=True)
     duration = 7200 # 2 hours
     lifetime = 60*15 # 2592000 # 30 days
 
@@ -23,6 +23,7 @@ class Task(models.Model):
             self.pay, self.duration, self.lifetime)
         self.hit_id = response.values['hitid']
         self.hit_group = response.values['hittypeid']
+        self.save()
 
 
 class FullVideoTask(Task):
@@ -34,3 +35,6 @@ class FullVideoTask(Task):
     @property
     def url(self):
         return reverse('video', args=[self.video.name])
+
+    def __str__(self):
+        return self.video.name

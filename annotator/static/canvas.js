@@ -88,26 +88,42 @@ class Canvas {
             for (var thing of myState.things) {
                 thing.drawButton(myState);
             }
-        });
+        }, () => {});
 
     }
 
-    saveState() {
+    saveState(mturk = false) {
         var state = JSON.stringify(this.things.map(Thing.toJson));
-        fetch(`/annotation/${video.name}`, {
-            headers: new Headers({'Content-Type': 'application/json'}),
+        var request = {
+            headers: {
+                'X-CSRFToken': CSRFToken,
+                'Content-Type': 'application/json',
+            },
+            credentials: 'same-origin',
             method: 'post',
             body: state,
-        }).then((response) => {
-            if (response.status == 200) {
-                console.log('State saved successfully.');
-                document.getElementById("response").innerHTML = 'State saved successfully.';
+        };
+        fetch(`/annotation/${video.name}`, request).then((response) => {
+            if (response.ok) {
+                if (mturk) {
+                    document.getElementById("turk-form").submit();
+                } else {
+                    console.log('State saved successfully.');
+                    document.getElementById("response").innerHTML = 'State saved successfully.';
+                }
             } else {
                 document.getElementById("response").innerHTML = response.statusText;
-                console.log(response);
+                return response.text();
+            }
+        }).then((text) => {
+            if (text) {
+                console.log(text);
+            } else {
+                console.log(state);
             }
         });
     }
+
 
     setUpListeners(canvas, html) {
         /* Since we want to modify the state of the canvas, we use closure in order
@@ -292,8 +308,9 @@ class Canvas {
             }
         }, myState.interval);
 
-        document.getElementById("submit").addEventListener("click", function() {
-            myState.saveState();
+        document.getElementById("submit-btn").addEventListener("click", function(e) {
+            e.preventDefault();
+            myState.saveState(assignmentId != 'None');
         })
     }
 

@@ -19,9 +19,9 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '8pje5%pxibt2c=&j_c+ly5v@x)$r77%h-x3%jluq-@)4^75)ak'
 DEBUG = True
 
-URL_ROOT = os.environ.get('URL_ROOT')
-MTURK_ID = os.environ.get('MTURK_ID')
-MTURK_KEY = os.environ.get('MTURK_KEY')
+URL_ROOT = os.environ.get('URL_ROOT', 'url_root')
+MTURK_ID = os.environ.get('MTURK_ID', 'mturk_id')
+MTURK_KEY = os.environ.get('MTURK_KEY', 'mturk_key')
 MTURK_SANDBOX = True
 assert MTURK_SANDBOX or not DEBUG
 
@@ -96,6 +96,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+CSRF_COOKIE_SECURE = not DEBUG
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.9/topics/i18n/
