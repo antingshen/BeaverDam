@@ -15,19 +15,23 @@ class ThingDrawing {
         this.rect = this.paper.rect(0, 0, 0, 0);
 
         // Reference self
-        this.rect.data('box', this);
+        // this.rect.data('box', this);
 
         // Default attr
+        this.setDefaultAppearance();
+
+        // Handlers
+        this.rect.mousemove(this.onMouseover.bind(this));
+        this.rect.drag(this.onDragMove.bind(this), this.onDragStart.bind(this), this.onDragEnd.bind(this));
+    }
+
+    setDefaultAppearance() {
         this.rect.attr({
             'fill': this.thing.fill,
             'stroke': 'black',
             'stroke-width': 5,
             'opacity': 0.5
-        });
-
-        // Handlers
-        this.rect.mousemove(this.onMouseover.bind(this));
-        this.rect.drag(this.onDragMove.bind(this), this.onDragStart.bind(this), this.onDragEnd.bind(this));
+        });        
     }
 
 
@@ -147,3 +151,60 @@ class ThingDrawing {
         }
     }
 }
+
+void ThingDrawing;
+
+
+class NewThingDrawing extends ThingDrawing {
+    constructor(player, thing) {
+        Object.assign(this, {player, thing});
+    }
+
+    setDefaultAppearance() {
+        this.makeHidden();
+    }
+
+    makeHidden() {
+        this.rect.toBack();
+        this.setBounds({
+            xMin: 0,
+            xMax: this.player.video.videoWidth,
+            yMin: 0,
+            yMax: this.player.video.videoHeight,
+        });
+        this.rect.attr({
+            'fill': 'transparent',
+            'stroke': 'transparent',
+            'stroke-width': 0,
+            'opacity': 0
+        });
+    }
+
+    makeVisible() {
+        this.rect.attr({
+            'fill': 'yellow',
+            'stroke': 'black',
+            'stroke-width': 5,
+            'opacity': 0.5
+        });
+        this.rect.toFront();
+    }
+
+    onDragStart() {
+        this.boundsBeforeDrag = this.bounds();
+    }
+
+    onDragEnd() {
+        var bounds = this.bounds();
+        if (!Bounds.equals(bounds, this.boundsBeforeDrag))
+            this.thing.updateKeyframeAtTime({
+                time: this.player.video.currentTime * 1000,
+                bounds: bounds,
+            });
+        this.boundsBeforeDrag = undefined;
+    }
+
+    onMouseover() {}
+}
+
+void NewThingDrawing;

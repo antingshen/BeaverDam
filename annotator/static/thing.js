@@ -67,6 +67,12 @@ class Thing {
             this.drawing.setBounds(bounds);
     }
 
+    /**
+     * A "frame" is the interpolation of the two closest keyframes. It tells us:
+     * - The previous and next keyframes
+     * - If there is a keyframe close enough (<= sameFrameThreshold away) to be considered the same frame
+     * - The bounds for the thing at this time
+     */
     getFrameAtTime(time) {
         var prevIndex = null;
         var nextIndex = null;
@@ -156,3 +162,5 @@ class Thing {
         return true;
     }
 }
+
+void Thing;

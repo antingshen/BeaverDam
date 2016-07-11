@@ -1,30 +1,41 @@
 "use strict";
 
 /* A Bounds object describes a bounding box. The class has 4 members: xMin,
-   xMax, yMin, yMax.
+   xMax, yMin, yMax. In Bounds objects, it is guaranteed that xMin <= xMax &&
+   yMin <= yMax.
 
-   We don't need an actual class for it, so we just construct it using object
-   notation:
+   We don't need a constructor for Bounds objects, so we just construct it
+   using object notation:
 
-    {
+    var bounds = {
         xMin: ...
         xMax: ...
         yMin: ...
         yMax: ...
-    }
+    };
 
-   This class holds utility/math functions for Bounds objects.
+   The Bounds class holds utility/math functions for Bounds objects.
  */
 
 class Bounds {
+    static normalize(bounds) {
+        var {xMin, xMax, yMin, yMax} = bounds;
+        return {
+            xMin: Math.min(xMin, xMax),
+            xMax: Math.max(xMin, xMax),
+            yMin: Math.min(yMin, yMax),
+            yMax: Math.max(yMin, yMax),
+        };
+    }
+
     static fromAttrs(attrs) {
         var {x, y, width, height} = attrs;
-        return {
-            xMin: Math.min(x, x + width),
-            xMax: Math.max(x, x + width),
-            yMin: Math.min(y, y + height),
-            yMax: Math.max(y, y + height),
-        };
+        return Bounds.normalize({
+            xMin: x,
+            xMax: x + width,
+            yMin: y,
+            yMax: y + height,
+        });
     }
 
     static toAttrs(bounds) {
@@ -39,15 +50,18 @@ class Bounds {
 
     static resize(bounds, dxMin = 0, dxMax = 0, dyMin = 0, dyMax = 0) {
         var {xMin, xMax, yMin, yMax} = bounds;
-        return {
+        return Bounds.normalize({
             xMin: xMin + dxMin,
             xMax: xMax + dxMax,
             yMin: yMin + dyMin,
             yMax: yMax + dyMax,
-        };
+        });
     }
 
     static interpolate(bounds0, bounds1, frac) {
+        if (frac < 0 || frac > 1)
+            throw new Error("Bounds.interpolate: invalid argument: frac");
+
         var ifrac = 1.0 - frac;
         return {
             xMin: bounds0.xMin * ifrac + bounds1.xMin * frac,
@@ -65,3 +79,5 @@ class Bounds {
         return true;
     }
 }
+
+void Bounds;

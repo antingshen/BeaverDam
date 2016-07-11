@@ -1,6 +1,9 @@
 "use strict";
 
-function setupPromise(cond = {}) {
+function makeCustomPromise() {
+    function cond() {
+        return cond.promise;
+    }
     cond.promise = new Promise((resolve, reject) => {
         cond.resolve = resolve;
         cond.reject = reject;
@@ -8,27 +11,47 @@ function setupPromise(cond = {}) {
     return cond;
 }
 
+/**
+ * Player has the following promises:
+ *     player.videoLoaded.then(() => {code to run when video is loaded})
+ *     player.annotationsLoaded.then(() => {code to run when annotations are loaded})
+ *     player.loaded.then(() => {code to run when video AND annotations are loaded})
+ */
 class Player {
     constructor($container, src, name) {
         Object.assign(this, {$container, src, name});
 
+        // Set video props
         this.$('video').attr('src', src);
         this.video = this.$('video')[0];
 
-        setupPromise(this.videoLoaded);
-        this.$('video').on("loadedmetadata", (e) => {
+        this.setVideoHandlers();
+
+        // Promise: player.videoLoaded
+        this.videoLoaded = makeCustomPromise();
+        this.$('video').on("loadedmetadata", () => {
             this.initPaper();
-            this.setVideoHandlers();
             this.videoLoaded.resolve();
-        }).on("abort", (e) => {
+        }).on("abort", () => {
             this.videoLoaded.reject();
         });
 
-        setupPromise(this.annotationsLoaded);
+        // Promise: player.annotationsLoaded
+        this.annotationsLoaded = makeCustomPromise();
         this.loadAnnotations().then(
             this.annotationsLoaded.resolve,
             this.annotationsLoaded.reject
         );
+
+        // Promise: player.loaded
+        this.loaded = Promise.all([this.videoLoaded(), this.annotationsLoaded()]);
+    }
+
+
+    // Drawing helpers
+
+    initPaper() {
+        this.paper = Raphael(this.$('paper')[0], this.video.videoWidth, this.video.videoHeight);   
     }
 
     loadAnnotations() {
@@ -58,55 +81,89 @@ class Player {
     }
 
     drawAnnotations() {
-        var video = this.$('video')[0];
+        for (let thing of this.things) {
+            thing.drawAtTime(this.video.currentTime);
+        }
+    }
 
-        for (let i = 0; i < this.things.length; i++) {
-            let thing = this.things[i];
-            thing.drawAtTime(video.currentTime);
-        }        
+    setupNewThing(x, y) {
+        var thing = new Thing(this);
+        this.things.push(thing);
+        thing.drawing.setBounds({
+            xMin: x,
+            xMax: x,
+            yMin: y,
+            yMax: y,
+        });
+        thing.drawing.onDragStart();
     }
 
 
-    initPaper() {
-        var video = this.$('video')[0];
-        this.paper = Raphael(this.$('paper')[0], video.videoWidth, video.videoHeight);   
-    }
+    // Video control helpers
 
     setVideoHandlers() {
-        var $video = this.$('video');
-        var video = $video[0];
+        var $video = $(this.video);
 
-        // control-play => video, control-pause => video
-        this.$('control-play').on('click', (e) => video.play());
-        this.$('control-pause').on('click', (e) => video.pause());
+        // control-play => video
+        // control-pause => video
+        this.$on('control-play', 'click', () => this.video.play());
+        this.$on('control-pause', 'click', () => this.video.pause());
 
         // video <=> control-time
-        this.$('control-time').on('change', (e) => video.currentTime = parseFloat(this.$('control-time').val()));
-        $video.on('timeupdate', (e) => this.$('control-time:not(:focus)').val(video.currentTime.toFixed(2)));
+        this.$on('control-time', 'change', () => this.videoTime = this.controlTime);
+        $video.on('timeupdate', () => this.controlTimeUnfocused = this.videoTime);
 
         // video <=> control-scrubber
-        this.$('control-scrubber').on('change input', (e) => video.currentTime = parseFloat(this.$('control-scrubber').val()) / 10000 * video.duration);
-        $video.on('timeupdate', (e) => this.$('control-scrubber:not(:focus)').val(video.currentTime * 10000 / video.duration));
+        this.$on('control-scrubber', 'change input', () => this.videoTime = this.controlScrubber);
+        $video.on('timeupdate', () => this.controlScrubberUnfocused = this.videoTime);
 
-        $video.on('timeupdate', (e) => {
+        // video => (annotations)
+        $video.on('timeupdate', () => {
             this.drawAnnotations();
         });
     }
+
+    get controlTime() {
+        return parseFloat(this.$('control-time').val());
+    }
+
+    get controlTimeUnfocused() {
+        return this.controlTime;
+    }
+
+    set controlTimeUnfocused(value) {
+        this.$('control-time:not(:focus)').val(value.toFixed(2));
+    }
+
+    get controlScrubber() {
+        return parseFloat(this.$('control-scrubber').val()) / 10000 * this.video.duration;
+    }
+    get controlScrubberUnfocused() {
+        return this.controlScrubber;
+    }
+
+    set controlScrubberUnfocused(value) {
+        this.$('control-scrubber:not(:focus)').val(value * 10000 / this.video.duration);
+    }
+
+    get videoTime() {
+        return this.video.currentTime;
+    }
+
+    set videoTime(value) {
+        this.video.currentTime = value;
+    }
+
+
+    // DOM/jQuery helpers
 
     $(selector) {
         return this.$container.find(`.player-${selector}`);
     }
 
-    videoLoaded() {
-        return this.videoLoaded.promise;
-    }
-
-    annotationsLoaded() {
-        return this.annotationsLoaded.promise;
-    }
-
-    loaded() {
-        return Promise.all([this.videoLoaded(), this.annotationsLoaded()]);
+    $on(selector, eventName, callback) {
+        return this.$container.on(eventName, `.player-${selector}`, callback);
     }
 }
 
+void Player;
