@@ -63,9 +63,10 @@ class Thing {
         var {bounds} = this.getFrameAtTime(time * 1000);
 
         // Don't fuck up our drag
-        if (this.boundsBeforeDrag == null) {
-            this.drawing.setBounds(bounds);
-        }
+        if (this.drawing.isBeingDragged()) return;
+
+        this.drawing.setBounds(bounds);
+        this.drawing.setSelected(this.player.selectedThing === this);
     }
 
 

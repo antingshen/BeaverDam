@@ -21,8 +21,9 @@ class ThingDrawing {
         this.setDefaultAppearance();
 
         // Handlers
-        this.rect.mousemove(this.onMouseover.bind(this));
+        this.rect.mousedown(this.onClick.bind(this));
         this.rect.drag(this.onDragMove.bind(this), this.onDragStart.bind(this), this.onDragEnd.bind(this));
+        this.rect.mousemove(this.onMouseover.bind(this));
     }
 
     setDefaultAppearance() {
@@ -32,6 +33,15 @@ class ThingDrawing {
             'stroke-width': 5,
             'opacity': 0.5
         });        
+    }
+
+    setSelected(isSelected) {
+        if (isSelected) {
+            this.rect.attr({'opacity': 0.7});
+        }
+        else {
+            this.rect.attr({'opacity': 0.3});
+        }
     }
 
 
@@ -59,6 +69,22 @@ class ThingDrawing {
             x: xMin + dx,
             y: yMin + dy,
         });
+    }
+
+
+    // Event handler: Click
+    
+    onClick() {
+        this.player.selectedThing = this.thing;
+        this.player.drawAnnotations();
+        this.rect.toFront();
+    }
+
+    
+    // Event handler: Drag
+    
+    isBeingDragged() {
+        return this.boundsBeforeDrag != null;
     }
 
     onDragStart() {
@@ -108,6 +134,9 @@ class ThingDrawing {
         }
         this.boundsBeforeDrag = undefined;
     }
+
+
+    // Event handler: Mouseover
 
     onMouseover(e, mouseX, mouseY) {
         var paper = this.player.$("paper");

@@ -21,6 +21,8 @@ class Player {
     constructor($container, src, name) {
         Object.assign(this, {$container, src, name});
 
+        this.selectedThing = null;
+
         // Set video props
         this.$('video').attr('src', src);
         this.video = this.$('video')[0];
