@@ -137,6 +137,15 @@ class Player {
     setVideoHandlers() {
         var $video = $(this.video);
 
+        // updates time more frequently by using setInterval
+        $video.on('playing', () => {
+            this.manualTimeupdateTimerId = setInterval(() => {
+                this.$('video').trigger('timeupdate');
+            }, 30);
+        }).on('pause', () => {
+            clearInterval(this.manualTimeupdateTimerId);
+        });
+
         // control-play => video
         // control-pause => video
         this.$on('control-play', 'click', () => this.video.play());
