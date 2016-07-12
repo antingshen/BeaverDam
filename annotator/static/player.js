@@ -76,7 +76,7 @@ class Player {
             body: JSON.stringify(json),
         }).then((response) => {
             if (response.ok)
-                return Promise.resolve('State saved successfully.');
+                return Promise.resolve("State saved successfully.");
             else
                 return Promise.reject(`Error code ${response.status}`);
         });
@@ -85,6 +85,22 @@ class Player {
     drawAnnotations() {
         for (let thing of this.things) {
             thing.drawAtTime(this.video.currentTime);
+        }
+    }
+
+    drawKeyframebar() {
+        var container = this.$('keyframebar');
+
+        container.empty();
+        if (this.selectedThing == null) return;
+
+        for (let keyframe of this.selectedThing.keyframes) {
+            let frac = keyframe.time / 1000 / this.video.duration;
+            let svg = `
+            <svg height="100" width="100" class="player-keyframebar-keyframe" style="left: 0%;" viewBox="0 0 100 100" preserveAspectRatio="xMaxYMax">
+                <circle cx="50" cy="50" r="30" stroke="black" stroke-width="0" fill="orange"></circle>
+            </svg>`;
+            $(svg).css({'left': `${frac * 100}%`}).appendTo(container);
         }
     }
 

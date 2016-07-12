@@ -77,6 +77,7 @@ class ThingDrawing {
     onClick() {
         this.player.selectedThing = this.thing;
         this.player.drawAnnotations();
+        this.player.drawKeyframebar();
         this.rect.toFront();
     }
 
@@ -88,6 +89,7 @@ class ThingDrawing {
     }
 
     onDragStart() {
+        this.player.video.pause();
         this.boundsBeforeDrag = this.bounds();
     }
 

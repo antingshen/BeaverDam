@@ -156,6 +156,8 @@ class Thing {
             else {
                 this.keyframes.splice(prevIndex, 0, frame);
             }
+
+            this.player.drawKeyframebar();
         }
     }
 
@@ -165,6 +167,8 @@ class Thing {
         if (closestIndex == null) return false;
 
         this.keyframes.splice(closestIndex, 1);
+
+        this.player.drawKeyframebar();
         return true;
     }
 }

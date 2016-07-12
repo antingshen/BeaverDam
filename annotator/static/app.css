@@ -58,7 +58,7 @@
 }
 
 #key-frames-controller{
-    width: 827px;
+    /* width: 827px; */
 }
 
 .panel-space {
@@ -69,19 +69,32 @@
 .dots {
     width: 0;
     height: 0;
-    border: 5px solid transparent;
-    border-bottom: 7px solid #f0ad4e;
+    border: 50% solid transparent;
+    border-bottom: 6% solid #f0ad4e;
     position: absolute;
     margin-left: 72px;
-
-    top: -5px;
+    top: 0%;
 }
 .dots:after {
     content: '';
     position: absolute;
-    left: -5px; top: 7px;
+    left: 0%;
+    top: 0%;
     width: 0;
     height: 0;
     border: 5px solid transparent;
     border-top: 7px solid #f0ad4e;
+}
+
+
+.player-keyframebar-keyframe {
+    position: absolute;
+    color: orange;
+    width: auto;
+    height: 100%;
+    top: 0;
+}
+
+.player-keyframebar {
+    position: relative;
 }
