@@ -100,11 +100,12 @@ class ThingDrawing {
 
     onDragEnd() {
         var bounds = this.bounds();
-        if (!Bounds.equals(bounds, this.boundsBeforeDrag))
+        if (!Bounds.equals(bounds, this.boundsBeforeDrag)) {
             this.thing.updateKeyframeAtTime({
                 time: this.player.video.currentTime * 1000,
                 bounds: bounds,
             });
+        }
         this.boundsBeforeDrag = undefined;
     }
 

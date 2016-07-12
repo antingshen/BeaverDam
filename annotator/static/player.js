@@ -73,7 +73,7 @@ class Player {
             method: 'post',
             body: JSON.stringify(json),
         }).then((response) => {
-            if (response.status == 200)
+            if (response.ok)
                 return Promise.resolve('State saved successfully.');
             else
                 return Promise.reject(`Error code ${response.status}`);

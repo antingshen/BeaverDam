@@ -25,9 +25,10 @@
 
     // app
     "Bounds",
-    "ThingDrawing",
+    "NewThingDrawing",
+    "Player",
     "Thing",
-    "Player"
+    "ThingDrawing"
   ],
   // "quotmark": "double",
   "regexp": true,

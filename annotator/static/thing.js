@@ -63,9 +63,11 @@ class Thing {
         var {bounds} = this.getFrameAtTime(time * 1000);
 
         // Don't fuck up our drag
-        if (this.boundsBeforeDrag == null)
+        if (this.boundsBeforeDrag == null) {
             this.drawing.setBounds(bounds);
+        }
     }
+
 
     /**
      * A "frame" is the interpolation of the two closest keyframes. It tells us:
@@ -140,16 +142,19 @@ class Thing {
             // operate on the front of the array. If you ever forget which one
             // is which, just take away the "f" from their name and it'll be
             // super clear.
-            if (prevIndex == null)
+            if (prevIndex == null) {
                 this.keyframes.unshift(frame);
+            }
 
             // The "else" case handles this case but explicitly writing it out
             // anyway for consistency and symmertry.
-            else if (nextIndex == null)
+            else if (nextIndex == null) {
                 this.keyframes.push(frame);
+            }
 
-            else
+            else {
                 this.keyframes.splice(prevIndex, 0, frame);
+            }
         }
     }
 
