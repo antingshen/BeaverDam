@@ -7,8 +7,8 @@ admin.site.site_header = 'BeaverDam Admin'
 
 urlpatterns = [
     url(r'^$', home),
-    url(r'^video/(\w+)', video, name='video'),
-    url(r'^annotation/(\w+)', AnnotationView.as_view()),
+    url(r'^video/(\d+)', video, name='video'),
+    url(r'^annotation/(\d+)', AnnotationView.as_view()),
 
     url(r'^admin/', admin.site.urls),
 ]

@@ -12,19 +12,21 @@ from .models import *
 
 
 def home(request):
-    return video(request, 'test_vid')
+    return video(request, 0)
 
 @xframe_options_exempt
-def video(request, video_name):
+def video(request, video_id):
     try:
-        video = Video.objects.get(name=video_name)
+        video = Video.objects.get(id=video_id)
     except Video.DoesNotExist:
-        raise Http404('No video named "{}". Possible fixes: 1) Download an up to date DB, see README. 2) Add this video to the DB via /admin'.format(video_name))
+        raise Http404('No video with id "{}". Possible fixes: \n1) Download an up to date DB, see README. \n2) Add this video to the DB via /admin'.format(video_id))
 
-    if finders.find('videos/{}/0/0/0.jpg'.format(video_name)):
-        video_location = 'static'
+    if finders.find('videos/{}.mp4'.format(video.id)):
+        video_location = '/static/videos/{}.mp4'.format(video.id)
+    elif video.url:
+        video_location = video.url
     else:
-        video_location = 's3'
+        raise Exception('Video {0} does not have a url. Possible fixes: \n1) Place {0}.mp4 into static/videos to serve locally. \n2) Update the url field of the Video with id={0}'.format(video_id))
 
     assignment_id = request.GET.get('assignmentId', None)
     preview = (assignment_id == 'ASSIGNMENT_ID_NOT_AVAILABLE')
@@ -34,7 +36,7 @@ def video(request, video_name):
         worker = request.GET['workerId']
 
     video_data = json.dumps({
-        'name': video_name,
+        'id': video.id,
         'location': video_location,
         'annotated': video.annotation != '',
     })
@@ -50,13 +52,13 @@ def video(request, video_name):
 
 class AnnotationView(View):
     
-    def get(self, request, video_name):
-        video = Video.objects.get(name=video_name)
+    def get(self, request, video_id):
+        video = Video.objects.get(id=video_id)
         return HttpResponse(video.annotation, content_type='application/json')
     
-    def post(self, request, video_name):
+    def post(self, request, video_id):
         annotation = request.body.decode('utf-8')
-        video = Video.objects.get(name=video_name)
+        video = Video.objects.get(id=video_id)
         video.annotation = annotation
         video.save()
         return HttpResponse('success')
