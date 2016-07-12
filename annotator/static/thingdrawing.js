@@ -1,5 +1,11 @@
 "use strict";
 
+
+// Mousing over the RESIZE_BORDER px-border around each rectangle initiates
+// resize, else initiates move.
+const RESIZE_BORDER = 10 /* px */;
+
+
 class ThingDrawing {
     constructor(player, thing) {
         Object.assign(this, {player, thing});
@@ -130,6 +136,7 @@ class ThingDrawing {
         var bounds = this.bounds();
         if (!Bounds.equals(bounds, this.boundsBeforeDrag)) {
             this.thing.updateKeyframeAtTime({
+                // TODO magic number
                 time: this.player.video.currentTime * 1000,
                 bounds: bounds,
             });
@@ -154,29 +161,27 @@ class ThingDrawing {
         var relativeXmax = shapeWidth - relativeXmin;
         var relativeYmax = shapeHeight - relativeYmin;
 
-        var resizeBorder = 10;
-
         // Change cursor
-        if (relativeYmin < resizeBorder) {
-            if (relativeXmin < resizeBorder)
+        if (relativeYmin < RESIZE_BORDER) {
+            if (relativeXmin < RESIZE_BORDER)
                 this.rect.attr('cursor', 'nw-resize');
-            else if (relativeXmax < resizeBorder)
+            else if (relativeXmax < RESIZE_BORDER)
                 this.rect.attr('cursor', 'ne-resize');
             else
                 this.rect.attr('cursor', 'n-resize');
         }
-        else if (relativeYmax < resizeBorder) {
-            if (relativeXmin < resizeBorder)
+        else if (relativeYmax < RESIZE_BORDER) {
+            if (relativeXmin < RESIZE_BORDER)
                 this.rect.attr('cursor', 'sw-resize');
-            else if (relativeXmax < resizeBorder)
+            else if (relativeXmax < RESIZE_BORDER)
                 this.rect.attr('cursor', 'se-resize');
             else
                 this.rect.attr('cursor', 's-resize');
         }
         else {
-            if (relativeXmin < resizeBorder)
+            if (relativeXmin < RESIZE_BORDER)
                 this.rect.attr('cursor', 'w-resize');
-            else if (relativeXmax < resizeBorder)
+            else if (relativeXmax < RESIZE_BORDER)
                 this.rect.attr('cursor', 'e-resize');
             else
                 this.rect.attr('cursor', 'move');
@@ -230,6 +235,7 @@ class NewThingDrawing extends ThingDrawing {
         var bounds = this.bounds();
         if (!Bounds.equals(bounds, this.boundsBeforeDrag))
             this.thing.updateKeyframeAtTime({
+                // TODO magic number
                 time: this.player.video.currentTime * 1000,
                 bounds: bounds,
             });

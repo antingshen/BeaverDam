@@ -1,5 +1,12 @@
 "use strict";
 
+
+// Are we at a keyframe or in betwen keyframes? If we're less than
+// SAME_FRAME_THRESHOLD away from the closest keyframe, then we're at that
+// keyframe.
+const SAME_FRAME_THRESHOLD = 0.1 /* seconds */;
+
+
 class Thing {
     constructor(player, fill = Thing.getRandomColor()) {
         this.keyframes = []; // List of boxes corresponding to keyframes
@@ -73,7 +80,7 @@ class Thing {
     /**
      * A "frame" is the interpolation of the two closest keyframes. It tells us:
      * - The previous and next keyframes
-     * - If there is a keyframe close enough (<= sameFrameThreshold away) to be considered the same frame
+     * - If we're "at" (<= SAME_FRAME_THRESHOLD away from) a keyframe
      * - The bounds for the thing at this time
      */
     getFrameAtTime(time) {
@@ -111,10 +118,8 @@ class Thing {
             bounds = Bounds.interpolate(prev.bounds, next.bounds, frac);
         }
 
-        var sameFrameThreshold = 0.1;
-
         var closest = this.keyframes[closestIndex];
-        if (Math.abs(closest.time - time) > sameFrameThreshold)
+        if (Math.abs(closest.time - time) > SAME_FRAME_THRESHOLD)
             closestIndex = null;
 
         return {

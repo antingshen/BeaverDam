@@ -78,6 +78,13 @@ class Bounds {
         if (bounds0.yMax != bounds1.yMax) return false;
         return true;
     }
+
+    static greaterOrEqualTo(bounds, minDimensions) {
+        var {xMin, xMax, yMin, yMax} = bounds;
+        var {width, height} = minDimensions;
+
+        return (xMax - xMin) >= width && (yMax - yMin) >= height;
+    }
 }
 
 void Bounds;

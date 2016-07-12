@@ -1,5 +1,13 @@
 "use strict";
 
+
+const PLAYER_KEYFRAMEBAR_KEYFRAME_SVG = `
+<svg height="100" width="100" class="player-keyframebar-keyframe" style="left: 0%;" viewBox="0 0 100 100" preserveAspectRatio="xMaxYMax">
+    <circle cx="50" cy="50" r="30" stroke="black" stroke-width="0" fill="orange"></circle>
+</svg>`;
+
+
+
 function makeCustomPromise() {
     function cond() {
         return cond.promise;
@@ -50,7 +58,7 @@ class Player {
     }
 
 
-    // Drawing helpers
+    // Annotations helpers
 
     initPaper() {
         this.paper = Raphael(this.$('paper')[0], this.video.videoWidth, this.video.videoHeight);   
@@ -103,12 +111,9 @@ class Player {
         if (this.selectedThing == null) return;
 
         for (let keyframe of this.selectedThing.keyframes) {
+            // TODO magic number
             let frac = keyframe.time / 1000 / this.video.duration;
-            let svg = `
-            <svg height="100" width="100" class="player-keyframebar-keyframe" style="left: 0%;" viewBox="0 0 100 100" preserveAspectRatio="xMaxYMax">
-                <circle cx="50" cy="50" r="30" stroke="black" stroke-width="0" fill="orange"></circle>
-            </svg>`;
-            $(svg).css({'left': `${frac * 100}%`}).appendTo(container);
+            $(PLAYER_KEYFRAMEBAR_KEYFRAME_SVG).css({'left': `${frac * 100}%`}).appendTo(container);
         }
     }
 
@@ -124,8 +129,9 @@ class Player {
         thing.drawing.onDragStart();
     }
 
-    submit(e) {
+    submitAnnotations(e) {
         e.preventDefault();
+        // TODO magic number
         this.saveAnnotations(window.assignmentId.length > 4).then((response) => {
             $('#response').html(response);
         });
@@ -164,7 +170,8 @@ class Player {
             this.drawAnnotations();
         });
 
-        $('#submit-btn').click(this.submit.bind(this));
+        // TODO doesn't respect scope
+        $('#submit-btn').click(this.submitAnnotations.bind(this));
     }
 
     get controlTime() {
@@ -180,6 +187,7 @@ class Player {
     }
 
     get controlScrubber() {
+        // TODO magic number
         return parseFloat(this.$('control-scrubber').val()) / 10000 * this.video.duration;
     }
     get controlScrubberUnfocused() {
@@ -187,6 +195,7 @@ class Player {
     }
 
     set controlScrubberUnfocused(value) {
+        // TODO magic number
         this.$('control-scrubber:not(:focus)').val(value * 10000 / this.video.duration);
     }
 
