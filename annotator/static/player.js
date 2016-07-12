@@ -18,8 +18,8 @@ function makeCustomPromise() {
  *     player.loaded.then(() => {code to run when video AND annotations are loaded})
  */
 class Player {
-    constructor($container, src, name) {
-        Object.assign(this, {$container, src, name});
+    constructor($container, src, video_id) {
+        Object.assign(this, {$container, src, video_id});
 
         this.selectedThing = null;
 
@@ -57,7 +57,7 @@ class Player {
     }
 
     loadAnnotations() {
-        return fetch(`/annotation/${this.name}`, {method: 'get'}).then((response) => {
+        return fetch(`/annotation/${this.video_id}`, {method: 'get'}).then((response) => {
             return response.json();
         }).then((json) => {
             this.things = json.map((json) => Thing.fromJson(json, this));
@@ -68,17 +68,25 @@ class Player {
         });
     }
 
-    saveAnnotations() {
+    saveAnnotations(mturk = false) {
         var json = this.things.map(Thing.toJson);
-        return fetch(`/annotation/${this.name}`, {
-            headers: new Headers({'Content-Type': 'application/json'}),
+        return fetch(`/annotation/${this.video_id}`, {
+            headers: {
+                'X-CSRFToken': window.CSRFToken,
+                'Content-Type': 'application/json',
+            },
+            credentials: 'same-origin',
             method: 'post',
             body: JSON.stringify(json),
         }).then((response) => {
-            if (response.ok)
-                return Promise.resolve("State saved successfully.");
-            else
-                return Promise.reject(`Error code ${response.status}`);
+            if (response.ok) {
+                if (mturk) {
+                    $('#turk-form').submit();
+                }
+                return Promise.resolve('State saved successfully.');
+            } else {
+                return Promise.resolve(`Error code ${response.status}`);
+            }
         });
     }
 
@@ -116,6 +124,13 @@ class Player {
         thing.drawing.onDragStart();
     }
 
+    submit(e) {
+        e.preventDefault();
+        this.saveAnnotations(window.assignmentId.length > 4).then((response) => {
+            $('#response').html(response);
+        });
+    }
+
 
     // Video control helpers
 
@@ -139,6 +154,8 @@ class Player {
         $video.on('timeupdate', () => {
             this.drawAnnotations();
         });
+
+        $('#submit-btn').click(this.submit.bind(this));
     }
 
     get controlTime() {

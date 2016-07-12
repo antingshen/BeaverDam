@@ -20,8 +20,8 @@ SECRET_KEY = '8pje5%pxibt2c=&j_c+ly5v@x)$r77%h-x3%jluq-@)4^75)ak'
 DEBUG = True
 
 URL_ROOT = os.environ.get('URL_ROOT', 'url_root')
-MTURK_ID = os.environ.get('MTURK_ID', 'mturk_id')
-MTURK_KEY = os.environ.get('MTURK_KEY', 'mturk_key')
+AWS_ID = os.environ.get('AWS_ID', 'aws_id')
+AWS_KEY = os.environ.get('AWS_KEY', 'aws_key')
 MTURK_SANDBOX = True
 assert MTURK_SANDBOX or not DEBUG
 
