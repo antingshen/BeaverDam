@@ -66,8 +66,13 @@ class Player {
 
     loadAnnotations() {
         return fetch(`/annotation/${this.video_id}`, {method: 'get'}).then((response) => {
-            return response.json();
-        }).then((json) => {
+            if (!response.ok) {
+                return Promise.reject("Player.loadAnnotations failed: fetch");
+            }
+            return response.text();
+        }).then((text) => {
+            var json = (text === '') ? [] : JSON.parse(text);
+
             this.things = json.map((json) => Thing.fromJson(json, this));
             return this.videoLoaded().then(() => {
                 this.drawAnnotations();
