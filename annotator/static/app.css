@@ -93,8 +93,13 @@
     width: auto;
     height: 100%;
     top: 0;
+    margin-left: -.7em;
 }
 
 .player-keyframebar {
     position: relative;
+    margin-left: 6px;
+    margin-right: 6px;
+    /* box-sizing: border-box; */
+    height: 1.4em;
 }

@@ -74,7 +74,7 @@ class Player {
         $(this.thingCreationTool).on('thingcreated', (e, bounds) => {
             var thing = new Thing(this);
             thing.drawing.setBounds(bounds);
-            $(thing.drawing).trigger('mutate');
+            $(thing.drawing).trigger('mutate', bounds);
             this.things.push(thing);
         });
     }
@@ -132,7 +132,11 @@ class Player {
 
         for (let keyframe of this.selectedThing.keyframes) {
             let frac = keyframe.time / this.video.duration;
-            $(PLAYER_KEYFRAMEBAR_KEYFRAME_SVG).css({'left': `${frac * 100}%`}).appendTo(container);
+            $(PLAYER_KEYFRAMEBAR_KEYFRAME_SVG).click(() => {
+                this.videoTime = keyframe.time;
+            }).css({
+                'left': `${frac * 100}%`
+            }).appendTo(container);
         }
     }
 
