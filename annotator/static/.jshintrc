@@ -25,9 +25,9 @@
 
     // app
     "Bounds",
-    "NewThingDrawing",
     "Player",
     "Thing",
+    "ThingCreationTool",
     "ThingDrawing"
   ],
   // "quotmark": "double",

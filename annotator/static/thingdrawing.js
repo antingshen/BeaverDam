@@ -26,8 +26,13 @@ class ThingDrawing {
         // Default attr
         this.setDefaultAppearance();
 
+        // Set handlers
+        this.setHandlers();
+    }
+
+    setHandlers() {
         // Handlers
-        this.rect.mousedown(this.onClick.bind(this));
+        this.rect.mousedown(this.onMousedown.bind(this));
         this.rect.drag(this.onDragMove.bind(this), this.onDragStart.bind(this), this.onDragEnd.bind(this));
         this.rect.mousemove(this.onMouseover.bind(this));
     }
@@ -80,7 +85,7 @@ class ThingDrawing {
 
     // Event handler: Click
     
-    onClick() {
+    onMousedown() {
         this.player.selectedThing = this.thing;
         this.player.drawAnnotations();
         this.player.drawKeyframebar();
@@ -135,29 +140,35 @@ class ThingDrawing {
     onDragEnd() {
         var bounds = this.bounds();
         if (!Bounds.equals(bounds, this.boundsBeforeDrag)) {
-            this.thing.updateKeyframeAtTime({
-                // TODO magic number
-                time: this.player.video.currentTime * 1000,
-                bounds: bounds,
-            });
+            $(this).trigger('mutate', bounds);
         }
         this.boundsBeforeDrag = undefined;
     }
 
 
+
+    getCanvasRelativePoint(x, y) {
+        var paperOffset = this.player.$("paper").offset();
+        return {
+            x: x - paperOffset.left,
+            y: y - paperOffset.top,
+        };
+    }
+
+
+
     // Event handler: Mouseover
 
     onMouseover(e, mouseX, mouseY) {
-        var paper = this.player.$("paper");
-
         // Don't change cursor during a drag operation
         if (this.boundsBeforeDrag != null) return;
 
         // X,Y Coordinates relative to shape's orgin
         var shapeWidth = this.rect.attr('width');
         var shapeHeight = this.rect.attr('height');
-        var relativeXmin = mouseX - paper.offset().left - this.rect.attr('x');
-        var relativeYmin = mouseY - paper.offset().top - this.rect.attr('y');
+        var canvasRelative = this.getCanvasRelativePoint(mouseX, mouseY);
+        var relativeXmin = canvasRelative.x - this.rect.attr('x');
+        var relativeYmin = canvasRelative.y - this.rect.attr('y');
         var relativeXmax = shapeWidth - relativeXmin;
         var relativeYmax = shapeHeight - relativeYmin;
 
@@ -192,12 +203,23 @@ class ThingDrawing {
 void ThingDrawing;
 
 
-class NewThingDrawing extends ThingDrawing {
-    constructor(player, thing) {
-        Object.assign(this, {player, thing});
+class ThingCreationTool extends ThingDrawing {
+    constructor(player) {
+        super(player, null);
     }
 
+    setHandlers() {
+        // Handlers
+        this.rect.mousedown(this.onMousedown.bind(this));
+        this.rect.drag(this.onDragMove.bind(this), this.onDragStart.bind(this), this.onDragEnd.bind(this));
+        this.rect.mousemove(this.onMouseover.bind(this));
+    }
+
+
+    // Setting appearance
+
     setDefaultAppearance() {
+        this.rect.attr('cursor', 'se-resize');
         this.makeHidden();
     }
 
@@ -220,29 +242,48 @@ class NewThingDrawing extends ThingDrawing {
     makeVisible() {
         this.rect.attr({
             'fill': 'yellow',
+            'fill-opacity': 1,
+            'opacity': 0.5,
             'stroke': 'black',
+            'stroke-opacity': 1,
             'stroke-width': 5,
-            'opacity': 0.5
         });
         this.rect.toFront();
     }
 
-    onDragStart() {
+
+    // Event handlers
+
+    onMousedown() {
+        this.player.selectedThing = null;
+        this.player.drawAnnotations();
+    }
+
+    onDragStart(mouseX, mouseY) {
+        var {x, y} = this.getCanvasRelativePoint(mouseX, mouseY);
+        this.setBounds({
+            xMin: x,
+            xMax: x,
+            yMin: y,
+            yMax: y,
+        });
         this.boundsBeforeDrag = this.bounds();
+
+        this.makeVisible();
     }
 
     onDragEnd() {
         var bounds = this.bounds();
-        if (!Bounds.equals(bounds, this.boundsBeforeDrag))
-            this.thing.updateKeyframeAtTime({
-                // TODO magic number
-                time: this.player.video.currentTime * 1000,
-                bounds: bounds,
-            });
+        console.log(this, 'thingcreated sent');
+        $(this).trigger('thingcreated', bounds);
         this.boundsBeforeDrag = undefined;
+        this.makeHidden();
     }
 
-    onMouseover() {}
-}
+    onMouseover() {
+        // Don't change cursor during a drag operation
+        if (this.boundsBeforeDrag != null) return;
 
-void NewThingDrawing;
+    }}
+
+void ThingCreationTool;

@@ -4,7 +4,7 @@
 // Are we at a keyframe or in betwen keyframes? If we're less than
 // SAME_FRAME_THRESHOLD away from the closest keyframe, then we're at that
 // keyframe.
-const SAME_FRAME_THRESHOLD = 0.1 /* seconds */;
+const SAME_FRAME_THRESHOLD = 0.01 /* seconds */;
 
 
 class Thing {
@@ -15,6 +15,17 @@ class Thing {
         this.type = document.querySelector('input[name = "object"]:checked').value;
         this.player = player;
         this.drawing = new ThingDrawing(player, this);
+
+        $(this.drawing).on('mutate', (e, bounds) => {
+            if (bounds == null) {
+                throw new Error("ThingDrawing:mutate: invalid argument: bounds");
+            }
+            this.updateKeyframeAtTime({
+                time: this.player.video.currentTime,
+                bounds: bounds,
+            });
+        });
+
     }
 
     static frameFromJson(json) {
@@ -67,7 +78,7 @@ class Thing {
 
     drawAtTime(time) {
         this.player.videoLoaded().then(() => this.drawing.addToPaper());
-        var {bounds} = this.getFrameAtTime(time * 1000);
+        var {bounds} = this.getFrameAtTime(time);
 
         // Don't fuck up our drag
         if (this.drawing.isBeingDragged()) return;
@@ -84,6 +95,18 @@ class Thing {
      * - The bounds for the thing at this time
      */
     getFrameAtTime(time) {
+        if (!this.keyframes.length) {
+            return {
+                time: time,
+                bounds: null,
+                prevIndex: null,
+                nextIndex: null,
+                closestIndex: null,
+                // closest: (closestIndex == null) ? null : this.keyframes[closestIndex]
+            };
+        }
+
+
         var prevIndex = null;
         var nextIndex = null;
         for (let i = 0; i < this.keyframes.length; i++) {

@@ -6,6 +6,12 @@ const PLAYER_KEYFRAMEBAR_KEYFRAME_SVG = `
     <circle cx="50" cy="50" r="30" stroke="black" stroke-width="0" fill="orange"></circle>
 </svg>`;
 
+/* Value of .player-control-scrubber[max] */
+const PLAYER_CONTROL_SCRUBBER_GRANULARITY = 10000;
+
+/* How often the UI updates the displayed time */
+const PLAYER_TIME_UPDATE_DELAY = 30 /* ms */;
+
 
 
 function makeCustomPromise() {
@@ -61,7 +67,16 @@ class Player {
     // Annotations helpers
 
     initPaper() {
-        this.paper = Raphael(this.$('paper')[0], this.video.videoWidth, this.video.videoHeight);   
+        this.paper = Raphael(this.$('paper')[0], this.video.videoWidth, this.video.videoHeight);
+        this.thingCreationTool = new ThingCreationTool(this);
+        this.thingCreationTool.addToPaper();
+
+        $(this.thingCreationTool).on('thingcreated', (e, bounds) => {
+            var thing = new Thing(this);
+            thing.drawing.setBounds(bounds);
+            $(thing.drawing).trigger('mutate');
+            this.things.push(thing);
+        });
     }
 
     loadAnnotations() {
@@ -116,22 +131,9 @@ class Player {
         if (this.selectedThing == null) return;
 
         for (let keyframe of this.selectedThing.keyframes) {
-            // TODO magic number
-            let frac = keyframe.time / 1000 / this.video.duration;
+            let frac = keyframe.time / this.video.duration;
             $(PLAYER_KEYFRAMEBAR_KEYFRAME_SVG).css({'left': `${frac * 100}%`}).appendTo(container);
         }
-    }
-
-    setupNewThing(x, y) {
-        var thing = new Thing(this);
-        this.things.push(thing);
-        thing.drawing.setBounds({
-            xMin: x,
-            xMax: x,
-            yMin: y,
-            yMax: y,
-        });
-        thing.drawing.onDragStart();
     }
 
     submitAnnotations(e) {
@@ -152,7 +154,7 @@ class Player {
         $video.on('playing', () => {
             this.manualTimeupdateTimerId = setInterval(() => {
                 this.$('video').trigger('timeupdate');
-            }, 30);
+            }, PLAYER_TIME_UPDATE_DELAY);
         }).on('pause', () => {
             clearInterval(this.manualTimeupdateTimerId);
         });
@@ -192,16 +194,14 @@ class Player {
     }
 
     get controlScrubber() {
-        // TODO magic number
-        return parseFloat(this.$('control-scrubber').val()) / 10000 * this.video.duration;
+        return parseFloat(this.$('control-scrubber').val()) / PLAYER_CONTROL_SCRUBBER_GRANULARITY * this.video.duration;
     }
     get controlScrubberUnfocused() {
         return this.controlScrubber;
     }
 
     set controlScrubberUnfocused(value) {
-        // TODO magic number
-        this.$('control-scrubber:not(:focus)').val(value * 10000 / this.video.duration);
+        this.$('control-scrubber:not(:focus)').val(value * PLAYER_CONTROL_SCRUBBER_GRANULARITY / this.video.duration);
     }
 
     get videoTime() {
