@@ -52,7 +52,7 @@ class Thing {
 
     static fromJson(json, player) {
         var thing = new Thing(player);
-        thing.keyframes = json.keyframes.map(this.frameFromJson);
+        thing.keyframes = json.keyframes.map(Thing.frameFromJson);
         thing.type = json.type;
         return thing;
     }
@@ -70,7 +70,7 @@ class Thing {
 
     static toJson(thing) {
         return {
-            keyframes: thing.keyframes.map(this.frameToJson),
+            keyframes: thing.keyframes.map(Thing.frameToJson),
             type: thing.type,
         };
     }

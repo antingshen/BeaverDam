@@ -16,7 +16,7 @@ pip3 install -r requirements.txt
 
 #### Download Sample Database & Data
 ```
-wget https://s3-us-west-2.amazonaws.com/beaverdam/db.sqlite3 db.sqlite3
+wget https://s3-us-west-2.amazonaws.com/beaverdam/db.sqlite3 db.sqlite3 -O db.sqlite3
 wget https://s3-us-west-2.amazonaws.com/beaverdam/videos/test_vid2.mp4 -O annotator/static/videos/0.mp4
 ```
 
