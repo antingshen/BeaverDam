@@ -148,11 +148,11 @@ class Player {
         });
     }
 
-    deleteSelectedThing() {
-        if (this.selectedThing == null) return false;
+    deleteThing(thing) {
+        if (thing == null) return false;
 
         for (let i = 0; i < this.things.length; i++) {
-            if (this.things[i] === this.selectedThing) {
+            if (this.things[i] === thing) {
                 this.things.splice(i, 1);
                 return true;
             }

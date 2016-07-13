@@ -29,6 +29,15 @@ class Thing {
 
     }
 
+    destroy() {
+        this.drawing.removeFromPaper();
+    }
+
+    removeFromPlayer() {
+        this.destroy();
+        this.player.deleteThing(this);
+    }
+
     static frameFromJson(json) {
         return {
             bounds: Bounds.fromAttrs({
@@ -203,6 +212,11 @@ class Thing {
         if (closestIndex == null) return false;
 
         this.keyframes.splice(closestIndex, 1);
+
+        if (!this.keyframes.length) {
+            this.removeFromPlayer();
+            return true;
+        }
 
         this.player.drawKeyframebar();
         this.redraw();

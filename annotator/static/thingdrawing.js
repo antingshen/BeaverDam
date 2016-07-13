@@ -30,6 +30,10 @@ class ThingDrawing {
         this.setHandlers();
     }
 
+    removeFromPaper() {
+        this.rect.remove();
+    }
+
     setHandlers() {
         // Handlers
         this.rect.mousedown(this.onMousedown.bind(this));
