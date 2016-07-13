@@ -4,7 +4,7 @@
 // Are we at a keyframe or in betwen keyframes? If we're less than
 // SAME_FRAME_THRESHOLD away from the closest keyframe, then we're at that
 // keyframe.
-const SAME_FRAME_THRESHOLD = 0.01 /* seconds */;
+const SAME_FRAME_THRESHOLD = 0.1 /* seconds */;
 
 
 class Thing {
@@ -114,7 +114,6 @@ class Thing {
                 prevIndex: null,
                 nextIndex: null,
                 closestIndex: null,
-                // closest: (closestIndex == null) ? null : this.keyframes[closestIndex]
             };
         }
 
@@ -163,14 +162,11 @@ class Thing {
             prevIndex: prevIndex,
             nextIndex: nextIndex,
             closestIndex: closestIndex,
-            closest: (closestIndex == null) ? null : this.keyframes[closestIndex]
         };
     }
 
     /* Insert or update keyframe at time. */
     updateKeyframeAtTime(frame) {
-        console.info("update", this.id, frame);
-
         var {prevIndex, nextIndex, closestIndex} = this.getFrameAtTime(frame.time);
 
         // Update the closestIndex-th frame
@@ -194,7 +190,7 @@ class Thing {
             }
 
             else {
-                this.keyframes.splice(prevIndex, 0, frame);
+                this.keyframes.splice(prevIndex + 1, 0, frame);
             }
 
             this.player.drawKeyframebar();
