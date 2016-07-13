@@ -93,7 +93,7 @@ class Thing {
     }
 
     drawAtTime(time) {
-        this.player.videoLoaded().then(() => this.drawing.addToPaper());
+        this.drawing.addToPaper();
         var {bounds, prevIndex, nextIndex, closestIndex} = this.getFrameAtTime(time);
 
         this.drawing.setIsReal(closestIndex != null || (prevIndex != null && nextIndex != null));
