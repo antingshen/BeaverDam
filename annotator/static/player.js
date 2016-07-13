@@ -141,10 +141,10 @@ class Player {
     }
 
     submitAnnotations(e) {
+        var mturk = window.assignmentId != null;
         e.preventDefault();
-        // TODO magic number
-        this.saveAnnotations(window.assignmentId.length > 4).then((response) => {
-            $('#response').html(response);
+        this.saveAnnotations(mturk).then((response) => {
+            window.alert(response);
         });
     }
 
