@@ -24,6 +24,7 @@ class Thing {
                 time: this.player.video.currentTime,
                 bounds: bounds,
             });
+            this.redraw();
         });
 
     }
@@ -76,15 +77,26 @@ class Thing {
         return color;
     }
 
+    redraw() {
+        if (this.lastDrawnTime != null) {
+            this.drawAtTime(this.lastDrawnTime);
+        }
+    }
+
     drawAtTime(time) {
         this.player.videoLoaded().then(() => this.drawing.addToPaper());
-        var {bounds} = this.getFrameAtTime(time);
+        var {bounds, prevIndex, nextIndex, closestIndex} = this.getFrameAtTime(time);
+
+        this.drawing.setIsReal(closestIndex != null || (prevIndex != null && nextIndex != null));
+
 
         // Don't fuck up our drag
         if (this.drawing.isBeingDragged()) return;
 
         this.drawing.setBounds(bounds);
         this.drawing.setSelected(this.player.selectedThing === this);
+
+        this.lastDrawnTime = time;
     }
 
 

@@ -43,7 +43,21 @@ class ThingDrawing {
             'stroke': 'black',
             'stroke-width': 5,
             'opacity': 0.5
-        });        
+        });
+    }
+
+    setIsReal(isReal) {
+        window.THIS = this;
+        if (isReal) {
+            this.rect.attr({
+                'stroke-dasharray': "",
+            });
+        }
+        else {
+            this.rect.attr({
+                'stroke-dasharray': "- ",
+            });
+        }
     }
 
     setSelected(isSelected) {
@@ -274,7 +288,6 @@ class ThingCreationTool extends ThingDrawing {
 
     onDragEnd() {
         var bounds = this.bounds();
-        console.log(this, 'thingcreated sent');
         $(this).trigger('thingcreated', bounds);
         this.boundsBeforeDrag = undefined;
         this.makeHidden();
