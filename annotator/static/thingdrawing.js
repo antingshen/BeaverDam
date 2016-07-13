@@ -152,6 +152,8 @@ class ThingDrawing {
     }
 
     onDragEnd() {
+        if (this.boundsBeforeDrag == null) return;
+        
         var bounds = this.bounds();
         if (!Bounds.equals(bounds, this.boundsBeforeDrag)) {
             $(this).trigger('mutate', bounds);

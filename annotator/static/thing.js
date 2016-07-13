@@ -197,14 +197,15 @@ class Thing {
         }
     }
 
-    deleteKeyframeAtTime(frame) {
-        var {closestIndex} = this.getFrameAtTime(frame.time);
+    deleteKeyframeAtTime(time) {
+        var {closestIndex} = this.getFrameAtTime(time);
 
         if (closestIndex == null) return false;
 
         this.keyframes.splice(closestIndex, 1);
 
         this.player.drawKeyframebar();
+        this.redraw();
         return true;
     }
 }

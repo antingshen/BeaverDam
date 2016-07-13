@@ -133,7 +133,7 @@ class Player {
         for (let keyframe of this.selectedThing.keyframes) {
             let frac = keyframe.time / this.video.duration;
             $(PLAYER_KEYFRAMEBAR_KEYFRAME_SVG).click(() => {
-                this.videoTime = keyframe.time;
+                this.video.currentTime = keyframe.time;
             }).css({
                 'left': `${frac * 100}%`
             }).appendTo(container);
@@ -146,6 +146,24 @@ class Player {
         this.saveAnnotations(window.assignmentId.length > 4).then((response) => {
             $('#response').html(response);
         });
+    }
+
+    deleteSelectedThing() {
+        if (this.selectedThing == null) return false;
+
+        for (let i = 0; i < this.things.length; i++) {
+            if (this.things[i] === this.selectedThing) {
+                this.things.splice(i, 1);
+                return true;
+            }
+        }
+    }
+
+    deleteSelectedKeyframe() {
+        if (this.selectedThing == null) return false;
+
+        this.selectedThing.deleteKeyframeAtTime(this.video.currentTime);
+        return true;
     }
 
 
@@ -167,14 +185,15 @@ class Player {
         // control-pause => video
         this.$on('control-play', 'click', () => this.video.play());
         this.$on('control-pause', 'click', () => this.video.pause());
+        this.$on('control-delete-keyframe', 'click', () => this.deleteSelectedKeyframe());
 
         // video <=> control-time
-        this.$on('control-time', 'change', () => this.videoTime = this.controlTime);
-        $video.on('timeupdate', () => this.controlTimeUnfocused = this.videoTime);
+        this.$on('control-time', 'change', () => this.video.currentTime = this.controlTime);
+        $video.on('timeupdate', () => this.controlTimeUnfocused = this.video.currentTime);
 
         // video <=> control-scrubber
-        this.$on('control-scrubber', 'change input', () => this.videoTime = this.controlScrubber);
-        $video.on('timeupdate', () => this.controlScrubberUnfocused = this.videoTime);
+        this.$on('control-scrubber', 'change input', () => this.video.currentTime = this.controlScrubber);
+        $video.on('timeupdate', () => this.controlScrubberUnfocused = this.video.currentTime);
 
         // video => (annotations)
         $video.on('timeupdate', () => {
@@ -206,14 +225,6 @@ class Player {
 
     set controlScrubberUnfocused(value) {
         this.$('control-scrubber:not(:focus)').val(value * PLAYER_CONTROL_SCRUBBER_GRANULARITY / this.video.duration);
-    }
-
-    get videoTime() {
-        return this.video.currentTime;
-    }
-
-    set videoTime(value) {
-        this.video.currentTime = value;
     }
 
 
