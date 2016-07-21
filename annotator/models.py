@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.staticfiles import finders
 
 
 class Video(models.Model):

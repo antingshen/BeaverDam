@@ -2,7 +2,6 @@ from django.shortcuts import render
 from django.conf import settings
 from django.http import HttpResponse, Http404
 from django.views.generic import View
-from django.contrib.staticfiles import finders
 from django.views.decorators.clickjacking import xframe_options_exempt
 
 import os
@@ -24,7 +23,7 @@ def video(request, video_id):
     assignment_id = request.GET.get('assignmentId', None)
     preview = (assignment_id == 'ASSIGNMENT_ID_NOT_AVAILABLE')
     iframe_mode = assignment_id is not None
-    if assignment_id is not None and assignment_id != 'ASSIGNMENT_ID_NOT_AVAILABLE':
+    if assignment_id is not None and assignment_id != 'ASSIGNMENT_ID_NOT_AVAILABLE' and (settings.DEBUG == False):
         hit_id = request.GET['hitId']
         worker = request.GET['workerId']
 
