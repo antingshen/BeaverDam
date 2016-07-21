@@ -148,6 +148,30 @@ class Player {
         });
     }
 
+    setVerifiedButton() {
+        var verifiedButton = $('#verified-btn');
+        verifiedButton.html(window.video.verified ? 'Verified' : 'Not Verified');
+        verifiedButton.attr('class', `btn btn-${window.video.verified ? 'success' : 'danger'}`);
+    }
+
+    submitVerified() {
+        return fetch(`/video/${this.video_id}/verify/`, {
+            headers: {
+                'X-CSRFToken': window.CSRFToken,
+                'Content-Type': 'application/json',
+            },
+            credentials: 'same-origin',
+            method: 'post',
+            body: (!window.video.verified).toString(),
+        }).then((response) => {
+            if (response.ok) {
+                window.video.verified = !window.video.verified;
+                this.setVerifiedButton();
+            }
+            return response.text();
+        }).then((text) => console.log(text));
+    }
+
     deleteThing(thing) {
         if (thing == null) return false;
 
@@ -202,6 +226,12 @@ class Player {
 
         // TODO doesn't respect scope
         $('#submit-btn').click(this.submitAnnotations.bind(this));
+
+        var verifiedButton = $('#verified-btn');
+        if (verifiedButton.length) {
+            this.setVerifiedButton();
+            verifiedButton.click(this.submitVerified.bind(this));
+        }
     }
 
     get controlTime() {
