@@ -9,8 +9,8 @@ class Video(models.Model):
     host = models.CharField(max_length=1048, blank=True)
     
     def __str__(self):
-        if self.name:
-            return self.name
+        if self.filename:
+            return self.filename
         return 'video_{}'.format(self.id)
 
     @property
