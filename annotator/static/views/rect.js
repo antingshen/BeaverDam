@@ -55,7 +55,8 @@ class Rect {
     // Working with $paper
 
     getCanvasRelativePoint(x, y) {
-        var paperOffset = this.$paper.offset();
+        // var paperOffset = this.$paper.offset();
+        var paperOffset = $(this.$paper.canvas).offset();
         return {
             x: x - paperOffset.left,
             y: y - paperOffset.top,
