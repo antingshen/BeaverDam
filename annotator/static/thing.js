@@ -14,10 +14,6 @@ class Thing {
 
 
     constructor({fill, id, keyframes, type}) {
-        // Prevent adding new properties after this thread finishes.
-        // Note: If the setTimeout is removed, child classes will error.
-        setTimeout(() => Object.seal(this), 0);
-
         // Fill of thing
         this.fill = fill;
 
@@ -29,6 +25,10 @@ class Thing {
 
         // Type of thing
         this.type = type;
+
+        // Prevent adding new properties
+        $(this).on('dummy', $.noop);
+        Object.seal(this);
     }
 
     // The hacky but only way to make a Thing right now.

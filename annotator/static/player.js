@@ -27,6 +27,7 @@ class Player {
         );
 
         // Prevent adding new properties after this thread finishes.
+        $(this).on('dummy', $.noop);
         Object.seal(this);
 
 

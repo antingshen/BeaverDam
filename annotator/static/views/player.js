@@ -55,6 +55,7 @@ class PlayerView {
         );
 
         // Prevent adding new properties
+        $(this).on('dummy', $.noop);
         Object.seal(this);
 
         this.initHandlers();
@@ -73,15 +74,20 @@ class PlayerView {
     }
 
     initPaper() {
-        // Depents on this.videoReady for this.video.videoWidth/Height
+        // Depends on this.videoReady for this.video.videoWidth/Height
         this.videoReady().then(() => {
-            this.$paper = Raphael(this.$('paper')[0], this.video.videoWidth, this.video.videoHeight);
+            var {videoWidth, videoHeight} = this.video;
+
+            this.$paper = Raphael(this.$('paper')[0], videoWidth, videoHeight);
             this.creationRect = new CreationRect({});
+
             this.creationRect.attach(this.$paper);
 
             $(this.creationRect).on('create', (e, bounds) => {
+                console.log(arguments);
                 var rect = this.addRect();
                 rect.bounds = bounds;
+                rect.focus();
                 $(this).triggerHandler('create', rect);
             });
 
@@ -96,6 +102,7 @@ class PlayerView {
 
         // updates time more frequently by using setInterval
         $(this.video).on('playing', () => {
+            clearInterval(this.manualTimeupdateTimerId);
             this.manualTimeupdateTimerId = setInterval(() => {
                 this.$('video').triggerHandler('timeupdate');
             }, this.TIME_UPDATE_DELAY);
@@ -105,7 +112,6 @@ class PlayerView {
 
         $(this.video).on("loadedmetadata", () => {
             this.videoReady.resolve();
-            this.initPaper();
         }).on("abort", () => {
             this.videoLoaded.reject();
         });
@@ -121,11 +127,11 @@ class PlayerView {
 
             // control-time <=> video
             this.$on('control-time', 'change', () => this.video.currentTime = this.controlTime);
-            this.$on('video', 'timeupdate', () => this.controlTimeUnfocused = this.video.currentTime);
+            $(this.video).on('timeupdate', () => this.controlTimeUnfocused = this.video.currentTime);
 
             // control-scrubber <=> video
             this.$on('control-scrubber', 'change input', () => this.video.currentTime = this.controlScrubber);
-            this.$on('video', 'timeupdate', () => this.controlScrubberUnfocused = this.video.currentTime);
+            $(this.video).on('timeupdate', () => this.controlScrubberUnfocused = this.video.currentTime);
 
             // keyframebar => video
             this.$on('keyframebar', 'jump-to-time', (e, time) => this.video.currentTime = time);

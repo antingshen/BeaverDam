@@ -3,14 +3,16 @@
 
 class Keyframebar {
     constructor({className}) {
-        // Prevent adding new properties after this thread finishes.
-        // Note: If the setTimeout is removed, child classes will error.
-        setTimeout(() => Object.seal(this), 0);
+        this.$container = null;
 
         this.className = className;
 
         // Duration of the video
         this.duration = 0;
+
+        // Prevent adding new properties
+        $(this).on('dummy', $.noop);
+        Object.seal(this);
     }
 
     attach($container) {

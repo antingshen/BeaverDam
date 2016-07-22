@@ -46,6 +46,7 @@ class Rect {
 
         // Prevent adding new properties
         if (this.constructor === Rect) {
+            $(this).on('dummy', $.noop);
             Object.seal(this);
         }
     }
@@ -144,6 +145,13 @@ class Rect {
     }
 
 
+    // Actions
+
+    focus() {
+        $(this).triggerHandler('focus');
+    }
+
+
     // Setting attrs
 
     attr(attrs) {
@@ -151,7 +159,7 @@ class Rect {
             Object.assign(this.preAttachedAttrs, attrs);
         }
         else {
-            this.$el.attrs(attrs);
+            this.$el.attr(attrs);
         }
     }
 
@@ -257,7 +265,7 @@ class Rect {
         // this.$el.toFront();
 
         // Trigger event
-        $(this).triggerHandler('focus');
+        this.focus();
     }
 
 
@@ -382,11 +390,8 @@ class CreationRect extends Rect {
     constructor() {
         super(...arguments);
 
-        // Width and height of paper
-        this.height = null;
-        this.width = null;
-
         // Prevent adding new properties
+        $(this).on('dummy', $.noop);
         Object.seal(this);
     }
 
@@ -396,12 +401,13 @@ class CreationRect extends Rect {
         // this.$el.mousemove(this.onMouseover.bind(this));
     }
 
-
     // Setting appearance
 
     setDefaultAppearance() {
         this.dragIntent = 'se-resize';
         this.appear({active: false});
+        // Draw with correct size at least once when we're attached to the paper
+        $(this).on('attach', () => this.appear({active: false}));
     }
 
     appear({active}) {
@@ -420,9 +426,9 @@ class CreationRect extends Rect {
             this.toBack();
             this.bounds = {
                 xMin: 0,
-                xMax: this.width,
+                xMax: (this.$paper != null) ? this.$paper.width : 0,
                 yMin: 0,
-                yMax: this.height,
+                yMax: (this.$paper != null) ? this.$paper.height : 0,
             };
             this.attr({
                 'fill': 'transparent',
@@ -437,8 +443,7 @@ class CreationRect extends Rect {
     // Event handlers
 
     onMousedown() {
-        this.player.selectedThing = null;
-        this.player.drawAnnotations();
+        this.focus();
     }
 
     onDragStart(mouseX, mouseY) {
