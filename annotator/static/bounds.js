@@ -1,22 +1,22 @@
 "use strict";
 
-/* A Bounds object describes a bounding box. The class has 4 members: xMin,
-   xMax, yMin, yMax. In Bounds objects, it is guaranteed that xMin <= xMax &&
-   yMin <= yMax.
-
-   We don't need a constructor for Bounds objects, so we just construct it
-   using object notation:
-
-    var bounds = {
-        xMin: ...
-        xMax: ...
-        yMin: ...
-        yMax: ...
-    };
-
-   The Bounds class holds utility/math functions for Bounds objects.
+/**
+ * A Bounds object describes a bounding box. The class has 4 members: xMin,
+ * xMax, yMin, yMax. In Bounds objects, it is guaranteed that xMin <= xMax &&
+ * yMin <= yMax.
+ * 
+ * We don't need a constructor for Bounds objects, so we just construct it
+ * using object notation:
+ * 
+ *  var bounds = {
+ *      xMin: ...
+ *      xMax: ...
+ *      yMin: ...
+ *      yMax: ...
+ *  };
+ * 
+ * The Bounds class holds utility/math functions for Bounds objects.
  */
-
 class Bounds {
     static normalize(bounds) {
         var {xMin, xMax, yMin, yMax} = bounds;
@@ -56,6 +56,10 @@ class Bounds {
             yMin: yMin + dyMin,
             yMax: yMax + dyMax,
         });
+    }
+
+    static move(bounds, dx, dy) {
+        return Bounds.resize(bounds, dx, dx, dy, dy);
     }
 
     static interpolate(bounds0, bounds1, frac) {

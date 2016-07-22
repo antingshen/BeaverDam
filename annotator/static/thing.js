@@ -1,118 +1,52 @@
 "use strict";
 
 
-// Are we at a keyframe or in betwen keyframes? If we're less than
-// SAME_FRAME_THRESHOLD away from the closest keyframe, then we're at that
-// keyframe.
-const SAME_FRAME_THRESHOLD = 0.1 /* seconds */;
-
-
 class Thing {
-    constructor(player, fill = Thing.getRandomColor()) {
-        this.keyframes = []; // List of boxes corresponding to keyframes
+    // Constants. ES6 doesn't support class constants yet, so we'll declare
+    // them this way for now:
+
+    // Are we at a keyframe or in betwen keyframes? If we're less than
+    // SAME_FRAME_THRESHOLD away from the closest keyframe, then we're at that
+    // keyframe.
+    get SAME_FRAME_THRESHOLD() {
+        return 0.1 /* seconds */;
+    }
+
+
+    constructor({fill, id, keyframes, type}) {
+        // Prevent adding new properties after this thread finishes.
+        // Note: If the setTimeout is removed, child classes will error.
+        setTimeout(() => Object.seal(this), 0);
+
+        // Fill of thing
         this.fill = fill;
-        this.id = this.fill;
-        this.type = document.querySelector('input[name = "object"]:checked').value;
-        this.player = player;
-        this.drawing = new ThingDrawing(player, this);
 
-        $(this.drawing).on('mutate', (e, bounds) => {
-            if (bounds == null) {
-                throw new Error("ThingDrawing:mutate: invalid argument: bounds");
-            }
-            this.updateKeyframeAtTime({
-                time: this.player.video.currentTime,
-                bounds: bounds,
-            });
-            this.redraw();
+        // ID of thing
+        this.id = id;
+
+        // Keyframes of thing
+        this.keyframes = keyframes;
+
+        // Type of thing
+        this.type = type;
+    }
+
+    // The hacky but only way to make a Thing right now.
+    static newHacky() {
+        var fill = Misc.getRandomColor();
+        return new Thing({
+            keyframes: [],
+            fill: fill,
+            id: fill,
+            type: document.querySelector('input[name = "object"]:checked').value,
         });
-
-    }
-
-    destroy() {
-        this.drawing.removeFromPaper();
-    }
-
-    removeFromPlayer() {
-        this.destroy();
-        this.player.deleteThing(this);
-    }
-
-    static frameFromJson(json) {
-        return {
-            bounds: Bounds.fromAttrs({
-                x: json.x,
-                y: json.y,
-                width: json.w,
-                height: json.h,
-            }),
-            time: json.frame,
-        };
-    }
-
-    static fromJson(json, player) {
-        var thing = new Thing(player);
-        thing.keyframes = json.keyframes.map(Thing.frameFromJson);
-        thing.type = json.type;
-        return thing;
-    }
-
-    static frameToJson(frame) {
-        var attr = Bounds.toAttrs(frame.bounds);
-        return {
-            x: attr.x,
-            y: attr.y,
-            w: attr.width,
-            h: attr.height,
-            frame: frame.time,
-        };
-    }
-
-    static toJson(thing) {
-        return {
-            keyframes: thing.keyframes.map(Thing.frameToJson),
-            type: thing.type,
-        };
-    }
-
-    static getRandomColor() {
-        var letters = '012345'.split('');
-        var color = '#';
-        color += letters[Math.round(Math.random() * 5)];
-        letters = '0123456789ABCDEF'.split('');
-        for (var i = 0; i < 5; i++) {
-            color += letters[Math.round(Math.random() * 15)];
-        }
-        return color;
-    }
-
-    redraw() {
-        if (this.lastDrawnTime != null) {
-            this.drawAtTime(this.lastDrawnTime);
-        }
-    }
-
-    drawAtTime(time) {
-        this.drawing.addToPaper();
-        var {bounds, prevIndex, nextIndex, closestIndex} = this.getFrameAtTime(time);
-
-        this.drawing.setIsReal(closestIndex != null || (prevIndex != null && nextIndex != null));
-
-
-        // Don't fuck up our drag
-        if (this.drawing.isBeingDragged()) return;
-
-        this.drawing.setBounds(bounds);
-        this.drawing.setSelected(this.player.selectedThing === this);
-
-        this.lastDrawnTime = time;
     }
 
 
     /**
      * A "frame" is the interpolation of the two closest keyframes. It tells us:
      * - The previous and next keyframes
-     * - If we're "at" (<= SAME_FRAME_THRESHOLD away from) a keyframe
+     * - If we're "at" (<= this.SAME_FRAME_THRESHOLD away from) a keyframe
      * - The bounds for the thing at this time
      */
     getFrameAtTime(time) {
@@ -162,7 +96,7 @@ class Thing {
         }
 
         var closest = this.keyframes[closestIndex];
-        if (Math.abs(closest.time - time) > SAME_FRAME_THRESHOLD)
+        if (Math.abs(closest.time - time) > this.SAME_FRAME_THRESHOLD)
             closestIndex = null;
 
         return {
@@ -175,7 +109,7 @@ class Thing {
     }
 
     /* Insert or update keyframe at time. */
-    updateKeyframeAtTime(frame) {
+    updateKeyframe(frame) {
         var {prevIndex, nextIndex, closestIndex} = this.getFrameAtTime(frame.time);
 
         // Update the closestIndex-th frame
@@ -202,7 +136,8 @@ class Thing {
                 this.keyframes.splice(prevIndex + 1, 0, frame);
             }
 
-            this.player.drawKeyframebar();
+            // Trigger event
+            $(this).trigger('change');
         }
     }
 
@@ -218,9 +153,15 @@ class Thing {
             return true;
         }
 
-        this.player.drawKeyframebar();
-        this.redraw();
+        // Trigger event
+        $(this).trigger('change');
+
         return true;
+    }
+
+    // Delete the entire thing
+    delete() {
+        $(this).trigger('delete');
     }
 }
 

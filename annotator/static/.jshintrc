@@ -24,11 +24,17 @@
     "$",
 
     // app
+    "CreationRect",
     "Bounds",
+    "DataSources",
+    "Misc",
     "Player",
     "Thing",
-    "ThingCreationTool",
-    "ThingDrawing"
+
+    // views
+    "Keyframebar",
+    "PlayerView",
+    "Rect"
   ],
   // "quotmark": "double",
   "regexp": true,
