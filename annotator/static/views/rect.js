@@ -47,7 +47,7 @@ class Rect {
         // Prevent adding new properties
         if (this.constructor === Rect) {
             $(this).on('dummy', $.noop);
-            Object.seal(this);
+            Object.preventExtensions(this);
         }
     }
 
@@ -70,7 +70,7 @@ class Rect {
         }
 
         // Apply appearance
-        this.setDefaultAppearance();
+        this.appearDefault();
 
         // Actually do the attaching
         this.$paper = $paper;
@@ -93,15 +93,15 @@ class Rect {
 
 
     // Appearance
-    // Appearnce is the combination of attrs, bounds, and z.
+    // Appearance is the combination of attrs, bounds, and z.
 
     appearDefault() {
-        this.appear();
+        this.appear({real: false, selected: true});
     }
 
     appear({real, selected}) {
         this.attr({
-            'fill': this.thing.fill,
+            'fill': this.fill,
             'stroke': 'black',
             'stroke-width': 5,
         });
@@ -149,6 +149,7 @@ class Rect {
     // Actions
 
     focus() {
+        this.$el.toFront();
         $(this).triggerHandler('focus');
     }
 
@@ -263,7 +264,6 @@ class Rect {
         // TODO REFACTOR this.player.selectedThing = this.thing;
         // TODO REFACTOR this.player.drawAnnotations();
         // TODO REFACTOR this.player.drawKeyframebar();
-        // this.$el.toFront();
 
         // Trigger event
         this.focus();
@@ -278,7 +278,7 @@ class Rect {
 
     onDragStart() {
         // TODO REFACTOR this.player.video.pause();
-        this.boundsBeforeDrag = this.bounds();
+        this.boundsBeforeDrag = this.bounds;
 
         // Trigger event
         $(this).triggerHandler('drag-start');
@@ -393,7 +393,7 @@ class CreationRect extends Rect {
 
         // Prevent adding new properties
         $(this).on('dummy', $.noop);
-        Object.seal(this);
+        Object.preventExtensions(this);
     }
 
     setHandlers() {
@@ -404,7 +404,7 @@ class CreationRect extends Rect {
 
     // Setting appearance
 
-    setDefaultAppearance() {
+    appearDefault() {
         this.dragIntent = 'se-resize';
         this.appear({active: false});
         // Draw with correct size at least once when we're attached to the paper
@@ -458,15 +458,21 @@ class CreationRect extends Rect {
         this.boundsBeforeDrag = this.bounds;
 
         this.appear({active: true});
+
+        // Trigger event
+        $(this).triggerHandler('drag-start');
     }
 
     onDragEnd() {
-        this.appear({active: false});
+        // Trigger event
+        $(this).triggerHandler('create-bounds', this.bounds);
 
         this.boundsBeforeDrag = undefined;
 
+        this.appear({active: false});
+
         // Trigger event
-        $(this).triggerHandler('create-bounds', this.bounds);
+        $(this).triggerHandler('drag-end');
     }
 }
 

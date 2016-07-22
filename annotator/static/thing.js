@@ -28,11 +28,11 @@ class Thing {
 
         // Prevent adding new properties
         $(this).on('dummy', $.noop);
-        Object.seal(this);
+        Object.preventExtensions(this);
     }
 
     // The hacky but only way to make a Thing right now.
-    static newHacky() {
+    static newFromCreationRect() {
         var fill = Misc.getRandomColor();
         return new Thing({
             keyframes: [],
@@ -147,11 +147,6 @@ class Thing {
         if (closestIndex == null) return false;
 
         this.keyframes.splice(closestIndex, 1);
-
-        if (!this.keyframes.length) {
-            this.removeFromPlayer();
-            return true;
-        }
 
         // Trigger event
         $(this).triggerHandler('change');

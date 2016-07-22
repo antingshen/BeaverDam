@@ -12,7 +12,7 @@ class Keyframebar {
 
         // Prevent adding new properties
         $(this).on('dummy', $.noop);
-        Object.seal(this);
+        Object.preventExtensions(this);
     }
 
     attach($container) {
@@ -60,7 +60,7 @@ class Keyframebar {
     addKeyframeAt(time) {
         let frac = time / this.duration;
 
-        $(this.KEYFRAME_SVG).click(() => {
+        $(this.keyframeSvg()).click(() => {
             $(this).triggerHandler('jump-to-time', time);
         }).css({
             'left': `${frac * 100}%`

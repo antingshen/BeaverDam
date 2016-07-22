@@ -11,6 +11,8 @@ class Player {
 
         this.things = null;
 
+        this.thingRectBindings = [];
+
         this.videoSrc = videoSrc;
 
         this.view = null;
@@ -28,11 +30,12 @@ class Player {
 
         // Prevent adding new properties after this thread finishes.
         $(this).on('dummy', $.noop);
-        Object.seal(this);
+        Object.preventExtensions(this);
 
 
         this.initAnnotations();
         this.initView();
+        this.initHandlers();
     }
 
 
@@ -66,12 +69,20 @@ class Player {
     }
 
     initBindThingAndRect(thing, rect) {
+        // On PlayerView...
+
+        this.thingRectBindings.push({thing, rect});
+
+
+        // On Rect...
+
         $(rect).on('discrete-change', (e, bounds) => {
             thing.updateKeyframe({
                 time: this.view.video.currentTime,
                 bounds: bounds,
             });
             $(this).triggerHandler('change-onscreen-annotations');
+            $(this).triggerHandler('change-keyframes');
         });
 
         $(rect).on('select', () => {
@@ -79,33 +90,75 @@ class Player {
             $(this).triggerHandler('change-keyframes');
         });
 
-        $(this).on('change-onscreen-annotations', () => {
-            this.drawThingOnRect(thing, rect);
+        $(rect).on('drag-start', () => {
+            this.view.video.pause();
         });
 
+        $(rect).on('focus', () => {
+            this.selectedThing = thing;
+            $(this).triggerHandler('change-onscreen-annotations');
+            $(this).triggerHandler('change-keyframes');
+        });
+
+
+        // On Thing...
+
         $(thing).on('delete', () => {
+            $(thing).off();
+            $(rect).off();
             this.view.deleteRect(rect);
         });
     }
 
     initHandlers() {
-        $(this.view).$on('video', 'timeupdate', () => {
-            $(this).triggerHandler('change-onscreen-annotations');
+        $(this).on('change-onscreen-annotations', () => {
+            this.drawOnscreenAnnotations();
         });
 
+
         $(this).on('change-keyframes', () => {
-            $(this).drawKeyframes();
+            this.drawKeyframes();
+        });
+
+        this.viewReady().then(() => {
+            $(this.view.creationRect).on('drag-start', () => {
+                this.view.video.pause();
+            });
+
+            $(this.view.video).on('timeupdate', () => {
+                $(this).triggerHandler('change-onscreen-annotations');
+            });
+
+            $(this.view).on('create-rect', (e, rect) => {
+                this.addThingAtCurrentTimeFromRect(rect);
+                rect.focus();
+                $(this).triggerHandler('change-keyframes');
+            });
+
+            this.view.$on('control-delete-keyframe', 'click', () => {
+                this.view.video.pause();
+                this.deleteSelectedKeyframe();
+                $(this).triggerHandler('change-onscreen-annotations');
+                $(this).triggerHandler('change-keyframes');
+            });
+
         });
     }
 
 
     // Draw something
 
+    drawOnscreenAnnotations() {
+        for (let {thing, rect} of this.thingRectBindings) {
+            this.drawThingOnRect(thing, rect);
+        }
+    }
+
     drawKeyframes() {
-        this.keyframebar.resetWithDuration(this.view.video.duration);
+        this.view.keyframebar.resetWithDuration(this.view.video.duration);
         if (this.selectedThing != null) {
             for (let keyframe of this.selectedThing.keyframes) {
-                this.keyframebar.addKeyframeAt(keyframe.time);
+                this.view.keyframebar.addKeyframeAt(keyframe.time);
             }
         }
     }
@@ -137,24 +190,46 @@ class Player {
         });
     }
 
+    addThingAtCurrentTimeFromRect(rect) {
+        var thing = Thing.newFromCreationRect();
+        thing.updateKeyframe({
+            time: this.view.video.currentTime,
+            bounds: rect.bounds
+        });
+        this.things.push(thing);
+        rect.fill = thing.fill;
+        rect.appear({real: true});
+        this.initBindThingAndRect(thing, rect);
+    }
+
     deleteThing(thing) {
         if (thing == null) return false;
+
+        if (thing == this.selectedThing) {
+            this.selectedThing = null;
+        }
 
         for (let i = 0; i < this.things.length; i++) {
             if (this.things[i] === thing) {
                 thing.delete();
                 this.things.splice(i, 1);
+                this.thingRectBindings.splice(i, 1);
                 return true;
             }
         }
 
-        // throw new Error()
+        throw new Error("Player.deleteThing: thing not found");
     }
 
     deleteSelectedKeyframe() {
         if (this.selectedThing == null) return false;
 
-        this.selectedThing.deleteKeyframeAtTime(this.video.currentTime);
+        this.selectedThing.deleteKeyframeAtTime(this.view.video.currentTime);
+
+        if (this.selectedThing.keyframes.length === 0) {
+            this.deleteThing(this.selectedThing);
+        }
+
         return true;
     }
 }

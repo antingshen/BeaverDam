@@ -56,7 +56,7 @@ class PlayerView {
 
         // Prevent adding new properties
         $(this).on('dummy', $.noop);
-        Object.seal(this);
+        Object.preventExtensions(this);
 
         this.initHandlers();
         this.initPaper();
@@ -68,7 +68,7 @@ class PlayerView {
     // Init ALL the things!
 
     initKeyframebar() {
-        this.keyframebar = new Keyframebar(this.className('keyframebar-keyframe'));
+        this.keyframebar = new Keyframebar({className: this.className('keyframebar-keyframe')});
         this.keyframebar.attach(this.$('keyframebar'));
         this.keyframebarReady.resolve();
     }
@@ -80,15 +80,14 @@ class PlayerView {
 
             this.$paper = Raphael(this.$('paper')[0], videoWidth, videoHeight);
             this.creationRect = new CreationRect({});
-
             this.creationRect.attach(this.$paper);
+            this.rects = [];
 
-            $(this.creationRect).on('create', (e, bounds) => {
-                console.log(arguments);
+            $(this.creationRect).on('create-bounds', (e, bounds) => {
                 var rect = this.addRect();
                 rect.bounds = bounds;
                 rect.focus();
-                $(this).triggerHandler('create', rect);
+                $(this).triggerHandler('create-rect', rect);
             });
 
             this.paperReady.resolve();
@@ -123,26 +122,30 @@ class PlayerView {
             // control-pause => video
             this.$on('control-play', 'click', () => this.video.play());
             this.$on('control-pause', 'click', () => this.video.pause());
-            this.$on('control-delete-keyframe', 'click', () => this.deleteSelectedKeyframe());
 
             // control-time <=> video
             this.$on('control-time', 'change', () => this.video.currentTime = this.controlTime);
             $(this.video).on('timeupdate', () => this.controlTimeUnfocused = this.video.currentTime);
 
             // control-scrubber <=> video
-            this.$on('control-scrubber', 'change input', () => this.video.currentTime = this.controlScrubber);
+            this.$on('control-scrubber', 'change input', () => this.jumpToTimeAndPause(this.controlScrubber));
             $(this.video).on('timeupdate', () => this.controlScrubberUnfocused = this.video.currentTime);
 
             // keyframebar => video
-            this.$on('keyframebar', 'jump-to-time', (e, time) => this.video.currentTime = time);
+            $(this.keyframebar).on('jump-to-time', (e, time) => this.jumpToTimeAndPause(time));
         });
+    }
+
+    jumpToTimeAndPause(time) {
+        this.video.currentTime = time;
+        this.video.pause();
     }
 
 
     // Rect control
 
     addRect() {
-        var rect = new Rect();
+        var rect = new Rect({});
         rect.attach(this.$paper);
         this.rects.push(rect);
         return rect;
