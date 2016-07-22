@@ -137,7 +137,7 @@ class Thing {
             }
 
             // Trigger event
-            $(this).trigger('change');
+            $(this).triggerHandler('change');
         }
     }
 
@@ -154,14 +154,14 @@ class Thing {
         }
 
         // Trigger event
-        $(this).trigger('change');
+        $(this).triggerHandler('change');
 
         return true;
     }
 
     // Delete the entire thing
     delete() {
-        $(this).trigger('delete');
+        $(this).triggerHandler('delete');
     }
 }
 

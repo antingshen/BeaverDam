@@ -29,13 +29,35 @@ var Misc = {
     },
 
     CustomPromise: function() {
+        var promise;
+
         function cond() {
-            return cond.promise;
+            return promise;
         }
-        cond.promise = new Promise((resolve, reject) => {
-            cond.resolve = resolve;
-            cond.reject = reject;
+
+        cond.state = 'pending';
+
+        promise = new Promise((resolve, reject) => {
+            cond.resolve = () => {
+                cond.state = 'fulfilled-ish';
+                resolve(...arguments);
+                cond.state = 'fulfilled';
+            };
+            cond.reject = () => {
+                cond.state = 'rejected-ish';
+                reject(...arguments);
+                cond.state = 'rejected';
+            };
+
+            Object.seal(cond);
         });
+
+        return cond;
+    },
+
+    CustomPromiseAll: function(...promises) {
+        var cond = Misc.CustomPromise();
+        Promise.all(promises).then(cond.resolve, cond.reject);
         return cond;
     },
 };

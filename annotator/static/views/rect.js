@@ -13,20 +13,8 @@ class Rect {
 
 
     constructor({fill}) {
-        // Bounds of the rect
-        this.bounds = undefined;
-
-        // Used to calculate new bounds after dragging
-        this.boundsBeforeDrag = null;
-
-        // Used to figure out what dragging should do
-        this.dragIntent = null;
-
-        // Fill color
-        this.fill = fill;
-
-        // Raphel paper that this element is attached to
-        this.$paper = null;
+        // Before things are attached, we cache appearance in these "pre-
+        // attached" properties
 
         // Bounds set before element is attached to paper
         this.preAttachedBounds = null;
@@ -36,6 +24,25 @@ class Rect {
 
         // Front/back set before element is attached to paper
         this.preAttachedZ = null;
+
+
+        // Bounds of the rect
+        this.bounds = undefined;
+
+        // Used to calculate new bounds after dragging
+        this.boundsBeforeDrag = null;
+
+        // Used to figure out what dragging should do
+        this.dragIntent = undefined;
+
+        // Fill color
+        this.fill = fill;
+
+        // Raphel rect element
+        this.$el = null;
+
+        // Raphel paper that this element is attached to
+        this.$paper = null;
 
         // Prevent adding new properties
         if (this.constructor === Rect) {
@@ -70,14 +77,14 @@ class Rect {
         this.setHandlers();
 
         // Trigger event
-        $(this).trigger('attach', this.$paper);
+        $(this).triggerHandler('attach', this.$paper);
     }
 
     detach() {
         this.$el.remove();
 
         // Trigger event
-        $(this).trigger('detach', this.$paper);
+        $(this).triggerHandler('detach', this.$paper);
 
         this.$paper = undefined;
     }
@@ -186,7 +193,7 @@ class Rect {
         this._bounds = bounds;
 
         // Trigger event
-        $(this).trigger('incremental-change');
+        $(this).triggerHandler('incremental-change');
     }
 
     resize({dxMin, dxMax, dyMin, dyMax}) {
@@ -196,7 +203,7 @@ class Rect {
         this.bounds = Bounds.resize(this.boundsBeforeDrag, dxMin, dxMax, dyMin, dyMax);
 
         // Trigger event
-        $(this).trigger('incremental-resize', this.bounds);
+        $(this).triggerHandler('incremental-resize', this.bounds);
     }
 
     move(dx, dy) {
@@ -206,7 +213,7 @@ class Rect {
         this.bounds = Bounds.move(this.boundsBeforeDrag, dx, dy);
 
         // Trigger event
-        $(this).trigger('incremental-move');
+        $(this).triggerHandler('incremental-move');
     }
 
 
@@ -250,7 +257,7 @@ class Rect {
         // this.$el.toFront();
 
         // Trigger event
-        $(this).trigger('focus');
+        $(this).triggerHandler('focus');
     }
 
 
@@ -265,7 +272,7 @@ class Rect {
         this.boundsBeforeDrag = this.bounds();
 
         // Trigger event
-        $(this).trigger('drag-start');
+        $(this).triggerHandler('drag-start');
     }
 
     onDragMove(dx, dy) {
@@ -306,12 +313,12 @@ class Rect {
         if (this.boundsBeforeDrag == null) return;
 
         if (!Bounds.equals(this.bounds, this.boundsBeforeDrag)) {
-            $(this).trigger('discrete-change', this.bounds);
+            $(this).triggerHandler('discrete-change', this.bounds);
         }
         this.boundsBeforeDrag = undefined;
 
         // Trigger event
-        $(this).trigger('drag-end');
+        $(this).triggerHandler('drag-end');
     }
 
 
@@ -322,7 +329,7 @@ class Rect {
     }
 
     set dragIntent(dragIntent) {
-        this.attr('cursor', dragIntent);
+        this.attr({'cursor': dragIntent});
 
         this._dragIntent = dragIntent;
     }
@@ -453,7 +460,7 @@ class CreationRect extends Rect {
         this.boundsBeforeDrag = undefined;
 
         // Trigger event
-        $(this).trigger('create-bounds', this.bounds);
+        $(this).triggerHandler('create-bounds', this.bounds);
     }
 }
 

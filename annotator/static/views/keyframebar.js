@@ -19,14 +19,14 @@ class Keyframebar {
             throw new Error("Keyframebar.attach: already attached to container");
         }
 
-        // Apply appearance
-        this.resetWithDuration(0);
-
         // Actually do the attaching
         this.$container = $container;
 
+        // Apply appearance
+        this.resetWithDuration(0);
+
         // Trigger event
-        $(this).trigger('attach', this.$container);
+        $(this).triggerHandler('attach', this.$container);
 
         return this;
     }
@@ -35,7 +35,7 @@ class Keyframebar {
         this.$container.empty();
 
         // Trigger event
-        $(this).trigger('detach', this.$container);
+        $(this).triggerHandler('detach', this.$container);
 
         this.$container = undefined;
 
@@ -59,7 +59,7 @@ class Keyframebar {
         let frac = time / this.duration;
 
         $(this.KEYFRAME_SVG).click(() => {
-            $(this).trigger('jump-to-time', time);
+            $(this).triggerHandler('jump-to-time', time);
         }).css({
             'left': `${frac * 100}%`
         }).appendTo(this.$container);

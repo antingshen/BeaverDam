@@ -3,17 +3,17 @@
 
 class Player {
     constructor({$container, videoSrc, annotationsId}) {
+        this.$container = $container;
+        
         this.annotationsId = annotationsId;
 
         this.selectedThing = null;
 
         this.things = null;
 
+        this.videoSrc = videoSrc;
+
         this.view = null;
-
-        // Prevent adding new properties after this thread finishes.
-        Object.seal(this);
-
 
         // Promises
         this.annotationsDataReady = Misc.CustomPromise();
@@ -21,10 +21,14 @@ class Player {
         this.viewReady = Misc.CustomPromise();
 
         // We're ready when all the components are ready.
-        this.ready = Promise.all([
+        this.ready = Misc.CustomPromiseAll(
             this.annotationsReady(),
-            this.viewReady(),
-        ]);
+            this.viewReady()
+        );
+
+        // Prevent adding new properties after this thread finishes.
+        Object.seal(this);
+
 
         this.initAnnotations();
         this.initView();
@@ -33,6 +37,14 @@ class Player {
 
     // Init ALL the things!
     
+    initView() {
+        var {$container, videoSrc} = this;
+
+        this.view = new PlayerView({$container, videoSrc});
+
+        this.view.ready().then(this.viewReady.resolve);
+    }
+
     initAnnotations() {
         DataSources.annotations.load(this.annotationsId).then((things) => {
             this.things = things;
@@ -46,7 +58,7 @@ class Player {
                 this.initBindThingAndRect(thing, rect);
             }
 
-            $(this.video).trigger('timeupdate');
+            $(this.video).triggerHandler('timeupdate');
 
             this.annotationsReady.resolve();
         });
@@ -58,11 +70,12 @@ class Player {
                 time: this.view.video.currentTime,
                 bounds: bounds,
             });
+            $(this).triggerHandler('change-onscreen-annotations');
         });
 
         $(rect).on('select', () => {
             this.selectedThing = thing;
-            $(this).trigger('change-keyframes');
+            $(this).triggerHandler('change-keyframes');
         });
 
         $(this).on('change-onscreen-annotations', () => {
@@ -72,11 +85,20 @@ class Player {
         $(thing).on('delete', () => {
             this.view.deleteRect(rect);
         });
+    }
 
-        $(thing).on('change', () => {
-            // this.keyframebar;
+    initHandlers() {
+        $(this.view).$on('video', 'timeupdate', () => {
+            $(this).triggerHandler('change-onscreen-annotations');
+        });
+
+        $(this).on('change-keyframes', () => {
+            $(this).drawKeyframes();
         });
     }
+
+
+    // Draw something
 
     drawKeyframes() {
         this.keyframebar.resetWithDuration(this.view.video.duration);
@@ -100,24 +122,6 @@ class Player {
         if (rect.isBeingDragged()) return;
 
         rect.bounds = bounds;
-    }
-
-    initHandlers() {
-        $(this.view).$on('video', 'timeupdate', () => {
-            $(this).trigger('change-onscreen-annotations');
-        });
-
-        $(this).on('change-keyframes', () => {
-            $(this).drawKeyframes();
-        });
-    }
-
-    initView() {
-        var {$container, videoSrc} = this;
-
-        this.view = new PlayerView({$container, videoSrc});
-
-        this.view.ready().then(this.viewReady.resolve);
     }
 
 

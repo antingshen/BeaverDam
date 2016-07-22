@@ -48,11 +48,11 @@ class PlayerView {
         this.videoReady = Misc.CustomPromise();
 
         // We're ready when all the components are ready.
-        this.ready = Promise.all([
+        this.ready = Misc.CustomPromiseAll(
             this.keyframebarReady(),
             this.paperReady(),
-            this.videoReady(),
-        ]);
+            this.videoReady()
+        );
 
         // Prevent adding new properties
         Object.seal(this);
@@ -76,13 +76,13 @@ class PlayerView {
         // Depents on this.videoReady for this.video.videoWidth/Height
         this.videoReady().then(() => {
             this.$paper = Raphael(this.$('paper')[0], this.video.videoWidth, this.video.videoHeight);
-            this.creationRect = new CreationRect(this);
-            this.creationRect.addToPaper();
+            this.creationRect = new CreationRect({});
+            this.creationRect.attach(this.$paper);
 
             $(this.creationRect).on('create', (e, bounds) => {
                 var rect = this.addRect();
                 rect.bounds = bounds;
-                $(this).trigger('create', rect);
+                $(this).triggerHandler('create', rect);
             });
 
             this.paperReady.resolve();
@@ -91,20 +91,19 @@ class PlayerView {
 
     initVideo() {
         // Set video props
-        var $video = this.$('video');
-        $video.attr('src', this.src);
-        this.video = $video[0];
+        this.video = this.$('video')[0];
+        $('video').attr('src', this.videoSrc);
 
         // updates time more frequently by using setInterval
-        $video.on('playing', () => {
+        $(this.video).on('playing', () => {
             this.manualTimeupdateTimerId = setInterval(() => {
-                this.$('video').trigger('timeupdate');
+                this.$('video').triggerHandler('timeupdate');
             }, this.TIME_UPDATE_DELAY);
         }).on('pause', () => {
             clearInterval(this.manualTimeupdateTimerId);
         });
 
-        $video.on("loadedmetadata", () => {
+        $(this.video).on("loadedmetadata", () => {
             this.videoReady.resolve();
             this.initPaper();
         }).on("abort", () => {
