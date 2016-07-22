@@ -29,20 +29,8 @@
                 <input type="radio" name="object" id="object-radio-car" value="car" checked>
               </label>
               <label for="object-radio-human" class="label label-primary">
-                Human
+                Pedestrian
                 <input type="radio" name="object" id="object-radio-human" value="human">
-              </label>
-              <label for="object-radio-tree" class="label label-success">
-                Tree
-                <input type="radio" name="object" id="object-radio-tree" value="tree">
-              </label>
-              <label for="object-radio-animal" class="label label-info">
-                Animal
-                <input type="radio" name="object" id="object-radio-animal" value="animal">
-              </label>
-              <label for="object-radio-vehicle" class="label label-warning">
-                Vehicle
-                <input type="radio" name="object" id="object-radio-vehicle" value="vehicle">
               </label>
               <label for="object-radio-other" class="label label-danger">
                 Other
@@ -58,7 +46,14 @@
                 </form>
 
                 {% else %}
-                <button id="submit-btn" type="button"  class="btn btn-primary" style="position: absolute; top: 10px; right: 20px;">Submit</button>
+                <div id="submit-btn-group" class="btn-group" role="group" style="position: absolute; top: 10px; right: 20px;">
+                  {% if request.user.is_superuser == False %}
+                  <button id="submit-btn" type="button" class="btn btn-primary">Submit</button>
+                  {% else %}
+                  <button id="submit-btn" type="button" class="btn btn-primary">Save</button>
+                  <button id="verified-btn" type="button" class="btn btn-danger">Not Verified</button>
+                  {% endif %}
+                </div>
                 {% endif %}
               {% endif %}
             </div>
