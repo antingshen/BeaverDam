@@ -36,6 +36,9 @@ class PlayerView {
         // The rects
         this.rects = null;
 
+        // Timder id for rewind
+        this.rewindTimerId = null;
+
         // The <video> object
         this.video = null;
 
@@ -133,12 +136,73 @@ class PlayerView {
 
             // keyframebar => video
             $(this.keyframebar).on('jump-to-time', (e, time) => this.jumpToTimeAndPause(time));
+
+            // key => video
+            $(document).keydown(this.keydown.bind(this));
+            $(document).keyup(this.keyup.bind(this));
+
         });
     }
+
+
+    // Time control
 
     jumpToTimeAndPause(time) {
         this.video.currentTime = time;
         this.video.pause();
+    }
+
+    keydown(e) {
+        switch (e.keyCode) {
+            case 190: // .
+            case 69: // e
+                this.video.play();
+                break;
+            case 186: // ;
+            case 81: // q
+                this.rewind();
+                break;
+            case 32: // <spacebar>
+                if (this.video.paused) {
+                    this.video.play();
+                } else {
+                    this.video.pause();
+                }
+                return false; // prevent default
+        }
+    }
+
+    keyup(e) {
+        switch (e.keyCode) {
+            case 190: // .
+            case 69: // e
+                this.video.pause();
+                break;
+            case 186: // ;
+            case 81: // q
+                this.stopRewind();
+                break;
+        }
+    }
+
+    rewind() {
+        this.video.pause();
+        clearInterval(this.rewindTimerId);
+        this.rewindTimerId = setInterval(() => {
+            if (this.video.currentTime <= 0) {
+                this.stopRewind();
+            }
+            else {
+                this.video.currentTime -= 0.05;
+            }
+        }, 20);
+    }
+
+    stopRewind() {
+        if (this.rewindTimerId != null) {
+            clearInterval(this.rewindTimerId);
+            this.rewindTimerId = null;
+        }
     }
 
 
