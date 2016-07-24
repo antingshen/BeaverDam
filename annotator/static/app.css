@@ -1,3 +1,19 @@
+.player-screen {
+  position: relative;
+  overflow: hidden;
+}
+
+.player-video {
+    // position: absolute;
+    top: 0;
+}
+
+.player-paper {
+    position: absolute;
+    top: 0;
+}
+
+
 #frame {
     display: block;
     background-color: #eee;
@@ -41,13 +57,8 @@
     width: 60px;
 }
 
-#play-button {
-    font-size: 1.2em;
-    padding-right: 5px;
-}
-
 #key-frames-controller{
-    width: 827px;
+    /* width: 827px; */
 }
 
 .panel-space {
@@ -58,19 +69,37 @@
 .dots {
     width: 0;
     height: 0;
-    border: 5px solid transparent;
-    border-bottom: 7px solid #f0ad4e;
+    border: 50% solid transparent;
+    border-bottom: 6% solid #f0ad4e;
     position: absolute;
     margin-left: 72px;
-
-    top: -5px;
+    top: 0%;
 }
 .dots:after {
     content: '';
     position: absolute;
-    left: -5px; top: 7px;
+    left: 0%;
+    top: 0%;
     width: 0;
     height: 0;
     border: 5px solid transparent;
     border-top: 7px solid #f0ad4e;
+}
+
+
+.player-keyframebar-keyframe {
+    position: absolute;
+    color: orange;
+    width: auto;
+    height: 100%;
+    top: 0;
+    margin-left: -.7em;
+}
+
+.player-keyframebar {
+    position: relative;
+    margin-left: 6px;
+    margin-right: 6px;
+    /* box-sizing: border-box; */
+    height: 1.4em;
 }

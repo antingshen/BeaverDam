@@ -6,7 +6,7 @@ from .mturk_api import Server
 from annotator.models import Video
 
 
-mturk = Server(settings.MTURK_ID, settings.MTURK_KEY, settings.URL_ROOT, settings.MTURK_SANDBOX)
+mturk = Server(settings.AWS_ID, settings.AWS_KEY, settings.URL_ROOT, settings.MTURK_SANDBOX)
 
 
 class Task(models.Model):
@@ -34,7 +34,7 @@ class FullVideoTask(Task):
 
     @property
     def url(self):
-        return reverse('video', args=[self.video.name])
+        return reverse('video', args=[self.video.id])
 
     def __str__(self):
         return self.video.name

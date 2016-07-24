@@ -3,93 +3,85 @@
     <link rel="stylesheet" type="text/css" href="/static/app.css"/>
     <script>
       video = {{ video_data|safe }};
-      assignmentId = '{{ assignment_id }}';
-      MTURK_SANDBOX = {{ MTURK_SANDBOX|yesno:"true,false" }};
+      mturk = {{ assignment_id|yesno:'true,false,false' }};
       CSRFToken = '{{ csrf_token }}';
     </script>
-    <script src="/static/box.js"></script>
-    <script src="/static/thing.js"></script>
-    <script src="/static/canvas.js"></script>
-    <script src="/static/frame.js"></script>
-    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.js"></script>
-
+    <script src="/static/vendor/jquery/jquery.js"></script>
+    <script src="/static/vendor/raphael/raphael.min.js"></script>
+    <link href="/static/vendor/bootstrap/css/bootstrap.css" rel="stylesheet">
+    <script type="text/javascript" src="/static/app.js"></script>
+    <script type="text/javascript" src="/static/bounds.js"></script>
+    <script type="text/javascript" src="/static/datasources.js"></script>
+    <script type="text/javascript" src="/static/misc.js"></script>
+    <script type="text/javascript" src="/static/player.js"></script>
+    <script type="text/javascript" src="/static/thing.js"></script>
+    <script type="text/javascript" src="/static/views/keyframebar.js"></script>
+    <script type="text/javascript" src="/static/views/player.js"></script>
+    <script type="text/javascript" src="/static/views/rect.js"></script>
   </head>
 
-
   <body style="text-align:center">
-    <div class="panel panel-default panel-space">
+    <div class=" {{ iframe_mode|yesno:'empty, panel panel-default panel-space'}}   player-container" id="player">
       <div class="row">
 
-        <div id="fixed-panel" class="col-xs-6">
+        <div id="fixed-panel" class="col-lg-12">
           <div class="panel-body">
 
-            <div class="btn-group" data-toggle="buttons">
-              <span class="label label-default">Car <input type="radio" name="object" value="car" checked></span>
-              <span class="label label-primary">Human <input type="radio" name="object" value="human"></span>
-              <span class="label label-success">Tree <input type="radio" name="object" value="tree"></span>
-              <span class="label label-info">Animal <input type="radio" name="object" value="animal"></span>
-              <span class="label label-warning">Vehicle <input type="radio" name="object" value="vehicle"></span>
-              <span class="label label-danger">Other <input type="radio" name="object" value="other"> </span>
-            </div>
+            <div data-toggle="buttons">
+              <label for="object-radio-car" class="label label-default">
+                Car
+                <input type="radio" name="object" id="object-radio-car" value="car" checked>
+              </label>
+              <label for="object-radio-human" class="label label-primary">
+                Pedestrian
+                <input type="radio" name="object" id="object-radio-human" value="human">
+              </label>
+              <label for="object-radio-other" class="label label-danger">
+                Other
+                <input type="radio" name="object" id="object-radio-other" value="other"> 
+              </label>
 
-            {% if preview == False %}
-              {% if assignment_id != None %}
-              <form method="post" id="turk-form" action="https://{{ MTURK_SANDBOX|yesno:'workersandbox,www'}}.mturk.com/mturk/externalSubmit" style="margin-left: 300px">
-                <input type="hidden" value="{{ assignment_id }}" name="assignmentId">
-                <input type="hidden" value="{{ video.name }}" name="video-name">
-                <button id="submit-btn" type="submit"  class="btn btn-primary">Submit</button>
-              </form>
+              {% if preview == False %}
+                {% if assignment_id != None %}
+                <form method="post" id="turk-form" action="https://{{ MTURK_SANDBOX|yesno:'workersandbox,www'}}.mturk.com/mturk/externalSubmit" style="margin-left: 300px;">
+                  <input type="hidden" value="{{ assignment_id }}" name="assignmentId">
+                  <input type="hidden" value="{{ video.id }}" name="video-id">
+                  <button id="submit-btn" type="submit"  class="btn btn-primary" style="position: absolute; top: 10px; right: 20px;" >Submit</button>
+                </form>
 
-              {% else %}
-              <button id="submit-btn" type="button"  class="btn btn-primary" data-toggle="modal" data-target="#myModal" style="margin-left: 300px">Submit</button>
+                {% else %}
+                <div id="submit-btn-group" class="btn-group" role="group" style="position: absolute; top: 10px; right: 20px;">
+                  {% if request.user.is_superuser == False %}
+                  <button id="submit-btn" type="button" class="btn btn-primary">Submit</button>
+                  {% else %}
+                  <button id="submit-btn" type="button" class="btn btn-primary">Save</button>
+                  <button id="verified-btn" type="button" class="btn">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&hellip;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</button>
+                  {% endif %}
+                </div>
+                {% endif %}
               {% endif %}
-            {% endif %}
-
-            <!-- Modal -->
-            <div class="modal fade" id="myModal" role="dialog">
-              <div class="modal-dialog">
-
-                <!-- Modal content-->
-                <div class="modal-content">
-                  <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal">&times;</button>
-                    <h4 class="modal-title">Notification</h4>
-                  </div>
-                  <div class="modal-body">
-                    <p id="response"></p>
-                  </div>
-                  <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                  </div>
-                </div>
-
-              </div>
             </div>
 
+            <div class="player-screen">
+              <video class="player-video" style="margin-top: 20px"></video>
+              <div class="player-paper"></div>
+            </div>
 
-            <canvas id="frame">
-            </canvas>
-
-            <div id="frame-controller" class="panel panel-primary">
+            <div class="panel panel-primary">
               <div class="panel-heading">
-                <div id="play-button" class="glyphicon glyphicon-play"></div>
-
-                <input id="scroll-bar" type="range" min="0" max="5000" value="0" step="1"/>
-                <input class="form-control" id="frame-number" placeholder="0">
-              </div>
-            </div>
-
-            <div id="key-frames-controller" class="panel panel-success">
-              <div class="panel-heading" style="background-color: #3A7734">
-
-                <div id="key-frames">
-
+                <input class="player-control-scrubber" type="range" min="0" max="10000" value="0" step="1"/>
+                <div class="panel panel-success">
+                  <!-- <div class="panel-heading style="background-color: #3A7734"> -->
+                    <div class="player-keyframebar"></div>
+                  <!-- </div> -->
                 </div>
+
+                <div class="glyphicon glyphicon-play player-control-play"></div>
+                <div class="glyphicon glyphicon-pause player-control-pause"></div>
+                <div class="glyphicon glyphicon-trash player-control-delete-keyframe"></div>
+                <input class="form-control player-control-time" id="frame-number" placeholder="0">
               </div>
             </div>
-
 
           </div>
         </div>

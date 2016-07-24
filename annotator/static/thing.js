@@ -1,113 +1,163 @@
+"use strict";
+
+
 class Thing {
-    constructor(fill = Thing.getRandomColor()) {
-        this.keyframes = []; // List of boxes corresponding to keyframes
+    // Constants. ES6 doesn't support class constants yet, so we'll declare
+    // them this way for now:
+
+    // Are we at a keyframe or in betwen keyframes? If we're less than
+    // SAME_FRAME_THRESHOLD away from the closest keyframe, then we're at that
+    // keyframe.
+    get SAME_FRAME_THRESHOLD() {
+        return 0.1 /* seconds */;
+    }
+
+
+    constructor({fill, id, keyframes, type}) {
+        // Fill of thing
         this.fill = fill;
-        this.id = this.fill;
-        this.type = document.querySelector('input[name = "object"]:checked').value;
+
+        // ID of thing
+        this.id = id;
+
+        // Keyframes of thing
+        this.keyframes = keyframes;
+
+        // Type of thing
+        this.type = type;
+
+        // Prevent adding new properties
+        $(this).on('dummy', $.noop);
+        Object.preventExtensions(this);
     }
 
-    static fromJson(json) {
-        var thing = new Thing();
-        thing.keyframes = json.keyframes.map(boxJson => Box.fromJson(boxJson, thing));
-        thing.type = json.type;
-        return thing;
+    // The hacky but only way to make a Thing right now.
+    static newFromCreationRect() {
+        var fill = Misc.getRandomColor();
+        return new Thing({
+            keyframes: [],
+            fill: fill,
+            id: fill,
+            type: document.querySelector('input[name = "object"]:checked').value,
+        });
     }
 
-    static toJson(thing) {
+
+    /**
+     * A "frame" is the interpolation of the two closest keyframes. It tells us:
+     * - The previous and next keyframes
+     * - If we're "at" (<= this.SAME_FRAME_THRESHOLD away from) a keyframe
+     * - The bounds for the thing at this time
+     */
+    getFrameAtTime(time) {
+        if (!this.keyframes.length) {
+            return {
+                time: time,
+                bounds: null,
+                prevIndex: null,
+                nextIndex: null,
+                closestIndex: null,
+            };
+        }
+
+
+        var prevIndex = null;
+        var nextIndex = null;
+        for (let i = 0; i < this.keyframes.length; i++) {
+            let keyframe = this.keyframes[i];
+
+            if (keyframe.time <= time) {
+                prevIndex = i;
+            }
+            else if (keyframe.time >= time) {
+                nextIndex = i;
+                break;
+            }
+        }
+
+        var bounds, closestIndex;
+        // Before first keyframe
+        if (prevIndex == null) {
+            closestIndex = nextIndex;
+            bounds = this.keyframes[nextIndex].bounds;
+        }
+        // After last keyframe
+        else if (nextIndex == null) {
+            closestIndex = prevIndex;
+            bounds = this.keyframes[prevIndex].bounds;
+        }
+        // Between keyframes
+        else {
+            let prev = this.keyframes[prevIndex];
+            let next = this.keyframes[nextIndex];
+            let frac = (time - prev.time) / (next.time - prev.time);
+            closestIndex = frac <= 0.5 ? prevIndex : nextIndex;
+            bounds = Bounds.interpolate(prev.bounds, next.bounds, frac);
+        }
+
+        var closest = this.keyframes[closestIndex];
+        if (Math.abs(closest.time - time) > this.SAME_FRAME_THRESHOLD)
+            closestIndex = null;
+
         return {
-            keyframes: thing.keyframes.map(Box.toJson),
-            type: thing.type,
+            time: time,
+            bounds: bounds,
+            prevIndex: prevIndex,
+            nextIndex: nextIndex,
+            closestIndex: closestIndex,
         };
     }
 
-    static getRandomColor() {
-        var letters = '012345'.split('');
-        var color = '#';
-        color += letters[Math.round(Math.random() * 5)];
-        letters = '0123456789ABCDEF'.split('');
-        for (var i = 0; i < 5; i++) {
-            color += letters[Math.round(Math.random() * 15)];
+    /* Insert or update keyframe at time. */
+    updateKeyframe(frame) {
+        var {prevIndex, nextIndex, closestIndex} = this.getFrameAtTime(frame.time);
+
+        // Update the closestIndex-th frame
+        if (closestIndex != null) {
+            this.keyframes[closestIndex] = frame;
         }
-        return color;
-    }
-
-    /* gets keyframe for current frame if exists, otherwise construct a fake/interpolated one */
-    getKeyframe(frame) {
-        var prevFrame = null;
-        var prevBox = null;
-        for (var currBox of this.keyframes) {
-            let currFrame = currBox.frame;
-            if (frame == currFrame) {
-                return currBox;
-            } else if (prevFrame == null && frame < currFrame) {
-                return null;
-            } else if (prevFrame < frame && frame < currFrame) {
-                return this.interpolate(prevBox, currBox, frame);
+        // Add a new frame
+        else {
+            // Protip: Shift and unshift are like push and pop except they
+            // operate on the front of the array. If you ever forget which one
+            // is which, just take away the "f" from their name and it'll be
+            // super clear.
+            if (prevIndex == null) {
+                this.keyframes.unshift(frame);
             }
-            prevFrame = currFrame;
-            prevBox = currBox;
+
+            // The "else" case handles this case but explicitly writing it out
+            // anyway for consistency and symmertry.
+            else if (nextIndex == null) {
+                this.keyframes.push(frame);
+            }
+
+            else {
+                this.keyframes.splice(prevIndex + 1, 0, frame);
+            }
+
+            // Trigger event
+            $(this).triggerHandler('change');
         }
-        return currBox.interpolated_copy(frame);
     }
 
-    /* returns a linear interpolation between two boxes at frame. */
-    interpolate(box1, box2, frame) {
-        var x, y, w, h, delta;
-        delta = (frame - box1.frame) / (box2.frame - box1.frame);
-        x = box1.x + (box2.x - box1.x) * delta;
-        y = box1.y + (box2.y - box1.y) * delta;
-        h = box1.h + (box2.h - box1.h) * delta;
-        w = box1.w + (box2.w - box1.w) * delta;
-        return new Box(this, frame, x, y, w, h, true);
+    deleteKeyframeAtTime(time) {
+        var {closestIndex} = this.getFrameAtTime(time);
+
+        if (closestIndex == null) return false;
+
+        this.keyframes.splice(closestIndex, 1);
+
+        // Trigger event
+        $(this).triggerHandler('change');
+
+        return true;
     }
 
-    /* replace existing ones if necessary */
-    insertKeyframe(keyframe) {
-        var prevFrame = null;
-        for (let [idx, box] of this.keyframes.entries()) {
-            if (box.frame == keyframe.frame) {
-                this.keyframes[idx] = keyframe;
-                return;
-            } else if ((prevFrame == null && keyframe.frame < box.frame) 
-                    || (prevFrame < keyframe.frame && keyframe < box.frame)) {
-                this.keyframes.splice(idx, 0, keyframe);
-                return;
-            }
-        }
-        this.keyframes.push(keyframe);
-
+    // Delete the entire thing
+    delete() {
+        $(this).triggerHandler('delete');
     }
-
-    /* returns true if this.keyframes is emptied, else false */
-    deleteKeyframe(keyframe) {
-        for (let [idx, box] of this.keyframes.entries()) {
-            if (box === keyframe) {
-                this.keyframes.splice(idx, 1);
-            }
-        }
-        return this.keyframes.length == 0;
-    }
-
-    drawButton(myState) {
-        var thingDom = document.createElement("li");
-        thingDom.className = "list-group-item col-xs-6";
-        thingDom.id = this.fill;
-        var length =  this.type.length + 70;
-        thingDom.style = "color: azure; background-color: " + this.fill + "; width: " + length + "px";
-        thingDom.innerText = this.type;
-        thingDom.addEventListener("click", function() {
-            myState.selection = myState.getBox(this);
-            if (!myState.selection) {
-                var firstBox = this.keyframes[0];
-                var previousBox = new Box(this, myState.frame, firstBox.x, firstBox.y, firstBox.w, firstBox.h);
-
-                myState.boxes.push(previousBox);
-                myState.selection = previousBox;
-            }
-            myState.valid = false;
-        });
-        document.getElementById("shape-list").appendChild(thingDom);
-    }
-
-
 }
+
+void Thing;
