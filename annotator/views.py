@@ -11,7 +11,9 @@ from .models import *
 
 
 def home(request):
-    return video(request, 0)
+    need_annotating = Video.objects.filter(id__gt=0, verified=False)
+    links = ('<a href=/video/{0}>video {0}</a>'.format(video.id) for video in need_annotating)
+    return HttpResponse('\n<br />\n'.join(links))
 
 @xframe_options_exempt
 def video(request, video_id):
