@@ -187,9 +187,10 @@ class Player {
     submitAnnotations(e) {
         e.preventDefault();
 
-        // TODO magic number
-        this.saveAnnotations(window.assignmentId.length > 4).then((response) => {
-            $('#response').html(response);
+        var mturk = window.assignmentId != null;
+        e.preventDefault();
+        this.saveAnnotations(mturk).then((response) => {
+            window.alert(response);
         });
     }
 
