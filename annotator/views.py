@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.conf import settings
-from django.http import HttpResponse, Http404
+from django.http import HttpResponse, Http404, HttpResponseBadRequest
 from django.views.generic import View
 from django.views.decorators.clickjacking import xframe_options_exempt
 
@@ -31,6 +31,7 @@ def video(request, video_id):
         'id': video.id,
         'location': video.url,
         'annotated': video.annotation != '',
+        'verified': video.verified,
     })
 
     return render(request, 'video.html', context={
@@ -39,6 +40,7 @@ def video(request, video_id):
         'preview': preview,
         'assignment_id': assignment_id,
         'MTURK_SANDBOX': settings.MTURK_SANDBOX,
+        'verified': video.verified,
     })
 
 
@@ -54,3 +56,17 @@ class AnnotationView(View):
         video.annotation = annotation
         video.save()
         return HttpResponse('success')
+
+
+def verify(request, video_id):
+    body = request.body.decode('utf-8')
+    video = Video.objects.get(id=video_id)
+    if body == 'true':
+        video.verified = True
+    elif body == 'false':
+        video.verified = False
+    else:
+        print(body)
+        return HttpResponseBadRequest()
+    video.save()
+    return HttpResponse('video verification state saved')

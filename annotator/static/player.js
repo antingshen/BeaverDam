@@ -2,10 +2,10 @@
 
 
 class Player {
-    constructor({$container, videoSrc, annotationsId}) {
+    constructor({$container, videoSrc, videoId}) {
         this.$container = $container;
         
-        this.annotationsId = annotationsId;
+        this.videoId = videoId;
 
         this.selectedThing = null;
 
@@ -50,7 +50,7 @@ class Player {
     }
 
     initAnnotations() {
-        DataSources.annotations.load(this.annotationsId).then((things) => {
+        DataSources.annotations.load(this.videoId).then((things) => {
             this.things = things;
             this.annotationsDataReady.resolve();
         });
@@ -114,15 +114,27 @@ class Player {
     }
 
     initHandlers() {
+        // Drawing things
         $(this).on('change-onscreen-annotations', () => {
             this.drawOnscreenAnnotations();
         });
-
 
         $(this).on('change-keyframes', () => {
             this.drawKeyframes();
         });
 
+
+        // Submitting
+        // TODO doesn't respect scope
+        $('#submit-btn').click(this.submitAnnotations.bind(this));
+
+        $(this).on('change-verification', this.updateVerifiedButton.bind(this));
+        $(this).triggerHandler('change-verification');
+
+        $('#verified-btn').click(this.submitVerified.bind(this));
+
+
+        // On drawing changed
         this.viewReady().then(() => {
             $(this.view.creationRect).on('drag-start', () => {
                 this.view.video.pause();
@@ -189,9 +201,36 @@ class Player {
 
         var mturk = window.assignmentId != null;
         e.preventDefault();
-        this.saveAnnotations(mturk).then((response) => {
+        DataSources.annotations.save(this.videoId, this.things, mturk).then((response) => {
             window.alert(response);
         });
+    }
+
+    updateVerifiedButton() {
+        if (window.video.verified) {
+            $('#verified-btn').text('Verified').addClass('btn btn-success').removeClass('btn-danger');
+        }
+        else {
+            $('#verified-btn').text('Not Verified').addClass('btn btn-danger').removeClass('btn-success');
+        }
+    }
+
+    submitVerified() {
+        return fetch(`/video/${this.videoId}/verify/`, {
+            headers: {
+                'X-CSRFToken': window.CSRFToken,
+                'Content-Type': 'application/json',
+            },
+            credentials: 'same-origin',
+            method: 'post',
+            body: (!window.video.verified).toString(),
+        }).then((response) => {
+            if (response.ok) {
+                window.video.verified = !window.video.verified;
+                $(this).triggerHandler('change-verification');
+            }
+            return response.text();
+        }).then((text) => console.log(text));
     }
 
     addThingAtCurrentTimeFromRect(rect) {

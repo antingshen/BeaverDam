@@ -28,7 +28,7 @@ var DataSources = {
 
     thing: {
         fromJson: function(json) {
-            var thing = Thing.newHacky();
+            var thing = Thing.newFromCreationRect();
             thing.keyframes = json.keyframes.map(DataSources.frame.fromJson);
             thing.type = json.type;
             return thing;
@@ -67,10 +67,9 @@ var DataSources = {
             });
         },
 
-        save: function(things) {
+        save: function(id, things, mturk) {
             var json = DataSources.annotations.toJson(things);
-
-            return fetch(`/annotation/${this.id}`, {
+            return fetch(`/annotation/${id}`, {
                 headers: {
                     'X-CSRFToken': window.CSRFToken,
                     'Content-Type': 'application/json',
@@ -80,9 +79,11 @@ var DataSources = {
                 body: JSON.stringify(json),
             }).then((response) => {
                 if (response.ok) {
+                    if (mturk) {
+                        $('#turk-form').submit();
+                    }
                     return Promise.resolve('State saved successfully.');
-                }
-                else {
+                } else {
                     return Promise.resolve(`Error code ${response.status}`);
                 }
             });
