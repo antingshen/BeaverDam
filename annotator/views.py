@@ -2,7 +2,6 @@ from django.shortcuts import render
 from django.conf import settings
 from django.http import HttpResponse, Http404
 from django.views.generic import View
-from django.contrib.staticfiles import finders
 from django.views.decorators.clickjacking import xframe_options_exempt
 
 import os
@@ -21,23 +20,16 @@ def video(request, video_id):
     except Video.DoesNotExist:
         raise Http404('No video with id "{}". Possible fixes: \n1) Download an up to date DB, see README. \n2) Add this video to the DB via /admin'.format(video_id))
 
-    if finders.find('videos/{}.mp4'.format(video.id)):
-        video_location = '/static/videos/{}.mp4'.format(video.id)
-    elif video.url:
-        video_location = video.url
-    else:
-        raise Exception('Video {0} does not have a url. Possible fixes: \n1) Place {0}.mp4 into static/videos to serve locally. \n2) Update the url field of the Video with id={0}'.format(video_id))
-
     assignment_id = request.GET.get('assignmentId', None)
     preview = (assignment_id == 'ASSIGNMENT_ID_NOT_AVAILABLE')
     iframe_mode = assignment_id is not None
-    if assignment_id is not None and assignment_id != 'ASSIGNMENT_ID_NOT_AVAILABLE':
+    if assignment_id is not None and assignment_id != 'ASSIGNMENT_ID_NOT_AVAILABLE' and (settings.DEBUG == False):
         hit_id = request.GET['hitId']
         worker = request.GET['workerId']
 
     video_data = json.dumps({
         'id': video.id,
-        'location': video_location,
+        'location': video.url,
         'annotated': video.annotation != '',
     })
 
