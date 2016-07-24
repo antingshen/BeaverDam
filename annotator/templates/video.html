@@ -21,7 +21,7 @@
   </head>
 
   <body style="text-align:center">
-    <div class="panel panel-default panel-space player-container" id="player">
+    <div class=" {{ iframe_mode|yesno:'empty, panel panel-default panel-space'}}   player-container" id="player">
       <div class="row">
 
         <div id="fixed-panel" class="col-lg-12">
@@ -58,17 +58,17 @@
                 <form method="post" id="turk-form" action="https://{{ MTURK_SANDBOX|yesno:'workersandbox,www'}}.mturk.com/mturk/externalSubmit" style="margin-left: 300px;">
                   <input type="hidden" value="{{ assignment_id }}" name="assignmentId">
                   <input type="hidden" value="{{ video.id }}" name="video-id">
-                  <button id="submit-btn" type="submit"  class="btn btn-primary">Submit</button>
+                  <button id="submit-btn" type="submit"  class="btn btn-primary" style="position: absolute; top: 10px; right: 20px;" >Submit</button>
                 </form>
 
                 {% else %}
-                <button id="submit-btn" type="button"  class="btn btn-primary" style="margin-left: 300px">Submit</button>
+                <button id="submit-btn" type="button"  class="btn btn-primary" style="position: absolute; top: 10px; right: 20px;">Submit</button>
                 {% endif %}
               {% endif %}
             </div>
 
             <div class="player-screen">
-              <video class="player-video"></video>
+              <video class="player-video" style="margin-top: 20px"></video>
               <div class="player-paper"></div>
             </div>
 
