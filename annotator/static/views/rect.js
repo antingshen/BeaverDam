@@ -11,6 +11,14 @@ class Rect {
         return 10 /* px */;
     }
 
+    // Minimum dimensions allowed for box
+    get MIN_RECT_DIMENSIONS() {
+        return {
+            width: 10 /* px */,
+            height: 10 /* px */,
+        }
+    }
+
 
     constructor({fill}) {
         // Before things are attached, we cache appearance in these "pre-
@@ -31,6 +39,9 @@ class Rect {
 
         // Used to calculate new bounds after dragging
         this.boundsBeforeDrag = null;
+
+        // Last bounds meeting or exceeding MIN_RECT_DIMENSIONS
+        this.boundsMeetingMin = null;
 
         // Used to figure out what dragging should do
         this.dragIntent = undefined;
@@ -155,7 +166,7 @@ class Rect {
 
 
     // Setting attrs
-    
+
     get fill() {
         return this._fill;
     }
@@ -204,6 +215,10 @@ class Rect {
             return;
         }
 
+        if (Bounds.greaterOrEqualTo(bounds, this.MIN_RECT_DIMENSIONS)) {
+            this.boundsMeetingMin = bounds;
+        }
+
         if (this.$el == null) {
             this.preAttachedBounds = bounds;
         }
@@ -215,6 +230,17 @@ class Rect {
 
         // Trigger event
         $(this).triggerHandler('incremental-change');
+    }
+
+    hasBoundsMeetingMin() {
+        if (Bounds.greaterOrEqualTo(this.bounds, this.MIN_RECT_DIMENSIONS)) {
+            return true;
+        }
+        if (this.boundsMeetingMin != null) {
+            return false
+        }
+        this.bounds = this.boundsMeetingMin;
+        return true;
     }
 
     resize({dxMin, dxMax, dyMin, dyMax}) {
@@ -272,10 +298,6 @@ class Rect {
     // Event handler: Click
 
     onMousedown() {
-        // TODO REFACTOR this.player.selectedThing = this.thing;
-        // TODO REFACTOR this.player.drawAnnotations();
-        // TODO REFACTOR this.player.drawKeyframebar();
-
         // Trigger event
         this.focus();
     }
@@ -332,6 +354,9 @@ class Rect {
         // In case something went wrong with the handlers
         if (this.boundsBeforeDrag == null) return;
 
+        if (!this.hasBoundsMeetingMin()) {
+            throw new Error('Rect.onDragEnd: bounds error')
+        }
         if (!Bounds.equals(this.bounds, this.boundsBeforeDrag)) {
             $(this).triggerHandler('discrete-change', this.bounds);
         }
@@ -354,40 +379,42 @@ class Rect {
         this._dragIntent = dragIntent;
     }
 
-    onMouseover(e, mouseX, mouseY) {
+    onMouseover(e, absMouseX, absMouseY) {
         // Don't change cursor during a drag operation
         if (this.isBeingDragged()) return;
 
         // X,Y Coordinates relative to shape's orgin
         var shapeWidth = this.attr('width');
         var shapeHeight = this.attr('height');
-        var canvasRelative = this.getCanvasRelativePoint(mouseX, mouseY);
-        var relativeXmin = canvasRelative.x - this.attr('x');
-        var relativeYmin = canvasRelative.y - this.attr('y');
-        var relativeXmax = shapeWidth - relativeXmin;
-        var relativeYmax = shapeHeight - relativeYmin;
+        var mouse = this.getCanvasRelativePoint(absMouseX, absMouseY);
+        var relative = {
+            xMin: mouse.x - this.bounds.xMin,
+            yMin: mouse.y - this.bounds.yMin,
+            xMax: this.bounds.xMax - mouse.x,
+            yMax: this.bounds.yMax - mouse.y,
+        }
 
         // Change cursor
-        if (relativeYmin < this.RESIZE_BORDER) {
-            if (relativeXmin < this.RESIZE_BORDER)
+        if (relative.yMin < this.RESIZE_BORDER) {
+            if (relative.xMin < this.RESIZE_BORDER)
                 this.dragIntent = 'nw-resize';
-            else if (relativeXmax < this.RESIZE_BORDER)
+            else if (relative.xMax < this.RESIZE_BORDER)
                 this.dragIntent = 'ne-resize';
             else
                 this.dragIntent = 'n-resize';
         }
-        else if (relativeYmax < this.RESIZE_BORDER) {
-            if (relativeXmin < this.RESIZE_BORDER)
+        else if (relative.yMax < this.RESIZE_BORDER) {
+            if (relative.xMin < this.RESIZE_BORDER)
                 this.dragIntent = 'sw-resize';
-            else if (relativeXmax < this.RESIZE_BORDER)
+            else if (relative.xMax < this.RESIZE_BORDER)
                 this.dragIntent = 'se-resize';
             else
                 this.dragIntent = 's-resize';
         }
         else {
-            if (relativeXmin < this.RESIZE_BORDER)
+            if (relative.xMin < this.RESIZE_BORDER)
                 this.dragIntent = 'w-resize';
-            else if (relativeXmax < this.RESIZE_BORDER)
+            else if (relative.xMax < this.RESIZE_BORDER)
                 this.dragIntent = 'e-resize';
             else
                 this.dragIntent = 'move';
@@ -476,7 +503,9 @@ class CreationRect extends Rect {
 
     onDragEnd() {
         // Trigger event
-        $(this).triggerHandler('create-bounds', this.bounds);
+        if (this.hasBoundsMeetingMin()) {
+            $(this).triggerHandler('create-bounds', this.bounds);
+        }
 
         this.boundsBeforeDrag = undefined;
 
