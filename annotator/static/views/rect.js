@@ -155,6 +155,17 @@ class Rect {
 
 
     // Setting attrs
+    
+    get fill() {
+        return this._fill;
+    }
+
+    set fill(fill) {
+        this._fill = fill;
+        this.attr({
+            'fill': this._fill,
+        });
+    }
 
     attr(attrs) {
         if (this.$el == null) {

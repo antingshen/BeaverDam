@@ -59,10 +59,12 @@ class Player {
         Promise.all([this.annotationsDataReady(), this.viewReady()]).then(() => {
             for (let thing of this.things) {
                 let rect = this.view.addRect();
+                rect.fill = thing.fill;
                 this.initBindThingAndRect(thing, rect);
             }
 
-            $(this.video).triggerHandler('timeupdate');
+            $(this).triggerHandler('change-onscreen-annotations');
+            $(this).triggerHandler('change-keyframes');
 
             this.annotationsReady.resolve();
         });
