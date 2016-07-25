@@ -60,18 +60,19 @@ var Misc = {
         return obj;
     },
 
-    preventExtensions: function(classObj, obj) {
-        if (classObj == null || obj == null) {
+    preventExtensions: function(obj, classObj) {
+        if (obj == null) {
             throw new TypeError("Misc.preventExtensions: invalid arguments");
         }
 
-        if (!(obj instanceof classObj)) {
+        if (classObj != null && !(obj instanceof classObj)) {
             throw new TypeError("Misc.preventExtensions: You probably passed in the wrong classObj");
         }
 
-        if (obj.constructor == classObj) {
+        if (classObj == null || obj.constructor == classObj) {
             // Prevent adding new properties
             $(obj).on('dummy', $.noop);
+            $(obj).data('dummy', null);
             Object.preventExtensions(obj);
             // $(obj).off('dummy', $.noop);
         }

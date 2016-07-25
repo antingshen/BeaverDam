@@ -29,7 +29,7 @@ class Player {
         );
 
         // Prevent adding new properties
-        Misc.preventExtensions(Player, this);
+        Misc.preventExtensions(this, Player);
 
         this.initAnnotations();
         this.initView();

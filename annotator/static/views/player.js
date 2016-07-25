@@ -62,7 +62,7 @@ class PlayerView {
         );
 
         // Prevent adding new properties
-        Misc.preventExtensions(PlayerView, this);
+        Misc.preventExtensions(this, PlayerView);
 
         this.initHandlers();
         this.initPaper();

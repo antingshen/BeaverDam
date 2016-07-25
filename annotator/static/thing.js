@@ -27,7 +27,7 @@ class Thing {
         this.type = type;
 
         // Prevent adding new properties
-        Misc.preventExtensions(Thing, this);
+        Misc.preventExtensions(this, Thing);
     }
 
     // The hacky but only way to make a Thing right now.

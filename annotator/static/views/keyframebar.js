@@ -13,7 +13,7 @@ class Keyframebar {
 
         // Prevent adding new properties
         $(this).on('dummy', $.noop);
-        Object.preventExtensions(this);
+        Object.preventExtensions(this, Keyframebar);
     }
 
     attach($container) {

@@ -80,7 +80,7 @@ class Rect {
         this.$paper = null;
 
         // Prevent adding new properties
-        Misc.preventExtensions(Rect, this);
+        Misc.preventExtensions(this, Rect);
     }
 
 
@@ -470,7 +470,7 @@ class CreationRect extends Rect {
         super(...arguments);
 
         // Prevent adding new properties
-        Misc.preventExtensions(CreationRect, this);
+        Misc.preventExtensions(this, CreationRect);
     }
 
     setHandlers() {
