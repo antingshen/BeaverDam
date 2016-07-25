@@ -62,6 +62,9 @@
     stroke-width: 0;
     opacity: 0;
 }
+.player-rect-noselected.player-rect-noreal {
+    display: none;
+}
 
 
 

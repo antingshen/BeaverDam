@@ -91,7 +91,6 @@ class Player {
         });
 
         $(rect).on('drag-start', () => {
-            rect.appear({real: true});
             this.view.video.pause();
         });
 
