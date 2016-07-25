@@ -117,7 +117,7 @@ class PlayerView {
         $(this.video).on("loadedmetadata", () => {
             this.videoReady.resolve();
         }).on("abort", () => {
-            this.videoLoaded.reject();
+            this.videoReady.reject();
         });
     }
 
