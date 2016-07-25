@@ -133,7 +133,7 @@ class PlayerView {
 
             // control-scrubber <=> video
             this.$on('control-scrubber', 'change input', () => this.jumpToTimeAndPause(this.controlScrubber));
-            $(this.video).on('timeupdate', () => this.controlScrubberUnfocused = this.video.currentTime);
+            $(this.video).on('timeupdate', () => this.controlScrubberInactive = this.video.currentTime);
 
             // keyframebar => video
             $(this.keyframebar).on('jump-to-time', (e, time) => this.jumpToTimeAndPause(time));
@@ -184,17 +184,25 @@ class PlayerView {
         this.video.pause();
     }
 
+    stepTime(timeDelta) {
+        this.video.currentTime += timeDelta;
+        return false;
+    }
+
+    rewindStep() {
+        if (this.video.currentTime <= 0) {
+            this.stopRewind();
+        }
+        else {
+            this.video.currentTime -= 0.1;
+        }        
+    }
+
     rewind() {
         this.video.pause();
         clearInterval(this.rewindTimerId);
-        this.rewindTimerId = setInterval(() => {
-            if (this.video.currentTime <= 0) {
-                this.stopRewind();
-            }
-            else {
-                this.video.currentTime -= 0.05;
-            }
-        }, 30);
+        this.rewindTimerId = setInterval(this.rewindStep.bind(this), 100);
+        this.rewindStep();
         return false;
     }
 
@@ -271,12 +279,12 @@ class PlayerView {
         return parseFloat(this.$('control-scrubber').val()) / this.CONTROL_SCRUBBER_GRANULARITY * this.video.duration;
     }
 
-    get controlScrubberUnfocused() {
+    get controlScrubberInactive() {
         return this.controlScrubber;
     }
 
-    set controlScrubberUnfocused(value) {
-        this.$('control-scrubber:not(:focus)').val(value * this.CONTROL_SCRUBBER_GRANULARITY / this.video.duration);
+    set controlScrubberInactive(value) {
+        this.$('control-scrubber:not(:active)').val(value * this.CONTROL_SCRUBBER_GRANULARITY / this.video.duration);
     }
 
 
