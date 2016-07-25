@@ -2,10 +2,11 @@
 
 
 class Keyframebar {
-    constructor({className}) {
+    constructor({classBaseName}) {
         this.$container = null;
 
-        this.className = className;
+        // Namespaced className generator
+        this.classBaseName = classBaseName.add('keyframebar');
 
         // Duration of the video
         this.duration = 0;
@@ -46,7 +47,7 @@ class Keyframebar {
 
     keyframeSvg() {
         return `
-        <svg height="100" width="100" class="${this.className}" style="left: 0%;" viewBox="0 0 100 100" preserveAspectRatio="xMaxYMax">
+        <svg height="100" width="100" class="${this.classBaseName.add('keyframe')}" style="left: 0%;" viewBox="0 0 100 100" preserveAspectRatio="xMaxYMax">
             <circle cx="50" cy="50" r="30" stroke="black" stroke-width="0" fill="orange"></circle>
         </svg>`;
     }

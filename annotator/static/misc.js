@@ -1,6 +1,8 @@
 "use strict";
 
 var Misc = {
+    // Styling
+
     getRandomColor: function() {
         var letters = '012345'.split('');
         var color = '#';
@@ -10,6 +12,36 @@ var Misc = {
             color += letters[Math.round(Math.random() * 15)];
         }
         return color;
+    },
+
+    ClassNameGenerator: class {
+        constructor(className) {
+            this.className = className;
+        }
+
+        add(classNameExtension) {
+            var This = this.constructor;
+            return new This(`${this.className}-${classNameExtension}`);
+        }
+
+        toString() {
+            return this.className;
+        }
+
+        toSelector() {
+            return `.${this.className}`;
+        }
+    },
+
+
+    // Objects and hashes
+
+    assignNonNull: function(target, obj) {
+        for (let key of Object.keys(obj)) {
+            if (obj[key] == null) continue;
+            target[key] = obj[key];
+        }
+        return target;
     },
 
     hashEnsure: function(obj, spec) {
@@ -27,6 +59,26 @@ var Misc = {
         }
         return obj;
     },
+
+    preventExtensions: function(classObj, obj) {
+        if (classObj == null || obj == null) {
+            throw new TypeError("Misc.preventExtensions: invalid arguments");
+        }
+
+        if (!(obj instanceof classObj)) {
+            throw new TypeError("Misc.preventExtensions: You probably passed in the wrong classObj");
+        }
+
+        if (obj.constructor == classObj) {
+            // Prevent adding new properties
+            $(obj).on('dummy', $.noop);
+            Object.preventExtensions(obj);
+            // $(obj).off('dummy', $.noop);
+        }
+    },
+
+
+    // Control flow
 
     CustomPromise: function() {
         var promise;

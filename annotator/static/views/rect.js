@@ -1,26 +1,39 @@
 "use strict";
 
 
-class Rect {
-    // Constants. ES6 doesn't support class constants yet, so we'll declare
-    // them this way for now:
-
+// Constants. ES6 doesn't support class constants yet, thus this hack.
+var RectConstants = {
     // Mousing over the RESIZE_BORDER px-border around each rectangle
     // initiates resize, else initiates move.
-    get RESIZE_BORDER() {
-        return 10 /* px */;
-    }
+    RESIZE_BORDER: 10 /* px */,
 
     // Minimum dimensions allowed for box
-    get MIN_RECT_DIMENSIONS() {
-        return {
-            width: 10 /* px */,
-            height: 10 /* px */,
-        }
-    }
+    MIN_RECT_DIMENSIONS: {
+        width: 10 /* px */,
+        height: 10 /* px */,
+    },
+
+    // Map of dragIntent => cursor
+    CURSOR_BY_DRAG_INTENT: {
+        'nw-resize': 'nwse-resize',
+        'se-resize': 'nwse-resize',
+        'sw-resize': 'nesw-resize',
+        'ne-resize': 'nesw-resize',
+        'n-resize': 'ns-resize',
+        's-resize': 'ns-resize',
+        'e-resize': 'ew-resize',
+        'w-resize': 'ew-resize',
+        'move': 'move',
+        'create': 'crosshair',
+    },
+};
 
 
-    constructor({fill}) {
+class Rect {
+    constructor({classBaseName, fill}) {
+        // Mix-in constants
+        Object.assign(this, RectConstants);
+
         // Before things are attached, we cache appearance in these "pre-
         // attached" properties
 
@@ -37,6 +50,14 @@ class Rect {
         // Bounds of the rect
         this.bounds = undefined;
 
+        // Namespaced class name generator
+        this.classBaseName = classBaseName.add('rect');
+
+        // State of class name extensions:
+        // If a key has value true, then we add the class player-rect-KEY
+        // If a key has value false, then we add the class player-rect-noKEY
+        this.classNameExtBooleans = {};
+
         // Used to calculate new bounds after dragging
         this.boundsBeforeDrag = null;
 
@@ -52,14 +73,14 @@ class Rect {
         // Raphel rect element
         this.$el = null;
 
+        // jQuer rect element
+        this.el = null;
+
         // Raphel paper that this element is attached to
         this.$paper = null;
 
         // Prevent adding new properties
-        if (this.constructor === Rect) {
-            $(this).on('dummy', $.noop);
-            Object.preventExtensions(this);
-        }
+        Misc.preventExtensions(Rect, this);
     }
 
 
@@ -85,7 +106,8 @@ class Rect {
 
         // Actually do the attaching
         this.$paper = $paper;
-        this.$el = $paper.rect(0, 0, 0, 0);
+        this.$el = $paper.rect(0, 0, this.$paper.width, this.$paper.height);
+        this.el = this.$el.node;
         this.applyPreAttachedAppearance();
         this.setHandlers();
 
@@ -98,6 +120,7 @@ class Rect {
 
         // Trigger event
         $(this).triggerHandler('detach', this.$paper);
+        $(this).off();
 
         this.$paper = undefined;
     }
@@ -107,29 +130,15 @@ class Rect {
     // Appearance is the combination of attrs, bounds, and z.
 
     appearDefault() {
+        this.setClassNameExts({normal: true});
         this.appear({real: false, selected: true});
     }
 
     appear({real, selected}) {
-        this.attr({
-            'fill': this.fill,
-            'stroke': 'black',
-            'stroke-width': 5,
-        });
+        this.setClassNameExts({real, selected});
 
         if (selected === true) {
             this.toFront();
-        }
-        if (selected != null) {
-            this.attr({
-                'opacity': selected ? 0.7 : 0.3,
-            });
-        }
-
-        if (real != null) {
-            this.attr({
-                'stroke-dasharray': real ? "" : "- ",
-            });
         }
     }
 
@@ -166,6 +175,35 @@ class Rect {
 
 
     // Setting attrs
+
+    // This function looks complicated but the idea isn't. Here's what it does:
+    //  If we call this.setClassNameExts({selected: true, active: false})
+    //  Then this.classNameExtBooleans would change this way:
+    //      old: this.classNameExtBooleans = {real: true, selected: false}
+    //      new: this.classNameExtBooleans = {real: true, selected: true, active: false}
+    // 
+    // And this will have the the following DOM class:
+    //      player-rect player-rect-real player-rect-selected player-rect-noactive
+    setClassNameExts(classNameExtBooleans) {
+        Misc.assignNonNull(this.classNameExtBooleans, classNameExtBooleans);
+
+        // Add player-rect class
+        var classNames = [this.classBaseName];
+        for (let ext of Object.keys(this.classNameExtBooleans)) {
+            switch (this.classNameExtBooleans[ext]) {
+                case true:
+                    classNames.push(this.classBaseName.add(ext));
+                    break;
+                case false:
+                    classNames.push(this.classBaseName.add('no' + ext));
+                    break;
+                default:
+                    throw new TypeError(`Rect.setClassNameExts: invalid key ${ext}`);
+            }
+        }
+
+        this.attr({class: classNames.join(' ')});
+    }
 
     get fill() {
         return this._fill;
@@ -237,7 +275,7 @@ class Rect {
             return true;
         }
         if (this.boundsMeetingMin != null) {
-            return false
+            return false;
         }
         this.bounds = this.boundsMeetingMin;
         return true;
@@ -347,6 +385,9 @@ class Rect {
             case 'move':
                 this.move(dx, dy);
                 break;
+            case 'create':
+                this.resize({dxMax: dx, dyMax: dy});
+                break;
         }
     }
 
@@ -355,7 +396,7 @@ class Rect {
         if (this.boundsBeforeDrag == null) return;
 
         if (!this.hasBoundsMeetingMin()) {
-            throw new Error('Rect.onDragEnd: bounds error')
+            throw new Error('Rect.onDragEnd: bounds error');
         }
         if (!Bounds.equals(this.bounds, this.boundsBeforeDrag)) {
             $(this).triggerHandler('discrete-change', this.bounds);
@@ -374,7 +415,8 @@ class Rect {
     }
 
     set dragIntent(dragIntent) {
-        this.attr({'cursor': dragIntent});
+        $(this).triggerHandler('change-cursor', this.CURSOR_BY_DRAG_INTENT[dragIntent]);
+        // this.attr({'cursor': this.CURSOR_BY_DRAG_INTENT[dragIntent]});
 
         this._dragIntent = dragIntent;
     }
@@ -384,15 +426,13 @@ class Rect {
         if (this.isBeingDragged()) return;
 
         // X,Y Coordinates relative to shape's orgin
-        var shapeWidth = this.attr('width');
-        var shapeHeight = this.attr('height');
         var mouse = this.getCanvasRelativePoint(absMouseX, absMouseY);
         var relative = {
             xMin: mouse.x - this.bounds.xMin,
             yMin: mouse.y - this.bounds.yMin,
             xMax: this.bounds.xMax - mouse.x,
             yMax: this.bounds.yMax - mouse.y,
-        }
+        };
 
         // Change cursor
         if (relative.yMin < this.RESIZE_BORDER) {
@@ -430,51 +470,41 @@ class CreationRect extends Rect {
         super(...arguments);
 
         // Prevent adding new properties
-        $(this).on('dummy', $.noop);
-        Object.preventExtensions(this);
+        Misc.preventExtensions(CreationRect, this);
     }
 
     setHandlers() {
         this.$el.mousedown(this.onMousedown.bind(this));
         this.$el.drag(this.onDragMove.bind(this), this.onDragStart.bind(this), this.onDragEnd.bind(this));
-        // this.$el.mousemove(this.onMouseover.bind(this));
+        this.$el.mousemove(this.onMouseover.bind(this));
     }
 
     // Setting appearance
 
     appearDefault() {
-        this.dragIntent = 'se-resize';
+        this.setClassNameExts({creation: true});
         this.appear({active: false});
+
         // Draw with correct size at least once when we're attached to the paper
-        $(this).on('attach', () => this.appear({active: false}));
+        // $(this).on('attach', () => this.appear({active: false}));
     }
 
     appear({active}) {
+        this.setClassNameExts({active});
+
         if (active === true) {
-            this.attr({
-                'fill': 'yellow',
-                'fill-opacity': 1,
-                'opacity': 0.5,
-                'stroke': 'black',
-                'stroke-opacity': 1,
-                'stroke-width': 5,
-            });
             this.toFront();
         }
         else if (active === false) {
             this.toBack();
-            this.bounds = {
-                xMin: 0,
-                xMax: (this.$paper != null) ? this.$paper.width : 0,
-                yMin: 0,
-                yMax: (this.$paper != null) ? this.$paper.height : 0,
-            };
-            this.attr({
-                'fill': 'transparent',
-                'stroke': 'transparent',
-                'stroke-width': 0,
-                'opacity': 0
-            });
+            if (this.$paper != null) {
+                this.bounds = {
+                    xMin: 0,
+                    xMax: this.$paper.width,
+                    yMin: 0,
+                    yMax: this.$paper.height,
+                };
+            }
         }
     }
 
@@ -485,13 +515,13 @@ class CreationRect extends Rect {
         this.focus();
     }
 
-    onDragStart(mouseX, mouseY) {
-        var canvasRelative = this.getCanvasRelativePoint(mouseX, mouseY);
+    onDragStart(absMouseX, absMouseY) {
+        var mouse = this.getCanvasRelativePoint(absMouseX, absMouseY);
         this.bounds = {
-            xMin: canvasRelative.x,
-            xMax: canvasRelative.x,
-            yMin: canvasRelative.y,
-            yMax: canvasRelative.y,
+            xMin: mouse.x,
+            xMax: mouse.x,
+            yMin: mouse.y,
+            yMax: mouse.y,
         };
         this.boundsBeforeDrag = this.bounds;
 
@@ -514,6 +544,11 @@ class CreationRect extends Rect {
         // Trigger event
         $(this).triggerHandler('drag-end');
     }
+
+    onMouseover() {
+        this.dragIntent = 'create';
+    }
+
 }
 
 void CreationRect;

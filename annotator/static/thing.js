@@ -27,8 +27,7 @@ class Thing {
         this.type = type;
 
         // Prevent adding new properties
-        $(this).on('dummy', $.noop);
-        Object.preventExtensions(this);
+        Misc.preventExtensions(Thing, this);
     }
 
     // The hacky but only way to make a Thing right now.

@@ -28,10 +28,8 @@ class Player {
             this.viewReady()
         );
 
-        // Prevent adding new properties after this thread finishes.
-        $(this).on('dummy', $.noop);
-        Object.preventExtensions(this);
-
+        // Prevent adding new properties
+        Misc.preventExtensions(Player, this);
 
         this.initAnnotations();
         this.initView();

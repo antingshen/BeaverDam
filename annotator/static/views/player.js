@@ -1,28 +1,29 @@
 "use strict";
 
 
-class PlayerView {
-    // Constants. ES6 doesn't support class constants yet, so we'll declare
-    // them this way for now:
-
+// Constants. ES6 doesn't support class constants yet, thus this hack.
+var PlayerViewConstants = {
     // Value of .player-control-scrubber[max]
-    get CONTROL_SCRUBBER_GRANULARITY() {
-        return 10000;
-    }
+    CONTROL_SCRUBBER_GRANULARITY: 10000,
 
     // How often the UI updates the displayed time
-    get TIME_UPDATE_DELAY() {
-        return 30 /* ms */;
-    }
+    TIME_UPDATE_DELAY: 30 /* ms */,
+};
 
-    //
 
+class PlayerView {
     constructor({$container, videoSrc}) {
+        // Mix-in constants
+        Object.assign(this, PlayerViewConstants);
+
         // This container of the player
         this.$container = $container;
 
         // The Raphael paper (canvas) for annotations
         this.$paper = null;
+
+        // Namespaced className generator
+        this.classBaseName = new Misc.ClassNameGenerator('player');
 
         // The invisible rect that receives drag events not targeted at speciifc 
         this.creationRect = null;
@@ -38,6 +39,9 @@ class PlayerView {
 
         // Timder id for rewind
         this.rewindTimerId = null;
+
+        // Is something being dragged?
+        this.dragInProgress = false;
 
         // The <video> object
         this.video = null;
@@ -58,8 +62,7 @@ class PlayerView {
         );
 
         // Prevent adding new properties
-        $(this).on('dummy', $.noop);
-        Object.preventExtensions(this);
+        Misc.preventExtensions(PlayerView, this);
 
         this.initHandlers();
         this.initPaper();
@@ -71,7 +74,7 @@ class PlayerView {
     // Init ALL the things!
 
     initKeyframebar() {
-        this.keyframebar = new Keyframebar({className: this.className('keyframebar-keyframe')});
+        this.keyframebar = new Keyframebar({classBaseName: this.classBaseName});
         this.keyframebar.attach(this.$('keyframebar'));
         this.keyframebarReady.resolve();
     }
@@ -82,8 +85,7 @@ class PlayerView {
             var {videoWidth, videoHeight} = this.video;
 
             this.$paper = Raphael(this.$('paper')[0], videoWidth, videoHeight);
-            this.creationRect = new CreationRect({});
-            this.creationRect.attach(this.$paper);
+            this.creationRect = this.makeAndAttachRect(CreationRect);
             this.rects = [];
 
             $(this.creationRect).on('create-bounds', (e, bounds) => {
@@ -208,9 +210,31 @@ class PlayerView {
 
     // Rect control
 
-    addRect() {
-        var rect = new Rect({});
+    makeAndAttachRect(KindOfRect) {
+        var {classBaseName} = this;
+        var rect = new KindOfRect({classBaseName});
         rect.attach(this.$paper);
+
+        // In case drag exceeds bounds of object, set it as the cursor of the
+        // entire paper
+        $(rect).on('change-cursor', (e, cursor) => {
+            if (this.dragInProgress) return;
+            this.$('paper').css({cursor});
+        });
+
+        // .. but don't change it if there's we're in the middle of a drag
+        $(rect).on('drag-start', () => {
+            this.dragInProgress = true;
+        });
+        $(rect).on('drag-end', () => {
+            this.dragInProgress = false;
+        });
+        return rect;
+    }
+
+
+    addRect() {
+        var rect = this.makeAndAttachRect(Rect);
         this.rects.push(rect);
         return rect;
     }
@@ -258,16 +282,12 @@ class PlayerView {
 
     // DOM/jQuery helpers
 
-    className(selector) {
-        return `player-${selector}`;
+    $(extension) {
+        return this.$container.find(this.classBaseName.add(extension).toSelector());
     }
 
-    $(selector) {
-        return this.$container.find(`.${this.className(selector)}`);
-    }
-
-    $on(selector, eventName, callback) {
-        return this.$container.on(eventName, `.${this.className(selector)}`, callback);
+    $on(extension, eventName, callback) {
+        return this.$container.on(eventName, this.classBaseName.add(extension).toSelector(), callback);
     }
 }
 
