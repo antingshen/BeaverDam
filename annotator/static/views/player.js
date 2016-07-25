@@ -123,10 +123,9 @@ class PlayerView {
 
     initHandlers() {
         this.ready().then(() => {
-            // control-play => video
-            // control-pause => video
-            this.$on('control-play', 'click', () => this.video.play());
-            this.$on('control-pause', 'click', () => this.video.pause());
+            // key => better key events
+            $(document).keydown(Misc.fireEventByKeyCode.bind(this));
+            $(document).keyup(Misc.fireEventByKeyCode.bind(this));
 
             // control-time <=> video
             this.$on('control-time', 'change', () => this.video.currentTime = this.controlTime);
@@ -139,52 +138,50 @@ class PlayerView {
             // keyframebar => video
             $(this.keyframebar).on('jump-to-time', (e, time) => this.jumpToTimeAndPause(time));
 
-            // key => video
-            $(document).keydown(this.keydown.bind(this));
-            $(document).keyup(this.keyup.bind(this));
+            // controls => video
+            this.$on('control-play', 'click', () => this.play());
+            this.$on('control-pause', 'click', () => this.pause());
+            this.$on('control-delete-keyframe', 'click', () => this.deleteKeyframe());
 
+            // better key events => video
+            // play/pause
+            $(this).on('keydn-space            ', () => this.playPause());
+            // rewind-play
+            $(this).on('keydn-semicolon keydn-q', () => this.rewind());
+            $(this).on('keyup-semicolon keyup-q', () => this.stopRewind());
+            // step-play
+            $(this).on('keydn-period    keydn-e', () => this.play());
+            $(this).on('keyup-period    keyup-e', () => this.pause());
+            // Delete keyframe
+            $(this).on('                keydn-d', () => this.deleteKeyframe());
         });
     }
 
 
     // Time control
 
+    play() {
+        this.video.play();
+        return false;
+    }
+
+    pause() {
+        this.video.pause();
+        return false;
+    }
+
+    playPause() {
+        if (this.video.paused) {
+            this.video.play();
+        } else {
+            this.video.pause();
+        }
+        return false;
+    }
+
     jumpToTimeAndPause(time) {
         this.video.currentTime = time;
         this.video.pause();
-    }
-
-    keydown(e) {
-        switch (e.keyCode) {
-            case 190: // .
-            case 69: // e
-                this.video.play();
-                break;
-            case 186: // ;
-            case 81: // q
-                this.rewind();
-                break;
-            case 32: // <spacebar>
-                if (this.video.paused) {
-                    this.video.play();
-                } else {
-                    this.video.pause();
-                }
-                return false; // prevent default
-        }
-    }
-
-    keyup(e) {
-        switch (e.keyCode) {
-            case 190: // .
-            case 69: // e
-                this.video.pause();
-                break;
-            case 186: // ;
-            case 81: // q
-                this.stopRewind();
-                break;
-        }
     }
 
     rewind() {
@@ -197,14 +194,17 @@ class PlayerView {
             else {
                 this.video.currentTime -= 0.05;
             }
-        }, 20);
+        }, 30);
+        return false;
     }
 
     stopRewind() {
-        if (this.rewindTimerId != null) {
-            clearInterval(this.rewindTimerId);
-            this.rewindTimerId = null;
-        }
+        clearInterval(this.rewindTimerId);
+        return false;
+    }
+
+    deleteKeyframe() {
+        $(this).trigger('delete-keyframe');
     }
 
 

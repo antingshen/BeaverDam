@@ -113,6 +113,117 @@ var Misc = {
         Promise.all(promises).then(cond.resolve, cond.reject);
         return cond;
     },
+
+
+    // UI
+
+    metaKeyIsCmd: function() {
+        return !!navigator.platform.match(/^(Mac|iPhone|iPod|iPad)/i);
+    },
+
+    fireEventByKeyCode: function(e) {
+        if (e === window || e === Misc) {
+            throw new Error("Misc.fireEventByKeyCode: incorrectly bound");
+        }
+
+        var keyName = Misc.keyNamesByCode[e.keyCode];
+        if (keyName == null) return;
+        var eventType = e.type.replace(/^keydown$/, 'keydn');
+
+        // Prevent the browser from firing multiple keydown events
+        if (eventType === 'keydn') {
+            if ($(this).data('preventKeydownFor') === keyName) return;
+            $(this).data('preventKeydownFor', keyName);
+        }
+        else if (eventType === 'keyup') {
+            $(this).data('preventKeydownFor', null);
+        }
+
+
+        let words = [];
+        if (e.ctrlKey)  words.push('ctrl');
+        if (e.altKey)   words.push('alt');
+        if (e.shiftKey) words.push('shift');
+        if (e.metaKey)  words.push('meta');
+        words.push(keyName);
+        Misc.fireSubEvent.call(this, e, `${eventType}-${words.join('-')}`);
+
+        var cmdKey = Misc.metaKeyIsCmd() ? e.metaKey : e.ctrlKey;
+        if (cmdKey) {
+            let words = [];
+            if (e.altKey)   words.push('alt');
+            if (e.shiftKey) words.push('shift');
+            words.push('cmd');
+            words.push(keyName);
+            Misc.fireSubEvent.call(this, e, `${eventType}-${words.join('-')}`);
+        }
+    },
+
+    fireSubEvent(originalEvent, eventType) {
+        var event = $.Event(eventType);
+        $(this).triggerHandler(event);
+        if (event.isDefaultPrevented()) {
+            originalEvent.preventDefault();
+        }
+    },
+
+    keyNamesByCode: {
+          8: "backspace",
+          9: "tab",
+         13: "enter",
+         32: "space",
+         37: "arrowleft",
+         38: "arrowup",
+         39: "arrowright",
+         40: "arrowdown",
+         48: "0",
+         49: "1",
+         50: "2",
+         51: "3",
+         52: "4",
+         53: "5",
+         54: "6",
+         55: "7",
+         56: "8",
+         57: "9",
+         65: "a",
+         66: "b",
+         67: "c",
+         68: "d",
+         69: "e",
+         70: "f",
+         71: "g",
+         72: "h",
+         73: "i",
+         74: "j",
+         75: "k",
+         76: "l",
+         77: "m",
+         78: "n",
+         79: "o",
+         80: "p",
+         81: "q",
+         82: "r",
+         83: "s",
+         84: "t",
+         85: "u",
+         86: "v",
+         87: "w",
+         88: "x",
+         89: "y",
+         90: "z",
+        186: "semicolon",
+        187: "equals",
+        188: "comma",
+        189: "dash",
+        190: "period",
+        191: "slash",
+        192: "grave",
+        219: "bracketleft",
+        220: "backslash",
+        221: "bracketright",
+        222: "singlequote",
+    },
 };
 
 void Misc;

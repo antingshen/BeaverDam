@@ -148,7 +148,7 @@ class Player {
                 $(this).triggerHandler('change-keyframes');
             });
 
-            this.view.$on('control-delete-keyframe', 'click', () => {
+            $(this.view).on('delete-keyframe', () => {
                 this.view.video.pause();
                 this.deleteSelectedKeyframe();
                 $(this).triggerHandler('change-onscreen-annotations');
