@@ -9,8 +9,8 @@ var RectConstants = {
 
     // Minimum dimensions allowed for box
     MIN_RECT_DIMENSIONS: {
-        width: 10 /* px */,
-        height: 10 /* px */,
+        width: 30 /* px */,
+        height: 30 /* px */,
     },
 
     // Map of dragIntent => cursor
@@ -274,7 +274,7 @@ class Rect {
         if (Bounds.greaterOrEqualTo(this.bounds, this.MIN_RECT_DIMENSIONS)) {
             return true;
         }
-        if (this.boundsMeetingMin != null) {
+        if (this.boundsMeetingMin == null) {
             return false;
         }
         this.bounds = this.boundsMeetingMin;
@@ -524,6 +524,7 @@ class CreationRect extends Rect {
             yMax: mouse.y,
         };
         this.boundsBeforeDrag = this.bounds;
+        this.boundsMeetingMin = null;
 
         this.appear({active: true});
 

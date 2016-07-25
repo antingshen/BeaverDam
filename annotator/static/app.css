@@ -1,8 +1,9 @@
 /* Player */
 
 .player-screen {
-  position: relative;
-  overflow: hidden;
+    margin: 1em 0 0.5em;
+    position: relative;
+    overflow: hidden;
 }
 
 .player-video {
@@ -32,7 +33,7 @@
 
 .player-rect-normal {
     stroke: black;
-    stroke-width: 5px;    
+    stroke-width: 3px;
 }
 .player-rect-selected {
     opacity: 0.7;
@@ -41,10 +42,10 @@
     opacity: 0.3;
 }
 .player-rect-real {
-    stroke-dasharray: '';
+    stroke-dasharray: none;
 }
 .player-rect-noreal {
-    stroke-dasharray: '5, 5';
+    stroke-dasharray: 8, 4;
 }
 
 .player-rect-active {
@@ -53,7 +54,7 @@
     opacity: 0.5;
     stroke: white;
     stroke-opacity: 1;
-    stroke-width: 5;
+    stroke-width: 3px;
 }
 .player-rect-noactive {
     fill: transparent;
