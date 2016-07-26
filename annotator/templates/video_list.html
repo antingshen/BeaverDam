@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block body %}
+<table class="table table-hover" style="width:500px; margin: 0 auto;">
+  <thead>
+    <tr>
+      <th>Video</th>
+      <th>Annotations</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for video in videos %}
+    <tr onclick="window.document.location='{% url "video" video.id %}';" style="cursor: pointer;">
+      <td>{{ video.id }}</td>
+      <td>{{ video.annotations|yesno }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

@@ -1,0 +1,17 @@
+<html>
+  <head>
+    <title>BeaverDam</title>
+    <script>
+      CSRFToken = '{{ csrf_token }}';
+    </script>
+
+    <script src="/static/vendor/jquery/jquery.js"></script>
+    <link href="/static/vendor/bootstrap/css/bootstrap.css" rel="stylesheet">
+
+    {% block head %}{% endblock %}
+
+  </head>
+  <body style="text-align:center">
+    {% block body %}{% endblock %}
+  </body>
+</html>

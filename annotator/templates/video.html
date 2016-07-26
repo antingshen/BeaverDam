@@ -1,100 +1,96 @@
-<html>
-  <head>
-    <link rel="stylesheet" type="text/css" href="/static/app.css"/>
-    <script>
-      video = {{ video_data|safe }};
-      mturk = {{ assignment_id|yesno:'true,false,false' }};
-      CSRFToken = '{{ csrf_token }}';
-    </script>
-    <script src="/static/vendor/jquery/jquery.js"></script>
-    <script src="/static/vendor/raphael/raphael.min.js"></script>
-    <link href="/static/vendor/bootstrap/css/bootstrap.css" rel="stylesheet">
-    <script type="text/javascript" src="/static/app.js"></script>
-    <script type="text/javascript" src="/static/bounds.js"></script>
-    <script type="text/javascript" src="/static/datasources.js"></script>
-    <script type="text/javascript" src="/static/misc.js"></script>
-    <script type="text/javascript" src="/static/player.js"></script>
-    <script type="text/javascript" src="/static/thing.js"></script>
-    <script type="text/javascript" src="/static/views/keyframebar.js"></script>
-    <script type="text/javascript" src="/static/views/player.js"></script>
-    <script type="text/javascript" src="/static/views/rect.js"></script>
-  </head>
+{% extends "base.html" %}
 
-  <body style="text-align:center">
-    <div class=" {{ iframe_mode|yesno:'empty, panel panel-default panel-space'}}   player-container" id="player">
-      <div class="row">
+{% block head %}
+  <link rel="stylesheet" type="text/css" href="/static/app.css"/>
+  <script>
+    video = {{ video_data|safe }};
+    mturk = {{ assignment_id|yesno:'true,false,false' }};
+  </script>
+  <script src="/static/vendor/raphael/raphael.min.js"></script>
+  <script type="text/javascript" src="/static/app.js"></script>
+  <script type="text/javascript" src="/static/bounds.js"></script>
+  <script type="text/javascript" src="/static/datasources.js"></script>
+  <script type="text/javascript" src="/static/misc.js"></script>
+  <script type="text/javascript" src="/static/player.js"></script>
+  <script type="text/javascript" src="/static/thing.js"></script>
+  <script type="text/javascript" src="/static/views/keyframebar.js"></script>
+  <script type="text/javascript" src="/static/views/player.js"></script>
+  <script type="text/javascript" src="/static/views/rect.js"></script>
+{% endblock %}
 
-        <div id="fixed-panel" class="col-lg-12">
-          <div class="panel-body">
+{% block body %}
+  <div class=" {{ iframe_mode|yesno:'empty, panel panel-default panel-space'}}   player-container" id="player">
+    <div class="row">
 
-            <div data-toggle="buttons">
-              <label for="object-radio-car" class="label label-default">
-                Car
-                <input type="radio" name="object" id="object-radio-car" value="car" checked>
-              </label>
-              <label for="object-radio-human" class="label label-primary">
-                Pedestrian
-                <input type="radio" name="object" id="object-radio-human" value="human">
-              </label>
-              <label for="object-radio-other" class="label label-danger">
-                Other
-                <input type="radio" name="object" id="object-radio-other" value="other"> 
-              </label>
+      <div id="fixed-panel" class="col-lg-12">
+        <div class="panel-body">
 
-              {% if preview == False %}
-                {% if assignment_id != None %}
-                <form method="post" id="turk-form" action="https://{{ MTURK_SANDBOX|yesno:'workersandbox,www'}}.mturk.com/mturk/externalSubmit" style="margin-left: 300px;">
-                  <input type="hidden" value="{{ assignment_id }}" name="assignmentId">
-                  <input type="hidden" value="{{ video.id }}" name="video-id">
-                  <button id="submit-btn" type="submit"  class="btn btn-primary" style="position: absolute; top: 10px; right: 20px;" >Submit</button>
-                </form>
+          <div data-toggle="buttons">
+            <label for="object-radio-car" class="label label-default">
+              Car
+              <input type="radio" name="object" id="object-radio-car" value="car" checked>
+            </label>
+            <label for="object-radio-human" class="label label-primary">
+              Pedestrian
+              <input type="radio" name="object" id="object-radio-human" value="human">
+            </label>
+            <label for="object-radio-other" class="label label-danger">
+              Other
+              <input type="radio" name="object" id="object-radio-other" value="other">
+            </label>
 
+            {% if preview == False %}
+              {% if assignment_id != None %}
+              <form method="post" id="turk-form" action="https://{{ MTURK_SANDBOX|yesno:'workersandbox,www'}}.mturk.com/mturk/externalSubmit" style="margin-left: 300px;">
+                <input type="hidden" value="{{ assignment_id }}" name="assignmentId">
+                <input type="hidden" value="{{ video.id }}" name="video-id">
+                <button id="submit-btn" type="submit"  class="btn btn-primary" style="position: absolute; top: 10px; right: 20px;" >Submit</button>
+              </form>
+
+              {% else %}
+              <div id="submit-btn-group" class="btn-group" role="group" style="position: absolute; top: 10px; right: 20px;">
+                {% if request.user.is_superuser == False %}
+                <button id="submit-btn" type="button" class="btn btn-primary">Submit</button>
                 {% else %}
-                <div id="submit-btn-group" class="btn-group" role="group" style="position: absolute; top: 10px; right: 20px;">
-                  {% if request.user.is_superuser == False %}
-                  <button id="submit-btn" type="button" class="btn btn-primary">Submit</button>
-                  {% else %}
-                  <button id="submit-btn" type="button" class="btn btn-primary">Save</button>
-                  <button id="verified-btn" type="button" class="btn">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&hellip;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</button>
-                  {% endif %}
-                </div>
+                <button id="submit-btn" type="button" class="btn btn-primary">Save</button>
+                <button id="verified-btn" type="button" class="btn">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&hellip;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</button>
                 {% endif %}
-              {% endif %}
-            </div>
-
-            <div class="player-screen">
-              <video class="player-video"></video>
-              <div class="player-paper"></div>
-            </div>
-
-            <div class="panel panel-primary">
-              <div class="panel-heading">
-                <input class="player-control-scrubber" type="range" min="0" max="10000" value="0" step="1"/>
-                <div class="panel panel-success">
-                  <!-- <div class="panel-heading style="background-color: #3A7734"> -->
-                    <div class="player-keyframebar"></div>
-                  <!-- </div> -->
-                </div>
-
-                <div class="glyphicon glyphicon-play player-control-play"></div>
-                <div class="glyphicon glyphicon-pause player-control-pause"></div>
-                <div class="glyphicon glyphicon-trash player-control-delete-keyframe"></div>
-                <input class="form-control player-control-time" id="frame-number" placeholder="0">
               </div>
-            </div>
-
+              {% endif %}
+            {% endif %}
           </div>
-        </div>
 
-        <div class="col-xs-6 col-md-4">
-          <ul id="shape-list" class="list-group row">
-          </ul>
-        </div>
+          <div class="player-screen">
+            <video class="player-video"></video>
+            <div class="player-paper"></div>
+          </div>
 
+          <div class="panel panel-primary">
+            <div class="panel-heading">
+              <input class="player-control-scrubber" type="range" min="0" max="10000" value="0" step="1"/>
+              <div class="panel panel-success">
+                <!-- <div class="panel-heading style="background-color: #3A7734"> -->
+                  <div class="player-keyframebar"></div>
+                <!-- </div> -->
+              </div>
+
+              <div class="glyphicon glyphicon-play player-control-play"></div>
+              <div class="glyphicon glyphicon-pause player-control-pause"></div>
+              <div class="glyphicon glyphicon-trash player-control-delete-keyframe"></div>
+              <input class="form-control player-control-time" id="frame-number" placeholder="0">
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="col-xs-6 col-md-4">
+        <ul id="shape-list" class="list-group row">
+        </ul>
       </div>
 
     </div>
 
-  </body>
+  </div>
 
-</html>
+{% endblock %}
