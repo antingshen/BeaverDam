@@ -8,7 +8,7 @@ verbose() {
 }
 
 if [[ "$1" != "-f" ]]; then
-    echo "Existing data may be overwritten. Run as $0 -f to acknoledge this."
+    echo "Existing data may be overwritten. Run as $0 -f to acknowledge this."
     exit 1
 fi
 

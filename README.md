@@ -44,4 +44,4 @@ Need to run on a custom port? `env PORT=1234 scripts/serve`
 
 ## Contributing
 
-See [annotator/static/README.md](annotator/static/README.md) for more info.
+See [annotator/static/README.md](annotator/static) for more info.
