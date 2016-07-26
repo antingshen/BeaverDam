@@ -1,0 +1,22 @@
+#!/bin/bash
+set -e
+cd "$(echo "$0" | xargs dirname | xargs dirname)"
+
+verbose() {
+    echo $ "$@"
+    "$@"
+}
+
+if [ "$PORT" = "" ]; then
+    PORT=5000
+fi
+
+verbose source venv/bin/activate
+
+if [ "$VIRTUAL_ENV" = "" ]; then
+    echo "Must be inside virtual env"
+    echo "To do so, run \"source venv/bin/activate\""
+    exit 1
+fi
+
+verbose ./manage.py runserver "0.0.0.0:$PORT"

@@ -1,0 +1,16 @@
+#!/bin/bash
+set -e
+cd "$(echo "$0" | xargs dirname | xargs dirname)"
+
+verbose() {
+    echo $ "$@"
+    "$@"
+}
+
+if [[ "$1" != "-f" ]]; then
+    echo "Existing data may be overwritten. Run as $0 -f to acknoledge this."
+    exit 1
+fi
+
+verbose wget https://s3-us-west-2.amazonaws.com/beaverdam/db.sqlite3 -O db.sqlite3
+verbose wget https://s3-us-west-2.amazonaws.com/beaverdam/videos/test_vid2.mp4 -O annotator/static/videos/0.mp4

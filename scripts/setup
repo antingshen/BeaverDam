@@ -1,0 +1,13 @@
+#!/bin/bash
+set -e
+cd "$(echo "$0" | xargs dirname | xargs dirname)"
+
+verbose() {
+    echo $ "$@"
+    "$@"
+}
+
+verbose virtualenv -p python3 venv
+verbose . venv/bin/activate
+verbose pip3 install -r requirements.txt
+verbose pip3 install --upgrade pip

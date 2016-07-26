@@ -1,8 +1,0 @@
-#!/bin/sh
-if [ "$VIRTUAL_ENV" = "" ]
-then
-    echo "Must be inside virtual env"
-    echo "To do so, run \"source venv/bin/activate\""
-    exit 1
-fi
-./manage.py runserver 0.0.0.0:5000

@@ -1,38 +1,44 @@
-# BeaverDam
+BeaverDam
+=========
+
 Video annotation tool for deep learning training labels
+
 
 ## Installation
 
 Make sure `virutalenv` is installed on your computer. Search for OS specific instructions.
 
-Clone the repository
+1. Clone the repository
+2. `cd BeaverDam`
+3. Install `virtualenv` (probably via `pip3 install virtualenv`)
+4. `scripts/setup` to make the Python venv
+5. `scripts/seed` to download sample database and data
 
-```
-cd BeaverDam
-virtualenv -p python3 venv
-. venv/bin/activate
-pip3 install -r requirements.txt
-```
+### If using mturk
 
-#### Download Sample Database & Data
-```
-wget https://s3-us-west-2.amazonaws.com/beaverdam/db.sqlite3 -O db.sqlite3
-wget https://s3-us-west-2.amazonaws.com/beaverdam/videos/test_vid2.mp4 -O annotator/static/videos/0.mp4
-```
+Replace the credentials below with your own:
 
-#### Export mturk Keys (only required for mturk module)
-
-Replace the credentials below with your own
-```
+```bash
 export AWS_ID="AKIAAAAYOURIDHERE"
 export AWS_KEY="YOURmturkKEYhere5DyUrkm/81SRSMG+5174"
 ```
+
 When ready for real turkers, edit `MTURK_SANDBOX` to `False` in `settings.py`.
 
 It is recommended to use IAM keys with only mturk permissions instead of root key.
 
-## Running the Server
 
-`./run_server`
-Then navigate to `localhost:5000/video/test_vid` in your browser.
+## Running the server
 
+```shell
+scripts/serve
+```
+
+Then navigate to <a href="http://localhost:5000/" target="_blank">localhost:5000</a> in your browser.
+
+Need to run on a custom port? `env PORT=1234 ./run_server`
+
+
+## Contributing
+
+See [annotator/static/README.md]() for more info.

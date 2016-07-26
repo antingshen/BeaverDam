@@ -1,0 +1,15 @@
+#!/bin/bash
+set -e
+cd "$(echo "$0" | xargs dirname | xargs dirname)"
+
+verbose() {
+    echo $ "$@"
+    "$@"
+}
+
+# This works similarly with ffmpeg, just replace avconv with ffmpeg
+# Example for converting folder: 
+# for i in *; do path/to/convert_to_h264.sh "$i"; done
+
+verbose avconv -y -i "$1" -c:v libx264 /tmp/converting.mp4
+verbose mv /tmp/converting.mp4 "$1"
