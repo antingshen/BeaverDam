@@ -6,13 +6,16 @@ Video annotation tool for deep learning training labels
 
 ## Installation
 
-Make sure `virutalenv` is installed on your computer. Search for OS specific instructions.
-
-1. Clone the repository
-2. `cd BeaverDam`
-3. Install `virtualenv` (probably via `pip3 install virtualenv`)
-4. `scripts/setup` to make the Python venv
-5. `scripts/seed` to download sample database and data
+ 1. Clone this repository.
+ 2. `cd BeaverDam`
+ 3. Make sure Python 3 is installed.  
+    If not: `brew install python3` (Mac) or `sudo apt-get install python3` (Ubuntu)
+ 3. Make sure virtualenv is installed.  
+    If not: `pip3 install virtualenv` or maybe `sudo pip3 install virtualenv`
+ 4. Make the Python virtualenv for this project:  
+    `scripts/setup`
+ 5. Download sample data:  
+    `scripts/seed -f`
 
 ### If using mturk
 
@@ -34,9 +37,9 @@ It is recommended to use IAM keys with only mturk permissions instead of root ke
 scripts/serve
 ```
 
-Then navigate to <a href="http://localhost:5000/" target="_blank">localhost:5000</a> in your browser.
+Then navigate to [localhost:5000](http://localhost:5000/) in your browser.
 
-Need to run on a custom port? `env PORT=1234 ./run_server`
+Need to run on a custom port? `env PORT=1234 scripts/serve`
 
 
 ## Contributing
