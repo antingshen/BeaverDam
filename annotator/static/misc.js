@@ -33,6 +33,30 @@ var Misc = {
         }
     },
 
+    // This function looks complicated but the idea isn't. Here's what it does:
+    //  If we call this.setClassNameExts({selected: true, active: false})
+    //  Then this.classNameExtBooleans would change this way:
+    //      old: this.classNameExtBooleans = {real: true, selected: false}
+    //      new: this.classNameExtBooleans = {real: true, selected: true, active: false}
+    // 
+    // And this will have the the following DOM class:
+    //      player-rect player-rect-real player-rect-selected player-rect-noactive
+    getClassNamesFromExts(classNames, classBaseName, classNameExtBooleans) {
+        for (let ext of Object.keys(classNameExtBooleans)) {
+            switch (classNameExtBooleans[ext]) {
+                case true:
+                    classNames.push(classBaseName.add(ext));
+                    break;
+                case false:
+                    classNames.push(classBaseName.add('no' + ext));
+                    break;
+                default:
+                    throw new TypeError(`Misc.getClassNamesFromExts: invalid key ${ext}`);
+            }
+        }
+        return classNames;
+    },
+
 
     // Objects and hashes
 

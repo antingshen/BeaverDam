@@ -176,32 +176,9 @@ class Rect {
 
     // Setting attrs
 
-    // This function looks complicated but the idea isn't. Here's what it does:
-    //  If we call this.setClassNameExts({selected: true, active: false})
-    //  Then this.classNameExtBooleans would change this way:
-    //      old: this.classNameExtBooleans = {real: true, selected: false}
-    //      new: this.classNameExtBooleans = {real: true, selected: true, active: false}
-    // 
-    // And this will have the the following DOM class:
-    //      player-rect player-rect-real player-rect-selected player-rect-noactive
     setClassNameExts(classNameExtBooleans) {
         Misc.assignNonNull(this.classNameExtBooleans, classNameExtBooleans);
-
-        // Add player-rect class
-        var classNames = [this.classBaseName];
-        for (let ext of Object.keys(this.classNameExtBooleans)) {
-            switch (this.classNameExtBooleans[ext]) {
-                case true:
-                    classNames.push(this.classBaseName.add(ext));
-                    break;
-                case false:
-                    classNames.push(this.classBaseName.add('no' + ext));
-                    break;
-                default:
-                    throw new TypeError(`Rect.setClassNameExts: invalid key ${ext}`);
-            }
-        }
-
+        var classNames = Misc.getClassNamesFromExts([this.classBaseName], this.classBaseName, this.classNameExtBooleans);
         this.attr({class: classNames.join(' ')});
     }
 
