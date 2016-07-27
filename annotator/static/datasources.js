@@ -31,6 +31,7 @@ var DataSources = {
             var thing = Thing.newFromCreationRect();
             thing.keyframes = json.keyframes.map(DataSources.frame.fromJson);
             thing.type = json.type;
+            thing.fill = json.color || Misc.getRandomColor();
             return thing;
         },
 
@@ -38,6 +39,7 @@ var DataSources = {
             return {
                 keyframes: thing.keyframes.map(DataSources.frame.toJson),
                 type: thing.type,
+                color: thing.fill,
             };
         },
     },
