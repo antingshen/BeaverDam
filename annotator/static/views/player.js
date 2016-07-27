@@ -161,7 +161,9 @@ class PlayerView {
     // Time control
 
     play() {
-        this.video.play();
+        if (this.video.currentTime < this.video.duration) {
+            this.video.play();
+        }
         return false;
     }
 
@@ -172,11 +174,11 @@ class PlayerView {
 
     playPause() {
         if (this.video.paused) {
-            this.video.play();
-        } else {
-            this.video.pause();
+            return this.play();
         }
-        return false;
+        else {
+            return this.pause();
+        }
     }
 
     jumpToTimeAndPause(time) {
