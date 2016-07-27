@@ -330,6 +330,7 @@ class Rect {
         this.$el.mousedown(this.onMousedown.bind(this));
         this.$el.drag(this.onDragMove.bind(this), this.onDragStart.bind(this), this.onDragEnd.bind(this));
         this.$el.mousemove(this.onMouseover.bind(this));
+        this.$el.dblclick(this.onDoubleclick.bind(this));
     }
 
 
@@ -405,6 +406,10 @@ class Rect {
 
         // Trigger event
         $(this).triggerHandler('drag-end');
+    }
+
+    onDoubleclick() {
+        $(this).triggerHandler('discrete-change', this.bounds);
     }
 
 
