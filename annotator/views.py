@@ -11,7 +11,7 @@ from .models import *
 
 
 def home(request):
-    need_annotating = Video.objects.filter(id__gt=0, verified=False)
+    need_annotating = Video.objects.filter(id__gt=0, verified=False)[:25]
     return render(request, 'video_list.html', context={
         'videos': need_annotating,
     })
