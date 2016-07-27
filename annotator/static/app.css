@@ -34,10 +34,16 @@
     top: 1.1em;
     opacity: 0.3;
 }
+.player-keyframebar-keyframe-noselected:hover {
+    opacity: 0.7;
+}
 .player-keyframebar-keyframe circle {
     stroke: #902B00;
     stroke-width: 7px;
-    fill: orange;
+    fill: #FF8000;
+}
+.player-keyframebar-keyframe:hover:not(:active) circle {
+    fill: #C25305;
 }
 
 .player-rect-normal {
