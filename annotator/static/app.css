@@ -65,7 +65,7 @@
     stroke-width: 0;
     opacity: 0;
 }
-.player-rect-noselected.player-rect-noreal {
+.player-rect-noselected.player-rect-noreal.player-rect-nosinglekeyframe {
     display: none;
 }
 

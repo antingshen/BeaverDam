@@ -134,8 +134,8 @@ class Rect {
         this.appear({real: false, selected: true});
     }
 
-    appear({real, selected}) {
-        this.setClassNameExts({real, selected});
+    appear({real, selected, singlekeyframe}) {
+        this.setClassNameExts({real, selected, singlekeyframe});
 
         if (selected === true) {
             this.toFront();

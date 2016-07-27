@@ -103,6 +103,11 @@ class Player {
 
         // On Thing...
 
+        $(thing).on('change delete', () => {
+            rect.appear({singlekeyframe: thing.keyframes.length === 1});
+        });
+        $(thing).triggerHandler('change');
+
         $(thing).on('delete', () => {
             $(thing).off();
             $(rect).off();
@@ -238,7 +243,6 @@ class Player {
         });
         this.things.push(thing);
         rect.fill = thing.fill;
-        rect.appear({real: true});
         this.initBindThingAndRect(thing, rect);
     }
 
