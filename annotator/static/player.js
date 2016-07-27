@@ -142,6 +142,11 @@ class Player {
                 this.view.video.pause();
             });
 
+            $(this.view.creationRect).on('focus', () => {
+               this.selectedThing = null;
+                $(this).triggerHandler('change-onscreen-annotations');
+            });
+
             $(this.view.video).on('timeupdate', () => {
                 $(this).triggerHandler('change-onscreen-annotations');
             });

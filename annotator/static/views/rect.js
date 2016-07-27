@@ -484,6 +484,7 @@ class CreationRect extends Rect {
         this.$el.mousemove(this.onMouseover.bind(this));
     }
 
+
     // Setting appearance
 
     appearDefault() {
@@ -511,6 +512,12 @@ class CreationRect extends Rect {
                 };
             }
         }
+    }
+
+
+    // Actions
+    focus() {
+        $(this).triggerHandler('focus');
     }
 
 
