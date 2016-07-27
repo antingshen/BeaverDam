@@ -145,6 +145,7 @@ class Player {
             $(this.view.creationRect).on('focus', () => {
                this.selectedThing = null;
                 $(this).triggerHandler('change-onscreen-annotations');
+                $(this).triggerHandler('change-keyframes');
             });
 
             $(this.view.video).on('timeupdate', () => {
