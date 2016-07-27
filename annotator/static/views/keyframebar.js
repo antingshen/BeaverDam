@@ -12,9 +12,6 @@ var KeyframebarConstants = {
 
 class Keyframebar {
     constructor({classBaseName}) {
-        // Mix-in constants
-        Object.assign(this, KeyframebarConstants);
-
         // This container of the keyframe bar
         this.$container = null;
 
@@ -77,4 +74,7 @@ class Keyframebar {
     }
 }
 
+// Mix-in constants
+Object.assign(Keyframebar, KeyframebarConstants);
+Object.assign(Keyframebar.prototype, KeyframebarConstants);
 void Keyframebar;

@@ -32,9 +32,6 @@ var RectConstants = {
 
 class Rect {
     constructor({classBaseName, fill}) {
-        // Mix-in constants
-        Object.assign(this, RectConstants);
-
         // Before things are attached, we cache appearance in these "pre-
         // attached" properties
 
@@ -449,6 +446,9 @@ class Rect {
     }
 }
 
+// Mix-in constants
+Object.assign(Rect, RectConstants);
+Object.assign(Rect.prototype, RectConstants);
 void Rect;
 
 

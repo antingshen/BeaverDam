@@ -13,9 +13,6 @@ var PlayerViewConstants = {
 
 class PlayerView {
     constructor({$container, videoSrc}) {
-        // Mix-in constants
-        Object.assign(this, PlayerViewConstants);
-
         // This container of the player
         this.$container = $container;
 
@@ -303,4 +300,7 @@ class PlayerView {
     }
 }
 
+// Mix-in constants
+Object.assign(PlayerView, PlayerViewConstants);
+Object.assign(PlayerView.prototype, PlayerViewConstants);
 void PlayerView;
