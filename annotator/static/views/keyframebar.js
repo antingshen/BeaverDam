@@ -1,8 +1,21 @@
 "use strict";
 
 
+// Constants. ES6 doesn't support class constants yet, thus this hack.
+var KeyframebarConstants = {
+    KEYFRAME_SVG: 
+        `<svg viewBox="0 0 100 100" preserveAspectRatio="xMaxYMax">
+            <circle cx="50" cy="50" r="30"></circle>
+        </svg>`,
+};
+
+
 class Keyframebar {
     constructor({classBaseName}) {
+        // Mix-in constants
+        Object.assign(this, KeyframebarConstants);
+
+        // This container of the keyframe bar
         this.$container = null;
 
         // Namespaced className generator
@@ -45,27 +58,22 @@ class Keyframebar {
         return this;
     }
 
-    keyframeSvg() {
-        return `
-        <svg height="100" width="100" class="${this.classBaseName.add('keyframe')}" style="left: 0%;" viewBox="0 0 100 100" preserveAspectRatio="xMaxYMax">
-            <circle cx="50" cy="50" r="30" stroke="black" stroke-width="0" fill="orange"></circle>
-        </svg>`;
-    }
-
     resetWithDuration(duration) {
         this.$container.empty();
 
         this.duration = duration;
     }
 
-    addKeyframeAt(time) {
-        let frac = time / this.duration;
+    addKeyframeAt(time, classNameExtBooleans) {
+        var frac = time / this.duration;
+        var classBaseName = this.classBaseName.add('keyframe');
+        var classNames = Misc.getClassNamesFromExts([classBaseName], classBaseName, classNameExtBooleans);
 
-        $(this.keyframeSvg()).click(() => {
-            $(this).triggerHandler('jump-to-time', time);
-        }).css({
-            'left': `${frac * 100}%`
-        }).appendTo(this.$container);
+        $(this.KEYFRAME_SVG)
+        .attr({class: classNames.join(' ')})
+        .css({'left': `${frac * 100}%`})
+        .click(() => { $(this).triggerHandler('jump-to-time', time); })
+        .appendTo(this.$container);
     }
 }
 

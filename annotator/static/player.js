@@ -179,9 +179,10 @@ class Player {
 
     drawKeyframes() {
         this.view.keyframebar.resetWithDuration(this.view.video.duration);
-        if (this.selectedThing != null) {
-            for (let keyframe of this.selectedThing.keyframes) {
-                this.view.keyframebar.addKeyframeAt(keyframe.time);
+        for (let thing of this.things) {
+            for (let keyframe of thing.keyframes) {
+                let selected = (thing == this.selectedThing);
+                this.view.keyframebar.addKeyframeAt(keyframe.time, {selected});
             }
         }
     }
