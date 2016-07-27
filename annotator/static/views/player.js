@@ -141,6 +141,8 @@ class PlayerView {
             // controls => video
             this.$on('control-play', 'click', () => this.play());
             this.$on('control-pause', 'click', () => this.pause());
+            this.$on('control-goto-start', 'click', () => this.jumpToTimeAndPause(0));
+            this.$on('control-goto-end', 'click', () => this.jumpToTimeAndPause(this.video.duration));
             this.$on('control-delete-keyframe', 'click', () => this.deleteKeyframe());
 
             // better key events => video
