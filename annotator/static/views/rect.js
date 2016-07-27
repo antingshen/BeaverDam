@@ -5,7 +5,8 @@
 var RectConstants = {
     // Mousing over the RESIZE_BORDER px-border around each rectangle
     // initiates resize, else initiates move.
-    RESIZE_BORDER: 10 /* px */,
+    RESIZE_BORDER_EDGE: 10 /* px */,
+    RESIZE_BORDER_CORNER: 20 /* px */,
 
     // Minimum dimensions allowed for box
     MIN_RECT_DIMENSIONS: {
@@ -417,29 +418,33 @@ class Rect {
         };
 
         // Change cursor
-        if (relative.yMin < this.RESIZE_BORDER) {
-            if (relative.xMin < this.RESIZE_BORDER)
+        if (relative.xMin > this.RESIZE_BORDER_EDGE && relative.xMax > this.RESIZE_BORDER_EDGE &&
+            relative.yMin > this.RESIZE_BORDER_EDGE && relative.yMax > this.RESIZE_BORDER_EDGE) {
+            this.dragIntent = 'move';
+        }
+        else if (relative.yMin < this.RESIZE_BORDER_CORNER) {
+            if (relative.xMin < this.RESIZE_BORDER_CORNER)
                 this.dragIntent = 'nw-resize';
-            else if (relative.xMax < this.RESIZE_BORDER)
+            else if (relative.xMax < this.RESIZE_BORDER_CORNER)
                 this.dragIntent = 'ne-resize';
             else
                 this.dragIntent = 'n-resize';
         }
-        else if (relative.yMax < this.RESIZE_BORDER) {
-            if (relative.xMin < this.RESIZE_BORDER)
+        else if (relative.yMax < this.RESIZE_BORDER_CORNER) {
+            if (relative.xMin < this.RESIZE_BORDER_CORNER)
                 this.dragIntent = 'sw-resize';
-            else if (relative.xMax < this.RESIZE_BORDER)
+            else if (relative.xMax < this.RESIZE_BORDER_CORNER)
                 this.dragIntent = 'se-resize';
             else
                 this.dragIntent = 's-resize';
         }
         else {
-            if (relative.xMin < this.RESIZE_BORDER)
+            if (relative.xMin < this.RESIZE_BORDER_CORNER)
                 this.dragIntent = 'w-resize';
-            else if (relative.xMax < this.RESIZE_BORDER)
+            else if (relative.xMax < this.RESIZE_BORDER_CORNER)
                 this.dragIntent = 'e-resize';
             else
-                this.dragIntent = 'move';
+                throw new Error('Rect.onMouseover: internal error');
         }
     }
 }
