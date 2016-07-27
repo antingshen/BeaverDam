@@ -12,7 +12,7 @@
     {% for video in videos %}
     <tr onclick="window.document.location='{% url "video" video.id %}';" style="cursor: pointer;">
       <td>{{ video.id }}</td>
-      <td>{{ video.annotations|yesno }}</td>
+      <td>{{ video.annotation|yesno }}</td>
     </tr>
     {% endfor %}
   </tbody>
