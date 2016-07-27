@@ -4,10 +4,8 @@
 $(() => {
     // Just a sanity check
     Misc.preventExtensions(document);
-
-    setTimeout(() => {
-        Misc.preventExtensions(window);
-    }, 0);
+    // Ideally I'd like to do this to window too but a lot of Chrome
+    // extensions rely on window being extensible
 
     // Make the player
     window.p = new Player({
