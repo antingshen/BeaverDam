@@ -1,13 +1,15 @@
 from django.shortcuts import render
 from django.conf import settings
-from django.http import HttpResponse, Http404, HttpResponseBadRequest
+from django.http import HttpResponse, Http404, HttpResponseBadRequest, HttpResponseForbidden
 from django.views.generic import View
 from django.views.decorators.clickjacking import xframe_options_exempt
+from django.contrib.admin.views.decorators import staff_member_required
 
 import os
 import json
 
 from .models import *
+from annotator.models import Task
 
 
 def home(request):
@@ -61,6 +63,7 @@ class AnnotationView(View):
         return HttpResponse('success')
 
 
+@staff_member_required
 def verify(request, video_id):
     body = request.body.decode('utf-8')
     video = Video.objects.get(id=video_id)

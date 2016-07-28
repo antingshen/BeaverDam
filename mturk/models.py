@@ -1,6 +1,7 @@
 from django.db import models
 from django.conf import settings
 from django.core.urlresolvers import reverse
+from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 
 from .mturk_api import Server
 from annotator.models import Video
@@ -25,6 +26,18 @@ class Task(models.Model):
         self.hit_group = response.values['hittypeid']
         self.save()
 
+    @classmethod
+    def valid_hit_id(cls, id):
+        items = []
+        for task_type in cls.__subclasses__():
+            try:
+                items.append(task_type.objects.get(id=id))
+            except ObjectDoesNotExist:
+                pass
+        if len(items) > 1:
+            raise MultipleObjectsReturned()
+        else:
+            return len(items) == 1
 
 class FullVideoTask(Task):
     video = models.ForeignKey(Video)
