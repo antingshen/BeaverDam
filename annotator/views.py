@@ -9,7 +9,7 @@ import os
 import json
 
 from .models import *
-from annotator.models import Task
+from mturk.models import Task
 
 
 def home(request):
