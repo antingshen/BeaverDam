@@ -1,2 +1,3 @@
 # Don't diff non-dotfiles in this directory
-!.* -diff
+* -diff
+.* diff
