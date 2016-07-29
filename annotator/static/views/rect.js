@@ -447,8 +447,7 @@ class Rect {
 }
 
 // Mix-in constants
-Object.assign(Rect, RectConstants);
-Object.assign(Rect.prototype, RectConstants);
+Misc.mixinClassConstants(Rect, RectConstants);
 void Rect;
 
 

@@ -102,6 +102,21 @@ var Misc = {
         }
     },
 
+    customAssign: function(target, constants, settings) {
+        for (let key of Object.keys(constants)) {
+          let value = constants[key];
+                    Object.defineProperty(target, key, Object.assign({value}, settings));
+        }
+        return target;
+    },
+
+    mixinClassConstants: function(target, constants) {
+      var configurable = false;
+      var writable = false;
+      Misc.customAssign(target, constants, {configurable, writable, enumerable: true});
+      Misc.customAssign(target.prototype, constants, {configurable, writable, enumerable: false});
+    },
+
 
     // Control flow
 

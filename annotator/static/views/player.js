@@ -327,6 +327,5 @@ class PlayerView {
 }
 
 // Mix-in constants
-Object.assign(PlayerView, PlayerViewConstants);
-Object.assign(PlayerView.prototype, PlayerViewConstants);
+Misc.mixinClassConstants(PlayerView, PlayerViewConstants);
 void PlayerView;

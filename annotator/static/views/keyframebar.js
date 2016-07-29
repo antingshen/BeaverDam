@@ -75,6 +75,5 @@ class Keyframebar {
 }
 
 // Mix-in constants
-Object.assign(Keyframebar, KeyframebarConstants);
-Object.assign(Keyframebar.prototype, KeyframebarConstants);
+Misc.mixinClassConstants(Keyframebar, KeyframebarConstants);
 void Keyframebar;
