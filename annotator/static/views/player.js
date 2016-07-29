@@ -88,6 +88,19 @@ class PlayerView {
             var {videoWidth, videoHeight} = this.video;
 
             this.$paper = Raphael(this.$('paper')[0], videoWidth, videoHeight);
+            $(this.$paper.canvas).attr({
+                viewBox: `0 0 ${videoWidth} ${videoHeight}`
+            }).removeAttr(
+                'width'
+            ).removeAttr(
+                'height'
+            ).css({
+                position: 'static',
+                left: '',
+                top: '',
+                'max-width': `${videoWidth}px`,
+                'max-height': `${videoHeight}px`,
+            });
             this.creationRect = this.makeAndAttachRect(CreationRect);
             this.rects = [];
 
@@ -227,11 +240,22 @@ class PlayerView {
 
 
     // Rect control
+    
+    metrics() {
+        return {
+            offset: $(this.$paper.canvas).offset(),
+            original: {
+                height: this.$paper.height,
+                width: this.$paper.width,
+            },
+            scale: $(this.$paper.canvas).height() / this.$paper.height,
+        };
+    }
 
     makeAndAttachRect(KindOfRect) {
         var {classBaseName} = this;
         var rect = new KindOfRect({classBaseName});
-        rect.attach(this.$paper);
+        rect.attach(this.$paper, this.metrics.bind(this));
 
         // In case drag exceeds bounds of object, set it as the cursor of the
         // entire paper

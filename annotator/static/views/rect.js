@@ -77,6 +77,8 @@ class Rect {
         // Raphel paper that this element is attached to
         this.$paper = null;
 
+        this.getPlayerMetrics = null;
+
         // Prevent adding new properties
         Misc.preventExtensions(this, Rect);
     }
@@ -85,26 +87,27 @@ class Rect {
     // Working with $paper
 
     getCanvasRelativePoint(x, y) {
-        // var paperOffset = this.$paper.offset();
-        var paperOffset = $(this.$paper.canvas).offset();
+        var {offset, scale} = this.getPlayerMetrics();
         return {
-            x: x - paperOffset.left,
-            y: y - paperOffset.top,
+            x: (x - offset.left) / scale,
+            y: (y - offset.top) / scale,
         };
     }
 
-    attach($paper) {
+    attach($paper, getPlayerMetrics) {
         // Don't add twice
         if (this.$el != null) {
             throw new Error("Rect.attach: already attached to paper");
         }
 
+        this.getPlayerMetrics = getPlayerMetrics;
+        this.$paper = $paper;
+
         // Apply appearance
         this.appearDefault();
 
         // Actually do the attaching
-        this.$paper = $paper;
-        this.$el = $paper.rect(0, 0, this.$paper.width, this.$paper.height);
+        this.$el = this.$paper.rect(0, 0, this.$paper.width, this.$paper.height);
         this.el = this.$el.node;
         this.applyPreAttachedAppearance();
         this.setHandlers();
@@ -332,6 +335,10 @@ class Rect {
     }
 
     onDragMove(dx, dy) {
+        var {scale} = this.getPlayerMetrics();
+        dx /= scale;
+        dy /= scale;
+
         // Inspect cursor to determine which resize/move process to use
         switch (this.dragIntent) {
             case 'nw-resize':
