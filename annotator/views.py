@@ -28,6 +28,9 @@ def video(request, video_id):
     assignment_id = request.GET.get('assignmentId', None)
     preview = (assignment_id == 'ASSIGNMENT_ID_NOT_AVAILABLE')
     iframe_mode = assignment_id is not None
+    start_time = request.GET.get('s', None)
+    end_time = request.GET.get('e', None)
+
     if assignment_id is not None and assignment_id != 'ASSIGNMENT_ID_NOT_AVAILABLE' and (settings.DEBUG == False):
         hit_id = request.GET['hitId']
         worker = request.GET['workerId']
@@ -37,6 +40,8 @@ def video(request, video_id):
         'location': video.url,
         'annotated': video.annotation != '',
         'verified': video.verified,
+        'start_time': start_time,
+        'end_time' : end_time,
     })
 
     return render(request, 'video.html', context={

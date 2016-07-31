@@ -2,7 +2,7 @@
 
 
 class Player {
-    constructor({$container, videoSrc, videoId}) {
+    constructor({$container, videoSrc, videoId, videoStart, videoEnd}) {
         this.$container = $container;
         
         this.videoId = videoId;
@@ -16,6 +16,10 @@ class Player {
         this.videoSrc = videoSrc;
 
         this.view = null;
+
+        this.videoStart = videoStart
+
+        this.videoEnd = videoEnd
 
         // Promises
         this.annotationsDataReady = Misc.CustomPromise();
@@ -40,9 +44,9 @@ class Player {
     // Init ALL the things!
     
     initView() {
-        var {$container, videoSrc} = this;
+        var {$container, videoSrc, videoStart, videoEnd} = this;
 
-        this.view = new PlayerView({$container, videoSrc});
+        this.view = new PlayerView({$container, videoSrc, videoStart, videoEnd});
 
         this.view.ready().then(this.viewReady.resolve);
     }
