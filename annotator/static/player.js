@@ -133,6 +133,7 @@ class Player {
         // Submitting
         // TODO doesn't respect scope
         $('#submit-btn').click(this.submitAnnotations.bind(this));
+        $('#submit-survey-btn').click(this.submitSurvey.bind(this));
 
         $(this).on('change-verification', this.updateVerifiedButton.bind(this));
         $(this).triggerHandler('change-verification');
@@ -215,8 +216,17 @@ class Player {
         var mturk = window.assignmentId != null;
         e.preventDefault();
         DataSources.annotations.save(this.videoId, this.things, mturk).then((response) => {
-            window.alert(response);
+            $('.submit-result').text(response + " Please provide some feedback on your experience: ");
         });
+    }
+
+    submitSurvey() {
+        var results = []
+        for (let i = 1; i <= numberOfSurveyQuestions; i++) {
+            results.push($(`input[name='survey-q${i}']:checked`).val());
+        }
+        console.log(results);
+        //TODO: Store results in datasources
     }
 
     updateVerifiedButton() {
