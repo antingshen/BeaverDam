@@ -309,6 +309,7 @@ class PlayerView {
         } else if (currentTime > this.videoEnd) {
             this.$('control-scrubber:not(:active)').val(this.videoEnd);
             this.video.currentTime = this.videoEnd;
+            this.pause();
         } else
             this.$('control-scrubber:not(:active)').val(value * this.CONTROL_SCRUBBER_GRANULARITY / this.video.duration);
     }
