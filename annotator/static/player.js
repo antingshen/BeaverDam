@@ -17,9 +17,9 @@ class Player {
 
         this.view = null;
 
-        this.videoStart = videoStart
+        this.videoStart = videoStart;
 
-        this.videoEnd = videoEnd
+        this.videoEnd = videoEnd;
 
         // Promises
         this.annotationsDataReady = Misc.CustomPromise();
