@@ -12,5 +12,7 @@ $(() => {
         $container: $("#player"),
         videoSrc: window.video.location,
         videoId: window.video.id,
+        videoStart: window.video.start_time,
+        videoEnd: window.video.end_time,
     });
 });
