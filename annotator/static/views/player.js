@@ -47,10 +47,10 @@ class PlayerView {
         this.videoSrc = videoSrc;
 
         // Video start time
-        this.videoStart = parseFloat(videoStart);
+        this.videoStart = videoStart;
 
         // Video end time
-        this.videoEnd = parseFloat(videoEnd);
+        this.videoEnd = videoEnd;
 
         // Promises
         this.keyframebarReady = Misc.CustomPromise();
@@ -283,10 +283,10 @@ class PlayerView {
 
     set controlTimeUnfocused(value) {
         var currentTime = this.$('control-time').val()
-        if (currentTime < this.videoStart) {
+        if (this.videoStart && currentTime < this.videoStart) {
             this.$('control-time:not(:focus)').val(this.videoStart);
             this.video.currentTime = this.videoStart;
-        } else if (currentTime > this.videoEnd) {
+        } else if (this.videoEnd && currentTime > this.videoEnd) {
             this.$('control-time:not(:focus)').val(this.videoEnd);
             this.video.currentTime = this.videoEnd;
         } else
@@ -303,10 +303,10 @@ class PlayerView {
 
     set controlScrubberInactive(value) {
         var currentTime = this.$('control-time').val()
-        if (currentTime < this.videoStart) {
+        if (this.videoStart && currentTime < this.videoStart) {
             this.$('control-scrubber:not(:active)').val(this.videoStart);
             this.video.currentTime = this.videoStart;
-        } else if (currentTime > this.videoEnd) {
+        } else if (this.videoEnd && currentTime > this.videoEnd) {
             this.$('control-scrubber:not(:active)').val(this.videoEnd);
             this.video.currentTime = this.videoEnd;
             this.pause();
