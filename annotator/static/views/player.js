@@ -12,7 +12,7 @@ var PlayerViewConstants = {
 
 
 class PlayerView {
-    constructor({$container, videoSrc}) {
+    constructor({$container, videoSrc, videoStart, videoEnd}) {
         // This container of the player
         this.$container = $container;
 
@@ -45,6 +45,12 @@ class PlayerView {
 
         // Video URL
         this.videoSrc = videoSrc;
+
+        // Video start time
+        this.videoStart = videoStart;
+
+        // Video end time
+        this.videoEnd = videoEnd;
 
         // Promises
         this.keyframebarReady = Misc.CustomPromise();
@@ -99,6 +105,9 @@ class PlayerView {
     initVideo() {
         // Set video props
         this.video = this.$('video')[0];
+        if (this.videoStart) {
+            this.video.currentTime = this.videoStart;
+        }
         $('video').attr('src', this.videoSrc);
 
         // updates time more frequently by using setInterval
@@ -273,7 +282,15 @@ class PlayerView {
     }
 
     set controlTimeUnfocused(value) {
-        this.$('control-time:not(:focus)').val(value.toFixed(2));
+        var currentTime = this.$('control-time').val()
+        if (this.videoStart && currentTime < this.videoStart) {
+            this.$('control-time:not(:focus)').val(this.videoStart);
+            this.video.currentTime = this.videoStart;
+        } else if (this.videoEnd && currentTime > this.videoEnd) {
+            this.$('control-time:not(:focus)').val(this.videoEnd);
+            this.video.currentTime = this.videoEnd;
+        } else
+            this.$('control-time:not(:focus)').val(value.toFixed(2));
     }
 
     get controlScrubber() {
@@ -285,7 +302,16 @@ class PlayerView {
     }
 
     set controlScrubberInactive(value) {
-        this.$('control-scrubber:not(:active)').val(value * this.CONTROL_SCRUBBER_GRANULARITY / this.video.duration);
+        var currentTime = this.$('control-time').val()
+        if (this.videoStart && currentTime < this.videoStart) {
+            this.$('control-scrubber:not(:active)').val(this.videoStart);
+            this.video.currentTime = this.videoStart;
+        } else if (this.videoEnd && currentTime > this.videoEnd) {
+            this.$('control-scrubber:not(:active)').val(this.videoEnd);
+            this.video.currentTime = this.videoEnd;
+            this.pause();
+        } else
+            this.$('control-scrubber:not(:active)').val(value * this.CONTROL_SCRUBBER_GRANULARITY / this.video.duration);
     }
 
 
