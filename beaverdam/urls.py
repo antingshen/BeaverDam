@@ -12,12 +12,12 @@ urlpatterns = [
     url(r'^$', home),
     url(r'^video/(\d+)/?$', video, name='video'),
     url(r'^video/(\d+)/verify/$', verify),
-    url(r'^annotation/(\d+)', AnnotationView.as_view()),
+    url(r'^annotation/(\d+)/(.*)?', AnnotationView.as_view()),
 
     url(r'^login/$', login, 
         {'template_name': 'admin/login.html', 
             'extra_context': {'site_header': 'BeaverDam Login'}
-        }),
+        }, name='login'),
     url(r'^logout/$', logout),
     url(r'^accounts/', RedirectView.as_view(url='/')),
     url(r'^admin/', admin.site.urls),
