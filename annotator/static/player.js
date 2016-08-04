@@ -212,10 +212,7 @@ class Player {
 
     submitAnnotations(e) {
         e.preventDefault();
-
-        var mturk = window.assignmentId != null;
-        e.preventDefault();
-        DataSources.annotations.save(this.videoId, this.things, mturk).then((response) => {
+        DataSources.annotations.save(this.videoId, this.things, window.mturk).then((response) => {
             $('.submit-result').text(response + " Please provide some feedback on your experience: ");
         });
     }

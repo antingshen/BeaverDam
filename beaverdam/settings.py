@@ -96,7 +96,11 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+LOGIN_REDIRECT_URL = '/'
+LOGIN_URL = '/login/'
+
 CSRF_COOKIE_SECURE = not DEBUG
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.9/topics/i18n/

@@ -41,6 +41,16 @@ Then navigate to [localhost:5000](http://localhost:5000/) in your browser.
 
 Need to run on a custom port? `env PORT=1234 scripts/serve`
 
+### Making accounts
+
+To make a superuser account for testing, or for production, run `./manage.py createsuperuser`
+
+### Simulating mturk view in debug
+
+To see what video pages look like on mturk preview mode, set url param `preview=true`.
+For mturk's HIT accepted mode, set url param `mturk=true`.
+
+Example: `localhost:5000/video/0/?mturk=true`
 
 ## Contributing
 

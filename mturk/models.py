@@ -31,13 +31,13 @@ class Task(models.Model):
         items = []
         for task_type in cls.__subclasses__():
             try:
-                items.append(task_type.objects.get(id=id))
+                items.append(task_type.objects.get(hit_id=id))
             except ObjectDoesNotExist:
                 pass
         if len(items) > 1:
             raise MultipleObjectsReturned()
         else:
-            return len(items) == 1
+            return len(items) == 1 or settings.DEBUG
 
 class FullVideoTask(Task):
     video = models.ForeignKey(Video)
