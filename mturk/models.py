@@ -28,6 +28,8 @@ class Task(models.Model):
 
     @classmethod
     def valid_hit_id(cls, id):
+        if id is None:
+            return False
         items = []
         for task_type in cls.__subclasses__():
             try:

@@ -32,8 +32,8 @@ def video(request, video_id):
     else:
         preview = bool(request.GET.get('preview', False))
 
-    hit_id = request.GET.get('hitId', None)
-    worker = request.GET.get('workerId', None)
+    hit_id = request.GET.get('hitId', '')
+    worker = request.GET.get('workerId', '')
     if not preview:
         if assignment_id is not None:
             if not Task.valid_hit_id(hit_id):
@@ -70,17 +70,18 @@ def video(request, video_id):
 
 class AnnotationView(View):
     
-    def get(self, request, video_id, hit_id=None):
+    def get(self, request, video_id):
         video = Video.objects.get(id=video_id)
         return HttpResponse(video.annotation, content_type='application/json')
     
-    def post(self, request, video_id, hit_id=''):
+    def post(self, request, video_id):
+        data = json.loads(request.body.decode('utf-8'))
+        hit_id = data.get('hitId', None)
         if not (request.user.is_authenticated() or 
                 Task.valid_hit_id(hit_id)):
             return HttpResponseForbidden('Not authenticated')
-        annotation = request.body.decode('utf-8')
         video = Video.objects.get(id=video_id)
-        video.annotation = annotation
+        video.annotation = json.dumps(data['annotation'])
         video.save()
         return HttpResponse('success')
 

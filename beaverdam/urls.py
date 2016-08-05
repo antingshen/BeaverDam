@@ -12,7 +12,7 @@ urlpatterns = [
     url(r'^$', home),
     url(r'^video/(\d+)/?$', video, name='video'),
     url(r'^video/(\d+)/verify/$', verify),
-    url(r'^annotation/(\d+)/(.*)?', AnnotationView.as_view()),
+    url(r'^annotation/(\d+)/$', AnnotationView.as_view()),
 
     url(r'^login/$', login, 
         {'template_name': 'admin/login.html', 

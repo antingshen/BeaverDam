@@ -71,14 +71,17 @@ var DataSources = {
 
         save: function(id, things, mturk) {
             var json = DataSources.annotations.toJson(things);
-            return fetch(`/annotation/${id}/${window.hitId}/`, {
+            return fetch(`/annotation/${id}/`, {
                 headers: {
                     'X-CSRFToken': window.CSRFToken,
                     'Content-Type': 'application/json',
                 },
                 credentials: 'same-origin',
                 method: 'post',
-                body: JSON.stringify(json),
+                body: JSON.stringify({
+                    annotation: json,
+                    hitId: window.hitId,
+                }),
             }).then((response) => {
                 if (response.ok) {
                     if (mturk) {
