@@ -45,15 +45,15 @@
               <form method="post" id="turk-form" action="https://{{ MTURK_SANDBOX|yesno:'workersandbox,www'}}.mturk.com/mturk/externalSubmit" style="margin-left: 300px;">
                 <input type="hidden" value="{{ assignment_id }}" name="assignmentId">
                 <input type="hidden" value="{{ video.id }}" name="video-id">
-                <button id="submit-btn" type="submit"  class="btn btn-primary" data-toggle="modal" data-target="#myModal" style="position: absolute; top: 10px; right: 20px;" >Submit</button>
+                <button id="submit-btn" type="submit"  class="btn btn-primary" data-toggle="modal" data-target="#myModal" style="position: absolute; top: 10px; right: 20px;">Submit</button>
               </form>
 
               {% else %}
               <div id="submit-btn-group" class="btn-group" role="group" style="position: absolute; top: 10px; right: 20px;">
                 {% if request.user.is_superuser == False %}
-                <button id="submit-btn" type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal">Submit</button>
+                <button id="submit-btn" type="button" class="btn btn-primary">Submit</button>
                 {% else %}
-                <button id="submit-btn" type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal">Save</button>
+                <button id="submit-btn" type="button" class="btn btn-primary">Save</button>
 
                 <button id="verified-btn" type="button" class="btn">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&hellip;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</button>
                 {% endif %}

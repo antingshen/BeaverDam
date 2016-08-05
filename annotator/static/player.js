@@ -201,7 +201,7 @@ class Player {
             selected: this.selectedThing === thing,
         });
 
-        // Don't fuck up our drag
+        // Don't mess up our drag
         if (rect.isBeingDragged()) return;
 
         rect.bounds = bounds;
@@ -212,9 +212,13 @@ class Player {
 
     submitAnnotations(e) {
         e.preventDefault();
+        if (this.things.length == 0 && !confirm('Confirm that there are no objects in the video?')) {
+            return;
+        }
         DataSources.annotations.save(this.videoId, this.things, window.mturk).then((response) => {
             $('.submit-result').text(response + " Please provide some feedback on your experience: ");
         });
+        $('#myModal').modal();
     }
 
     submitSurvey() {
