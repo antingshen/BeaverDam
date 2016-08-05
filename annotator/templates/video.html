@@ -6,6 +6,7 @@
     video = {{ video_data|safe }};
     mturk = {{ assignment_id|yesno:'true,false,false' }};
     hitId = '{{ hit_id }}';
+    workerId = '{{ worker_id }}';
   </script>
   <script src="/static/vendor/raphael/raphael.min.js"></script>
   <script type="text/javascript" src="/static/app.js"></script>
