@@ -62,6 +62,7 @@ def video(request, video_id):
         'assignment_id': assignment_id,
         'hit_id': hit_id,
         'MTURK_SANDBOX': settings.MTURK_SANDBOX,
+        'survey': False,
     })
     if assignment_id is None:
         response['X-Frame-Options'] = 'SAMEORIGIN'

@@ -216,7 +216,7 @@ class Player {
             return;
         }
         DataSources.annotations.save(this.videoId, this.annotations, window.mturk).then((response) => {
-            $('.submit-result').text(response + " Please provide some feedback on your experience: ");
+            $('.submit-result').html(response + (numberOfSurveyQuestions ? "<br />Optional feedback on your experience: " : ''));
         });
         $('#myModal').modal();
     }
