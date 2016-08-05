@@ -7,11 +7,11 @@ class Player {
         
         this.videoId = videoId;
 
-        this.selectedThing = null;
+        this.selectedAnnotation = null;
 
-        this.things = null;
+        this.annotations = null;
 
-        this.thingRectBindings = [];
+        this.annotationRectBindings = [];
 
         this.videoSrc = videoSrc;
 
@@ -41,7 +41,7 @@ class Player {
     }
 
 
-    // Init ALL the things!
+    // Init ALL the annotations!
     
     initView() {
         var {$container, videoSrc, videoStart, videoEnd} = this;
@@ -52,17 +52,17 @@ class Player {
     }
 
     initAnnotations() {
-        DataSources.annotations.load(this.videoId).then((things) => {
-            this.things = things;
+        DataSources.annotations.load(this.videoId).then((annotations) => {
+            this.annotations = annotations;
             this.annotationsDataReady.resolve();
         });
 
-        // When this.things is loaded AND view is ready for drawing...
+        // When this.annotations is loaded AND view is ready for drawing...
         Promise.all([this.annotationsDataReady(), this.viewReady()]).then(() => {
-            for (let thing of this.things) {
+            for (let annotation of this.annotations) {
                 let rect = this.view.addRect();
-                rect.fill = thing.fill;
-                this.initBindThingAndRect(thing, rect);
+                rect.fill = annotation.fill;
+                this.initBindAnnotationAndRect(annotation, rect);
             }
 
             $(this).triggerHandler('change-onscreen-annotations');
@@ -72,16 +72,16 @@ class Player {
         });
     }
 
-    initBindThingAndRect(thing, rect) {
+    initBindAnnotationAndRect(annotation, rect) {
         // On PlayerView...
 
-        this.thingRectBindings.push({thing, rect});
+        this.annotationRectBindings.push({annotation, rect});
 
 
         // On Rect...
 
         $(rect).on('discrete-change', (e, bounds) => {
-            thing.updateKeyframe({
+            annotation.updateKeyframe({
                 time: this.view.video.currentTime,
                 bounds: bounds,
             });
@@ -90,7 +90,7 @@ class Player {
         });
 
         $(rect).on('select', () => {
-            this.selectedThing = thing;
+            this.selectedAnnotation = annotation;
             $(this).triggerHandler('change-keyframes');
         });
 
@@ -99,28 +99,28 @@ class Player {
         });
 
         $(rect).on('focus', () => {
-            this.selectedThing = thing;
+            this.selectedAnnotation = annotation;
             $(this).triggerHandler('change-onscreen-annotations');
             $(this).triggerHandler('change-keyframes');
         });
 
 
-        // On Thing...
+        // On Annotation...
 
-        $(thing).on('change delete', () => {
-            rect.appear({singlekeyframe: thing.keyframes.length === 1});
+        $(annotation).on('change delete', () => {
+            rect.appear({singlekeyframe: annotation.keyframes.length === 1});
         });
-        $(thing).triggerHandler('change');
+        $(annotation).triggerHandler('change');
 
-        $(thing).on('delete', () => {
-            $(thing).off();
+        $(annotation).on('delete', () => {
+            $(annotation).off();
             $(rect).off();
             this.view.deleteRect(rect);
         });
     }
 
     initHandlers() {
-        // Drawing things
+        // Drawing annotations
         $(this).on('change-onscreen-annotations', () => {
             this.drawOnscreenAnnotations();
         });
@@ -148,7 +148,7 @@ class Player {
             });
 
             $(this.view.creationRect).on('focus', () => {
-               this.selectedThing = null;
+               this.selectedAnnotation = null;
                 $(this).triggerHandler('change-onscreen-annotations');
                 $(this).triggerHandler('change-keyframes');
             });
@@ -158,7 +158,7 @@ class Player {
             });
 
             $(this.view).on('create-rect', (e, rect) => {
-                this.addThingAtCurrentTimeFromRect(rect);
+                this.addAnnotationAtCurrentTimeFromRect(rect);
                 rect.focus();
                 $(this).triggerHandler('change-keyframes');
             });
@@ -177,28 +177,28 @@ class Player {
     // Draw something
 
     drawOnscreenAnnotations() {
-        for (let {thing, rect} of this.thingRectBindings) {
-            this.drawThingOnRect(thing, rect);
+        for (let {annotation, rect} of this.annotationRectBindings) {
+            this.drawAnnotationOnRect(annotation, rect);
         }
     }
 
     drawKeyframes() {
         this.view.keyframebar.resetWithDuration(this.view.video.duration);
-        for (let thing of this.things) {
-            for (let keyframe of thing.keyframes) {
-                let selected = (thing == this.selectedThing);
+        for (let annotation of this.annotations) {
+            for (let keyframe of annotation.keyframes) {
+                let selected = (annotation == this.selectedAnnotation);
                 this.view.keyframebar.addKeyframeAt(keyframe.time, {selected});
             }
         }
     }
 
-    drawThingOnRect(thing, rect) {
+    drawAnnotationOnRect(annotation, rect) {
         var time = this.view.video.currentTime;
-        var {bounds, prevIndex, nextIndex, closestIndex} = thing.getFrameAtTime(time);
+        var {bounds, prevIndex, nextIndex, closestIndex} = annotation.getFrameAtTime(time);
 
         rect.appear({
             real: closestIndex != null || (prevIndex != null && nextIndex != null),
-            selected: this.selectedThing === thing,
+            selected: this.selectedAnnotation === annotation,
         });
 
         // Don't mess up our drag
@@ -212,10 +212,10 @@ class Player {
 
     submitAnnotations(e) {
         e.preventDefault();
-        if (this.things.length == 0 && !confirm('Confirm that there are no objects in the video?')) {
+        if (this.annotations.length == 0 && !confirm('Confirm that there are no objects in the video?')) {
             return;
         }
-        DataSources.annotations.save(this.videoId, this.things, window.mturk).then((response) => {
+        DataSources.annotations.save(this.videoId, this.annotations, window.mturk).then((response) => {
             $('.submit-result').text(response + " Please provide some feedback on your experience: ");
         });
         $('#myModal').modal();
@@ -257,43 +257,43 @@ class Player {
         }).then((text) => console.log(text));
     }
 
-    addThingAtCurrentTimeFromRect(rect) {
-        var thing = Thing.newFromCreationRect();
-        thing.updateKeyframe({
+    addAnnotationAtCurrentTimeFromRect(rect) {
+        var annotation = Annotation.newFromCreationRect();
+        annotation.updateKeyframe({
             time: this.view.video.currentTime,
             bounds: rect.bounds
         });
-        this.things.push(thing);
-        rect.fill = thing.fill;
-        this.initBindThingAndRect(thing, rect);
+        this.annotations.push(annotation);
+        rect.fill = annotation.fill;
+        this.initBindAnnotationAndRect(annotation, rect);
     }
 
-    deleteThing(thing) {
-        if (thing == null) return false;
+    deleteAnnotation(annotation) {
+        if (annotation == null) return false;
 
-        if (thing == this.selectedThing) {
-            this.selectedThing = null;
+        if (annotation == this.selectedAnnotation) {
+            this.selectedAnnotation = null;
         }
 
-        for (let i = 0; i < this.things.length; i++) {
-            if (this.things[i] === thing) {
-                thing.delete();
-                this.things.splice(i, 1);
-                this.thingRectBindings.splice(i, 1);
+        for (let i = 0; i < this.annotations.length; i++) {
+            if (this.annotations[i] === annotation) {
+                annotation.delete();
+                this.annotations.splice(i, 1);
+                this.annotationRectBindings.splice(i, 1);
                 return true;
             }
         }
 
-        throw new Error("Player.deleteThing: thing not found");
+        throw new Error("Player.deleteAnnotation: annotation not found");
     }
 
     deleteSelectedKeyframe() {
-        if (this.selectedThing == null) return false;
+        if (this.selectedAnnotation == null) return false;
 
-        this.selectedThing.deleteKeyframeAtTime(this.view.video.currentTime);
+        this.selectedAnnotation.deleteKeyframeAtTime(this.view.video.currentTime);
 
-        if (this.selectedThing.keyframes.length === 0) {
-            this.deleteThing(this.selectedThing);
+        if (this.selectedAnnotation.keyframes.length === 0) {
+            this.deleteAnnotation(this.selectedAnnotation);
         }
 
         return true;

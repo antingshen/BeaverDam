@@ -74,7 +74,7 @@ class PlayerView {
     }
 
 
-    // Init ALL the things!
+    // Init ALL the annotations!
 
     initKeyframebar() {
         this.keyframebar = new Keyframebar({classBaseName: this.classBaseName});

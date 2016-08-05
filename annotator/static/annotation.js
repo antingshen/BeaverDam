@@ -1,7 +1,7 @@
 "use strict";
 
 
-class Thing {
+class Annotation {
     // Constants. ES6 doesn't support class constants yet, so we'll declare
     // them this way for now:
 
@@ -14,26 +14,26 @@ class Thing {
 
 
     constructor({fill, id, keyframes, type}) {
-        // Fill of thing
+        // Fill of annotation
         this.fill = fill;
 
-        // ID of thing
+        // ID of annotation
         this.id = id;
 
-        // Keyframes of thing
+        // Keyframes of annotation
         this.keyframes = keyframes;
 
-        // Type of thing
+        // Type of annotation
         this.type = type;
 
         // Prevent adding new properties
-        Misc.preventExtensions(this, Thing);
+        Misc.preventExtensions(this, Annotation);
     }
 
-    // The hacky but only way to make a Thing right now.
+    // The hacky but only way to make a Annotation right now.
     static newFromCreationRect() {
         var fill = Misc.getRandomColor();
-        return new Thing({
+        return new Annotation({
             keyframes: [],
             fill: fill,
             id: fill,
@@ -46,7 +46,7 @@ class Thing {
      * A "frame" is the interpolation of the two closest keyframes. It tells us:
      * - The previous and next keyframes
      * - If we're "at" (<= this.SAME_FRAME_THRESHOLD away from) a keyframe
-     * - The bounds for the thing at this time
+     * - The bounds for the annotation at this time
      */
     getFrameAtTime(time) {
         if (!this.keyframes.length) {
@@ -153,10 +153,10 @@ class Thing {
         return true;
     }
 
-    // Delete the entire thing
+    // Delete the entire annotation
     delete() {
         $(this).triggerHandler('delete');
     }
 }
 
-void Thing;
+void Annotation;
