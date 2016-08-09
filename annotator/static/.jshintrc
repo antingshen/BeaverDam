@@ -25,12 +25,12 @@
     "Raphael",
 
     // app
-    "CreationRect",
+    "Annotation",
     "Bounds",
+    "CreationRect",
     "DataSources",
     "Misc",
     "Player",
-    "Thing",
 
     // views
     "Keyframebar",

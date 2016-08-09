@@ -32,7 +32,7 @@ var RectConstants = {
 
 class Rect {
     constructor({classBaseName, fill}) {
-        // Before things are attached, we cache appearance in these "pre-
+        // Before annotations are attached, we cache appearance in these "pre-
         // attached" properties
 
         // Bounds set before element is attached to paper

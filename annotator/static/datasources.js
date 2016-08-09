@@ -26,31 +26,31 @@ var DataSources = {
         },
     },
 
-    thing: {
+    annotation: {
         fromJson: function(json) {
-            var thing = Thing.newFromCreationRect();
-            thing.keyframes = json.keyframes.map(DataSources.frame.fromJson);
-            thing.type = json.type;
-            thing.fill = json.color || Misc.getRandomColor();
-            return thing;
+            var annotation = Annotation.newFromCreationRect();
+            annotation.keyframes = json.keyframes.map(DataSources.frame.fromJson);
+            annotation.type = json.type;
+            annotation.fill = json.color || Misc.getRandomColor();
+            return annotation;
         },
 
-        toJson: function(thing) {
+        toJson: function(annotation) {
             return {
-                keyframes: thing.keyframes.map(DataSources.frame.toJson),
-                type: thing.type,
-                color: thing.fill,
+                keyframes: annotation.keyframes.map(DataSources.frame.toJson),
+                type: annotation.type,
+                color: annotation.fill,
             };
         },
     },
 
     annotations: {
         fromJson: function(json) {
-            return json.map(DataSources.thing.fromJson);
+            return json.map(DataSources.annotation.fromJson);
         },
 
-        toJson: function(things) {
-            return things.map(DataSources.thing.toJson);
+        toJson: function(annotations) {
+            return annotations.map(DataSources.annotation.toJson);
         },
 
         load: function(id) {
@@ -63,14 +63,14 @@ var DataSources = {
                 return response.text();
             }).then((text) => {
                 var json = (text === '') ? [] : JSON.parse(text);
-                var things = DataSources.annotations.fromJson(json);
+                var annotations = DataSources.annotations.fromJson(json);
 
-                return Promise.resolve(things);
+                return Promise.resolve(annotations);
             });
         },
 
-        save: function(id, things, mturk) {
-            var json = DataSources.annotations.toJson(things);
+        save: function(id, annotations, mturk) {
+            var json = DataSources.annotations.toJson(annotations);
             return fetch(`/annotation/${id}/`, {
                 headers: {
                     'X-CSRFToken': window.CSRFToken,
