@@ -20,8 +20,9 @@
     "fetch",
 
     // plugins
-    "Raphael",
     "$",
+    "_",
+    "Raphael",
 
     // app
     "CreationRect",
