@@ -1,6 +1,5 @@
 #!/bin/bash
 set -e
-cd "$(echo "$0" | xargs dirname | xargs dirname)"
 
 verbose() {
     echo $ "$@"

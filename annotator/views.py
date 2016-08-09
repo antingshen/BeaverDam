@@ -4,6 +4,7 @@ from django.http import HttpResponse, Http404, HttpResponseBadRequest, HttpRespo
 from django.views.generic import View
 from django.views.decorators.clickjacking import xframe_options_exempt
 from django.contrib.admin.views.decorators import staff_member_required
+from django.core.exceptions import ObjectDoesNotExist
 
 import os
 import json
@@ -61,7 +62,9 @@ def video(request, video_id):
         'preview': preview,
         'assignment_id': assignment_id,
         'hit_id': hit_id,
+        'worker_id': worker_id,
         'MTURK_SANDBOX': settings.MTURK_SANDBOX,
+        'survey': False,
     })
     if assignment_id is None:
         response['X-Frame-Options'] = 'SAMEORIGIN'
@@ -77,9 +80,17 @@ class AnnotationView(View):
     def post(self, request, video_id):
         data = json.loads(request.body.decode('utf-8'))
         hit_id = data.get('hitId', None)
-        if not (request.user.is_authenticated() or 
-                Task.valid_hit_id(hit_id)):
-            return HttpResponseForbidden('Not authenticated')
+        if not (request.user.is_authenticated()):
+            if not Task.valid_hit_id(hit_id):
+                return HttpResponseForbidden('Not authenticated')
+            else:
+                try:
+                    worker_id = data.get('workerId', '')
+                    task = Task.get_by_hit_id(hit_id)
+                    task.worker_id = worker_id
+                    task.save()
+                except ObjectDoesNotExist:
+                    assert settings.DEBUG
         video = Video.objects.get(id=video_id)
         video.annotation = json.dumps(data['annotation'])
         video.save()

@@ -81,6 +81,7 @@ var DataSources = {
                 body: JSON.stringify({
                     annotation: json,
                     hitId: window.hitId,
+                    workerId: window.workerId,
                 }),
             }).then((response) => {
                 if (response.ok) {

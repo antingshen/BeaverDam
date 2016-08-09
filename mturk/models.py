@@ -15,6 +15,7 @@ class Task(models.Model):
     hit_group = models.CharField(max_length=64, blank=True)
     duration = 7200 # 2 hours
     lifetime = 60*15 # 2592000 # 30 days
+    worker_id = models.CharField(max_length=64, blank=True)
 
     class Meta:
         abstract = True
@@ -30,6 +31,14 @@ class Task(models.Model):
     def valid_hit_id(cls, id):
         if id is None:
             return False
+        try:
+            item = cls.get_by_hit_id(id)
+            return True
+        except ObjectDoesNotExist:
+            return settings.DEBUG
+
+    @classmethod
+    def get_by_hit_id(cls, id):
         items = []
         for task_type in cls.__subclasses__():
             try:
@@ -38,8 +47,11 @@ class Task(models.Model):
                 pass
         if len(items) > 1:
             raise MultipleObjectsReturned()
+        elif len(items) == 0:
+            raise ObjectDoesNotExist()
         else:
-            return len(items) == 1 or settings.DEBUG
+            return items[0]
+
 
 class FullVideoTask(Task):
     video = models.ForeignKey(Video)

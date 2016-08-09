@@ -6,6 +6,7 @@
     video = {{ video_data|safe }};
     mturk = {{ assignment_id|yesno:'true,false,false' }};
     hitId = '{{ hit_id }}';
+    workerId = '{{ worker_id }}';
   </script>
   <script src="/static/vendor/raphael/raphael.min.js"></script>
   <script type="text/javascript" src="/static/app.js"></script>
@@ -31,13 +32,9 @@
               Car
               <input type="radio" name="object" id="object-radio-car" value="car" checked>
             </label>
-            <label for="object-radio-human" class="label label-primary">
-              Pedestrian
-              <input type="radio" name="object" id="object-radio-human" value="human">
-            </label>
-            <label for="object-radio-other" class="label label-danger">
-              Other
-              <input type="radio" name="object" id="object-radio-other" value="other">
+            <label for="object-radio-traffic-light" class="label label-primary">
+              Traffic Light
+              <input type="radio" name="object" id="object-radio-traffic-light" value="traffic-light">
             </label>
 
             {% if preview == False %}
@@ -45,7 +42,7 @@
               <form method="post" id="turk-form" action="https://{{ MTURK_SANDBOX|yesno:'workersandbox,www'}}.mturk.com/mturk/externalSubmit" style="margin-left: 300px;">
                 <input type="hidden" value="{{ assignment_id }}" name="assignmentId">
                 <input type="hidden" value="{{ video.id }}" name="video-id">
-                <button id="submit-btn" type="submit"  class="btn btn-primary" data-toggle="modal" data-target="#myModal" style="position: absolute; top: 10px; right: 20px;">Submit</button>
+                <button id="submit-btn" type="submit"  class="btn btn-primary" style="position: absolute; top: 10px; right: 20px;">Submit</button>
               </form>
 
               {% else %}
@@ -106,8 +103,9 @@
             <h4 class="modal-title submit-result"></h4>
           </div>
           <script>
-            const numberOfSurveyQuestions = 2;
+            const numberOfSurveyQuestions = {% if survey %} 2 {% else %} 0 {% endif %};
           </script>
+          {% if survey %}
           <div>
             <p>Are there way too many cars to label?</p>
             <label class="radio-inline"><input type="radio" name="survey-q1" value="yes">Yes</label>
@@ -117,8 +115,9 @@
             <label class="radio-inline"><input type="radio" name="survey-q2" value="yes">Yes</label>
             <label class="radio-inline"><input type="radio" name="survey-q2" value="no">No</label></br>
           </div>
+          {% endif %}
           <div class="modal-footer">
-            <button id="submit-survey-btn" type="button" class="btn btn-default" data-dismiss="modal">Submit Survey</button>
+            <button id="submit-survey-btn" type="button" class="btn btn-default" data-dismiss="modal">Done</button>
           </div>
         </div>
         
