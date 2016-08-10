@@ -34,7 +34,7 @@ def video(request, video_id):
         preview = bool(request.GET.get('preview', False))
 
     hit_id = request.GET.get('hitId', '')
-    worker = request.GET.get('workerId', '')
+    worker_id = request.GET.get('workerId', '')
     if not preview:
         if assignment_id is not None:
             if not Task.valid_hit_id(hit_id):
