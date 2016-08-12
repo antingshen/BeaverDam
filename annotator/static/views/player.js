@@ -249,11 +249,11 @@ class PlayerView {
         return {
             violatesStartTime: currentTime < this.videoStart,
             violatesEndTime: currentTime > this.videoEnd,
-            closestTimeinRange: closestTimeinRange
+            closestTimeinRange: closestTimeinRange,
         };
     }
 
-    fixVideoTime(newTime){
+    fixVideoTime(newTime) {
         if (newTime != null) {
             this.video.currentTime = newTime;
         }
@@ -261,7 +261,7 @@ class PlayerView {
 
     // Rect control
     
-    metrics(){
+    metrics() {
         return {
             offset: $(this.$paper.canvas).offset(),
             original: {
