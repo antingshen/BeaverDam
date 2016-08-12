@@ -118,7 +118,7 @@ class PlayerView {
     initVideo() {
         // Set video props
         this.video = this.$('video')[0];
-        if (this.videoStart) {
+        if (this.videoStart != null) {
             this.video.currentTime = this.videoStart;
         }
         $('video').attr('src', this.videoSrc);
@@ -238,10 +238,30 @@ class PlayerView {
         $(this).trigger('delete-keyframe');
     }
 
+    checkTimeRange() {
+        var currentTime = this.$('control-time').val();
+        var closestTimeinRange = currentTime;
+        if (currentTime < this.videoStart) {
+            closestTimeinRange = this.videoStart;
+        } else if (currentTime > this.videoEnd) {
+            closestTimeinRange = this.videoEnd;
+        }
+        return {
+            violatesStartTime: currentTime < this.videoStart,
+            violatesEndTime: currentTime > this.videoEnd,
+            closestTimeinRange: closestTimeinRange
+        };
+    }
+
+    fixVideoTime(newTime){
+        if (newTime != null) {
+            this.video.currentTime = newTime;
+        }
+    }
 
     // Rect control
     
-    metrics() {
+    metrics(){
         return {
             offset: $(this.$paper.canvas).offset(),
             original: {
@@ -306,15 +326,11 @@ class PlayerView {
     }
 
     set controlTimeUnfocused(value) {
-        var currentTime = this.$('control-time').val()
-        if (this.videoStart && currentTime < this.videoStart) {
-            this.$('control-time:not(:focus)').val(this.videoStart);
-            this.video.currentTime = this.videoStart;
-        } else if (this.videoEnd && currentTime > this.videoEnd) {
-            this.$('control-time:not(:focus)').val(this.videoEnd);
-            this.video.currentTime = this.videoEnd;
-        } else
-            this.$('control-time:not(:focus)').val(value.toFixed(2));
+        var timeRange = this.checkTimeRange();
+        this.$('control-time:not(:focus)').val(value.toFixed(2));
+        if (timeRange.violatesStartTime || timeRange.violatesEndTime) {
+            this.fixVideoTime(timeRange.closestTimeinRange);
+        }
     }
 
     get controlScrubber() {
@@ -326,16 +342,11 @@ class PlayerView {
     }
 
     set controlScrubberInactive(value) {
-        var currentTime = this.$('control-time').val()
-        if (this.videoStart && currentTime < this.videoStart) {
-            this.$('control-scrubber:not(:active)').val(this.videoStart);
-            this.video.currentTime = this.videoStart;
-        } else if (this.videoEnd && currentTime > this.videoEnd) {
-            this.$('control-scrubber:not(:active)').val(this.videoEnd);
-            this.video.currentTime = this.videoEnd;
-            this.pause();
-        } else
-            this.$('control-scrubber:not(:active)').val(value * this.CONTROL_SCRUBBER_GRANULARITY / this.video.duration);
+        var timeRange = this.checkTimeRange();
+        this.$('control-scrubber:not(:active)').val(value * this.CONTROL_SCRUBBER_GRANULARITY / this.video.duration);
+        if (timeRange.violatesStartTime || timeRange.violatesEndTime) {
+            this.fixVideoTime();
+        }
     }
 
 
