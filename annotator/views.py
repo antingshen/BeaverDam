@@ -19,6 +19,10 @@ def home(request):
         'videos': need_annotating,
     })
 
+def next_unannotated(request, video_id):
+    id = Video.objects.filter(id__gt=video_id, annotation='')[0].id
+    return redirect('video', id)
+
 @xframe_options_exempt
 def video(request, video_id):
     try:
