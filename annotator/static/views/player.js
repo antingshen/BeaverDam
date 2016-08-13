@@ -150,7 +150,7 @@ class PlayerView {
             $(this).on('keyup-comma                 ', () => this.stopRewind());
             // step-play
             $(this).on('keydn-period                ', () => this.play());
-            $(this).on('keyup-semicolon keyup-period', () => this.pause());
+            $(this).on('keyup-period', () => this.pause());
             // Delete keyframe
             $(this).on('keydn-backspace             ', () => this.deleteKeyframe());
         });
