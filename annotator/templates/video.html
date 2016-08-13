@@ -117,7 +117,10 @@
           </div>
           {% endif %}
           <div class="modal-footer">
-            <button id="submit-survey-btn" type="button" class="btn btn-default" data-dismiss="modal">Done</button>
+            {% if assignment_id == None %}
+              <a class="btn btn-primary" href="{{ request.path }}next">Next Video</a>
+            {% endif %}
+            <button id="submit-survey-btn" type="button" class="btn btn-default" data-dismiss="modal">Close</button>
           </div>
         </div>
         

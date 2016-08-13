@@ -1,0 +1,21 @@
+#!/bin/sh
+set -e
+
+verbose() {
+    echo $ "$@"
+    "$@"
+}
+
+# This assumes video is already in H264
+
+for f in "$@" do
+    verbose ffmpeg \
+        -i "$f" \
+        -c copy \
+        -an \
+        -segment_time 30 \
+        -f segment \
+        -reset_timestamps 1 \
+        -segment_list "$f".list \
+        "$f"_%02d.mp4
+done
