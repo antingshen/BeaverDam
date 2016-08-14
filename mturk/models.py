@@ -14,13 +14,17 @@ class Task(models.Model):
     hit_id = models.CharField(max_length=64, blank=True)
     hit_group = models.CharField(max_length=64, blank=True)
     duration = 7200 # 2 hours
-    lifetime = 60*15 # 2592000 # 30 days
+    lifetime = 2592000 # 30 days
     worker_id = models.CharField(max_length=64, blank=True)
+    sandbox = models.BooleanField(default=settings.MTURK_SANDBOX)
+
 
     class Meta:
         abstract = True
 
     def publish(self):
+        if settings.MTURK_SANDBOX != self.sandbox:
+            raise Exception("settings.MTURK_SANDBOX != self.sandbox")
         response = mturk.create_hit(self.title, self.description, self.url, 
             self.pay, self.duration, self.lifetime)
         self.hit_id = response.values['hitid']
@@ -64,4 +68,19 @@ class FullVideoTask(Task):
         return reverse('video', args=[self.video.id])
 
     def __str__(self):
-        return self.video.name
+        return self.video.filename
+
+
+class SingleFrameTask(Task):
+    video = models.ForeignKey(Video)
+    time = models.FloatField()
+    title = "Image Annotation"
+    description = "Draw boxes around all objects of interest in an image, with bonus per object"
+    pay = 0.01
+
+    @property
+    def url(self):
+        return reverse('video', args=[self.video.id]) + '?s={0}&amp;e={0}'.format(self.time)
+
+    def __str__(self):
+        return '{:.2f} of {}'.format(self.time, self.video.filename)
