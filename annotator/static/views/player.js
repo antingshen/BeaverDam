@@ -257,6 +257,7 @@ class PlayerView {
         if (newTime != null) {
             this.video.currentTime = newTime;
         }
+        this.pause();
     }
 
     // Rect control
