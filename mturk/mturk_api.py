@@ -57,7 +57,7 @@ class Server(object):
         return response
 
     def create_hit(self, title, description, page, amount, duration,
-        lifetime, keywords = "", autoapprove = 604800, height = 650,
+        lifetime, keywords = "", autoapprove = 604800, height = 950,
         minapprovedpercent = None, minapprovedamount = None, countrycode = None):
         """
         Creates a HIT on Mechanical Turk.

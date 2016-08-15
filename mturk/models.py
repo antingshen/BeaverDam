@@ -3,6 +3,8 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 
+from tqdm import tqdm
+
 from .mturk_api import Server
 from annotator.models import Video
 
@@ -25,11 +27,23 @@ class Task(models.Model):
     def publish(self):
         if settings.MTURK_SANDBOX != self.sandbox:
             raise Exception("settings.MTURK_SANDBOX != self.sandbox")
+        if self.video.verified:
+            self.video.verified = False
+            self.video.save()
         response = mturk.create_hit(self.title, self.description, self.url, 
             self.pay, self.duration, self.lifetime)
         self.hit_id = response.values['hitid']
         self.hit_group = response.values['hittypeid']
         self.save()
+
+    @classmethod
+    def batch_create_and_publish(cls, videos, **kwargs):
+        created = []
+        for video in tqdm(videos):
+            task = cls(video=video, **kwargs)
+            task.save()
+            task.publish()
+        return created
 
     @classmethod
     def valid_hit_id(cls, id):
