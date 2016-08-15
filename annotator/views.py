@@ -70,7 +70,7 @@ def video(request, video_id):
         'MTURK_SANDBOX': settings.MTURK_SANDBOX,
         'survey': False,
     })
-    if assignment_id is None:
+    if not iframe_mode:
         response['X-Frame-Options'] = 'SAMEORIGIN'
     return response
 

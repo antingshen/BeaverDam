@@ -1,5 +1,6 @@
 from django.contrib import admin
 
-from .models import FullVideoTask
+from .models import *
 
 admin.site.register(FullVideoTask)
+admin.site.register(SingleFrameTask)
