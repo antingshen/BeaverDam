@@ -21,6 +21,12 @@ class Player {
 
         this.videoEnd = videoEnd;
 
+        this.metrics = {
+            playerStartTimes: Date.now(),
+            annotationsStartTime: null,
+            annotationsEndTime: null,
+        };
+
         // Promises
         this.annotationsDataReady = Misc.CustomPromise();
         this.annotationsReady = Misc.CustomPromise();
@@ -193,6 +199,9 @@ class Player {
     }
 
     drawAnnotationOnRect(annotation, rect) {
+        if (this.metrics.annotationsStartTime == null) {
+            this.metrics.annotationsStartTime = Date.now();
+        }
         var time = this.view.video.currentTime;
         var {bounds, prevIndex, nextIndex, closestIndex} = annotation.getFrameAtTime(time);
 
@@ -212,17 +221,21 @@ class Player {
 
     submitAnnotations(e) {
         e.preventDefault();
-        if (this.annotations.length == 0 && !confirm('Confirm that there are no objects in the video?')) {
+        this.metrics.annotationsEndTime = Date.now();
+        if (this.metrics.annotationsStartTime == null) {
+            this.metrics.annotationsStartTime = this.metrics.annotationsEndTime;
+        }
+        if (this.annotations.length === 0 && !confirm('Confirm that there are no objects in the video?')) {
             return;
         }
-        DataSources.annotations.save(this.videoId, this.annotations, window.mturk).then((response) => {
+        DataSources.annotations.save(this.videoId, this.annotations, this.metrics, window.mturk).then((response) => {
             $('.submit-result').html(response + (numberOfSurveyQuestions ? "<br />Optional feedback on your experience: " : ''));
         });
         $('#myModal').modal();
     }
 
     submitSurvey() {
-        var results = []
+        var results = [];
         for (let i = 1; i <= numberOfSurveyQuestions; i++) {
             results.push($(`input[name='survey-q${i}']:checked`).val());
         }
