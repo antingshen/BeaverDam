@@ -16,6 +16,7 @@ mturk = Server(settings.AWS_ID, settings.AWS_KEY, settings.URL_ROOT, settings.MT
 class Task(models.Model):
     hit_id = models.CharField(max_length=64, blank=True)
     hit_group = models.CharField(max_length=64, blank=True)
+    metrics = models.TextField(blank=True)
     duration = 7200 # 2 hours
     lifetime = 2592000 # 30 days
     worker_id = models.CharField(max_length=64, blank=True)
@@ -41,9 +42,10 @@ class Task(models.Model):
         self.hit_group = response.values['hittypeid']
         self.save()
 
-    def complete(self, worker_id, assignment_id):
+    def complete(self, worker_id, assignment_id, metrics):
         self.worker_id = worker_id
         self.assignment_id = assignment_id
+        self.metrics = metrics
         self.bonus = self.calculate_bonus()
         self.time_completed = datetime.now()
         self.save()
