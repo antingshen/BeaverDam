@@ -239,20 +239,18 @@ class PlayerView {
     }
 
     checkTimeRange() {
-        var currentTime =this.$('control-time').val();
-        var time = {
-            closestTimeinRange: currentTime,
-            violatesEndTime: false,
-            violatesStartTime: false,
-        };
-        if (this.videoStart != null && currentTime < this.videoStart) {
-            time.closestTimeinRange = this.videoStart;
-            time.violatesStartTime = true;
-        } else if (this.videoEnd != null && currentTime > this.videoEnd) {
-            time.closestTimeinRange = this.videoEnd;
-            time.violatesEndTime = true;
+        var currentTime = this.$('control-time').val();
+        var closestTimeinRange = currentTime;
+        if (currentTime < this.videoStart) {
+            closestTimeinRange = this.videoStart;
+        } else if (currentTime > this.videoEnd) {
+            closestTimeinRange = this.videoEnd;
         }
-        return time;
+        return {
+            violatesStartTime: currentTime < this.videoStart,
+            violatesEndTime: currentTime > this.videoEnd,
+            closestTimeinRange: closestTimeinRange,
+        };
     }
 
     fixVideoTime(newTime) {
@@ -348,7 +346,7 @@ class PlayerView {
         var timeRange = this.checkTimeRange();
         this.$('control-scrubber:not(:active)').val(value * this.CONTROL_SCRUBBER_GRANULARITY / this.video.duration);
         if (timeRange.violatesStartTime || timeRange.violatesEndTime) {
-            this.fixVideoTime(timeRange.closestTimeinRange);
+            this.fixVideoTime();
         }
     }
 
