@@ -334,7 +334,6 @@ class PlayerView {
         if (timeRange.violatesStartTime || timeRange.violatesEndTime) {
             this.fixVideoTime(timeRange.closestTimeinRange);
         }
-        console.log("T")
     }
 
     get controlScrubber() {
