@@ -15,6 +15,7 @@ mturk = Server(settings.AWS_ID, settings.AWS_KEY, settings.URL_ROOT, settings.MT
 class Task(models.Model):
     hit_id = models.CharField(max_length=64, blank=True)
     hit_group = models.CharField(max_length=64, blank=True)
+    metrics = models.TextField(blank=True)
     duration = 7200 # 2 hours
     lifetime = 2592000 # 30 days
     worker_id = models.CharField(max_length=64, blank=True)

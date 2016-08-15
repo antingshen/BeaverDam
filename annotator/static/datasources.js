@@ -69,7 +69,7 @@ var DataSources = {
             });
         },
 
-        save: function(id, annotations, mturk) {
+        save: function(id, annotations, metrics, mturk) {
             var json = DataSources.annotations.toJson(annotations);
             return fetch(`/annotation/${id}/`, {
                 headers: {
@@ -80,6 +80,7 @@ var DataSources = {
                 method: 'post',
                 body: JSON.stringify({
                     annotation: json,
+                    metrics: metrics,
                     hitId: window.hitId,
                     workerId: window.workerId,
                 }),
