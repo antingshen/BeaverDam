@@ -94,11 +94,18 @@ var Misc = {
         }
 
         if (classObj == null || obj.constructor == classObj) {
-            // Prevent adding new properties
-            $(obj).on('dummy', $.noop);
-            $(obj).data('dummy', null);
-            Object.preventExtensions(obj);
-            // $(obj).off('dummy', $.noop);
+            try {
+                // Prevent adding new properties
+                $(obj).on('dummy', $.noop);
+                $(obj).data('dummy', null);
+                Object.preventExtensions(obj);
+                // $(obj).off('dummy', $.noop);
+            }
+            catch (e) {
+                window.$0 = obj;
+                console.error("Could not prevent this object ($0) from being extended:", obj);
+                throw e;
+            }
         }
     },
 

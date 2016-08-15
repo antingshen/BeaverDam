@@ -2,10 +2,13 @@
 
 
 $(() => {
-    // Just a sanity check
-    Misc.preventExtensions(document);
-    // Ideally I'd like to do this to window too but a lot of Chrome
-    // extensions rely on window being extensible
+    // Some sanity checks that can't be used
+
+    // Firefox doesn't allow this
+    // Misc.preventExtensions(document);
+
+    // Chrome extensions rely on window being extensible
+    // Misc.preventExtensions(window);
 
     // Make the player
     window.p = new Player({
