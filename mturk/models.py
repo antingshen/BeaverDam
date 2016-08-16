@@ -18,6 +18,7 @@ class Task(models.Model):
     duration = 7200 # 2 hours
     lifetime = 2592000 # 30 days
     worker_id = models.CharField(max_length=64, blank=True)
+    assignment_id = models.CharField(max_length=64, blank=True)
     sandbox = models.BooleanField(default=settings.MTURK_SANDBOX)
 
 

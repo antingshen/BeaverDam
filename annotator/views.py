@@ -90,8 +90,10 @@ class AnnotationView(View):
             else:
                 try:
                     worker_id = data.get('workerId', '')
+                    assignment_id = data.get('assignmentId', '')
                     task = Task.get_by_hit_id(hit_id)
                     task.worker_id = worker_id
+                    task.assignment_id = assignment_id
                     task.save()
                 except ObjectDoesNotExist:
                     assert settings.DEBUG
