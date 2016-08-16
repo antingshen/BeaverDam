@@ -4,6 +4,7 @@ from django.core.urlresolvers import reverse
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 
 from tqdm import tqdm
+from datetime import datetime
 
 from .mturk_api import Server
 from annotator.models import Video
@@ -19,6 +20,7 @@ class Task(models.Model):
     lifetime = 2592000 # 30 days
     worker_id = models.CharField(max_length=64, blank=True)
     assignment_id = models.CharField(max_length=64, blank=True)
+    time_completed = models.DateTimeField(null=True)
     bonus = models.DecimalField(max_digits=3, decimal_places=2, default=0)
     paid = models.BooleanField(default=False)
     sandbox = models.BooleanField(default=settings.MTURK_SANDBOX)
@@ -43,6 +45,7 @@ class Task(models.Model):
         self.worker_id = worker_id
         self.assignment_id = assignment_id
         self.bonus = self.calculate_bonus()
+        self.time_completed = datetime.now()
         self.save()
 
     def calculate_bonus(self):
