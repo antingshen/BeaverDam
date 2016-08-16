@@ -19,6 +19,8 @@ class Task(models.Model):
     lifetime = 2592000 # 30 days
     worker_id = models.CharField(max_length=64, blank=True)
     assignment_id = models.CharField(max_length=64, blank=True)
+    bonus = models.DecimalField(max_digits=3, decimal_places=2, default=0)
+    paid = models.BooleanField(default=False)
     sandbox = models.BooleanField(default=settings.MTURK_SANDBOX)
 
 
@@ -36,6 +38,15 @@ class Task(models.Model):
         self.hit_id = response.values['hitid']
         self.hit_group = response.values['hittypeid']
         self.save()
+
+    def complete(self, worker_id, assignment_id):
+        self.worker_id = worker_id
+        self.assignment_id = assignment_id
+        self.bonus = self.calculate_bonus()
+        self.save()
+
+    def calculate_bonus(self):
+        return 0
 
     @classmethod
     def batch_create_and_publish(cls, videos, **kwargs):
@@ -92,6 +103,12 @@ class SingleFrameTask(Task):
     title = "Image Annotation"
     description = "Draw boxes around all objects of interest in an image, with bonus per object"
     pay = 0.01
+    bonus_per_box = 0.005
+
+    def calculate_bonus(self):
+        boxes = self.video.count_keyframes(at_time=self.time)
+        num_cents = ((boxes - 1) * bonus_per_box + pay) * 100
+        return math.ceil(num_cents) / 100
 
     @property
     def url(self):

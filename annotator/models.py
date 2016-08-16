@@ -31,6 +31,8 @@ class Video(models.Model):
         else:
             return self.host + self.filename
 
-    @property
-    def num_keyframes(self):
-        return self.annotation.count('"frame"')
+    def count_keyframes(self, at_time=None):
+        if at_time is None:
+            return self.annotation.count('"frame"')
+        else:
+            return self.annotation.count('"frame": {}'.format(at_time))
