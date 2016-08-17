@@ -17,6 +17,13 @@ def home(request):
     need_annotating = Video.objects.filter(id__gt=0, verified=False)[:25]
     return render(request, 'video_list.html', context={
         'videos': need_annotating,
+        'thumbnail': True,
+    })
+
+def verify_list(request):
+    need_verification = Video.objects.filter(id__gt=0, verified=False).exclude(annotation='')[:100]
+    return render(request, 'video_list.html', context={
+        'videos': need_verification,
     })
 
 def next_unannotated(request, video_id):

@@ -6,7 +6,11 @@
     <tr>
       <th>Id</th>
       <th>Annotations</th>
-      <th>Video</th>
+      <th>Verified</th>
+      <th>Source</th>
+      {% if thumbnail %}
+        <th>Video</th>
+      {% endif %}
     </tr>
   </thead>
   <tbody>
@@ -14,7 +18,11 @@
     <tr onclick="window.document.location='{% url "video" video.id %}';" style="cursor: pointer;">
       <td>{{ video.id }}</td>
       <td>{{ video.annotation|yesno }}</td>
-      <td><video height="100"><source src="{{ video.url }}" type="video/mp4"></video>
+      <td>{{ video.verified|yesno }}</td>
+      <td>{{ video.source }}</td>
+      {% if thumbnail %}
+        <td><video height="100"><source src="{{ video.url }}" type="video/mp4"></video>
+      {% endif %}
     </tr>
     {% endfor %}
   </tbody>
