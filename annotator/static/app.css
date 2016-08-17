@@ -115,3 +115,10 @@
     margin: 50px;
 }
 
+#submit-container {
+    display: inline-block;
+    position: absolute;
+    margin-left: 300px;
+    top: 10px;
+    right: 20px;
+}

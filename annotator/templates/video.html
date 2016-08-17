@@ -39,16 +39,17 @@
             </label>
             <a class="btn btn-default" href="https://github.com/antingshen/BeaverDam/wiki/Single-Image-Labeling-Task" target="_blank" style="margin-left: 25px;">Instructions &amp; Requirements</a>
 
+            <div id="submit-container">
             {% if preview == False %}
               {% if assignment_id != None %}
-              <form method="post" id="turk-form" action="https://{{ MTURK_SANDBOX|yesno:'workersandbox,www'}}.mturk.com/mturk/externalSubmit" style="margin-left: 300px;">
+              <form method="post" id="turk-form" action="https://{{ MTURK_SANDBOX|yesno:'workersandbox,www'}}.mturk.com/mturk/externalSubmit">
                 <input type="hidden" value="{{ assignment_id }}" name="assignmentId">
                 <input type="hidden" value="{{ video.id }}" name="video-id">
-                <button id="submit-btn" type="submit"  class="btn btn-primary" style="position: absolute; top: 10px; right: 20px;">Submit</button>
+                <button id="submit-btn" type="submit"  class="btn btn-primary">Submit</button>
               </form>
 
               {% else %}
-              <div id="submit-btn-group" class="btn-group" role="group" style="position: absolute; top: 10px; right: 20px;">
+              <div id="submit-btn-group" class="btn-group" role="group">
                 {% if request.user.is_superuser == False %}
                 <button id="submit-btn" type="button" class="btn btn-primary">Submit</button>
                 {% else %}
@@ -58,7 +59,10 @@
                 {% endif %}
               </div>
               {% endif %}
+            {% else %}
+              <h2>Preview Mode: Please accept HIT before working</h2>
             {% endif %}
+            </div>
           </div>
 
           <div class="player-screen">
