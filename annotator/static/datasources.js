@@ -82,6 +82,7 @@ var DataSources = {
                     annotation: json,
                     hitId: window.hitId,
                     workerId: window.workerId,
+                    assignmentId: window.assignmentId,
                 }),
             }).then((response) => {
                 if (response.ok) {

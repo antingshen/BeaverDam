@@ -90,11 +90,12 @@ class AnnotationView(View):
             else:
                 try:
                     worker_id = data.get('workerId', '')
+                    assignment_id = data.get('assignmentId', '')
                     task = Task.get_by_hit_id(hit_id)
-                    task.worker_id = worker_id
-                    task.save()
+                    task.complete(worker_id, assignment_id)
                 except ObjectDoesNotExist:
-                    assert settings.DEBUG
+                    if not settings.DEBUG:
+                        raise
         video = Video.objects.get(id=video_id)
         video.annotation = json.dumps(data['annotation'])
         video.save()
