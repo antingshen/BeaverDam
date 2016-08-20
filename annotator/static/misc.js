@@ -1,17 +1,18 @@
 "use strict";
+/* globals randomColor */
 
 var Misc = {
     // Styling
-
-    getRandomColor: function() {
-        var letters = '012345'.split('');
-        var color = '#';
-        color += letters[Math.round(Math.random() * 5)];
-        letters = '0123456789ABCDEF'.split('');
-        for (var i = 0; i < 5; i++) {
-            color += letters[Math.round(Math.random() * 15)];
+    numberOfColorsPerType: 25,
+    typeToColorSet: {},
+    colorSet: ['red', 'blue', 'green', 'purple', 'yellow', 'monochrome'],
+    getRandomColor: function(type) {
+        var numberOfObjects = Object.keys(this.typeToColorSet).length;
+        var numberOfColors = this.colorSet.length;
+        if (this.typeToColorSet[type] === undefined) {
+          this.typeToColorSet[type] = randomColor({hue: this.colorSet[numberOfObjects % numberOfColors], count: this.numberOfColorsPerType});
         }
-        return color;
+        return this.typeToColorSet[type][parseInt(Math.random() * this.numberOfColorsPerType)];
     },
 
     ClassNameGenerator: class {
