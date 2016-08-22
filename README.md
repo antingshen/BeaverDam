@@ -17,6 +17,8 @@ Video annotation tool for deep learning training labels
  5. Download sample data:  
     `scripts/seed -f`
 
+When running any `./manage.py` commands, use `source venv/bin/activate` to enter venv first.
+
 ### If using mturk
 
 Replace the credentials below with your own:
@@ -43,7 +45,8 @@ Need to run on a custom port? `env PORT=1234 scripts/serve`
 
 ### Making accounts
 
-To make a superuser account for testing, or for production, run `./manage.py createsuperuser`
+To make a superuser account for testing, or for production, run inside venv `./manage.py createsuperuser`
+If you are using sample data, login with username `test` and password `password`
 
 ### Simulating mturk view in debug
 
@@ -51,6 +54,10 @@ To see what video pages look like on mturk preview mode, set url param `preview=
 For mturk's HIT accepted mode, set url param `mturk=true`.
 
 Example: `localhost:5000/video/0/?mturk=true`
+
+### Running tests
+
+Inside venv, run `./manage.py test`
 
 ## Contributing
 
