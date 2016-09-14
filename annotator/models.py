@@ -12,7 +12,7 @@ class Video(models.Model):
     @classmethod
     def from_list(cls, path_to_list, *, source, host, filename_prefix=''):
         created = []
-        for line in open('path_to_list', 'r'):
+        for line in open(path_to_list, 'r'):
             if line:
                 video = cls(source=source, filename=filename_prefix + line.strip(), host=host)
                 video.save()
