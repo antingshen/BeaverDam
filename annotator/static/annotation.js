@@ -9,7 +9,7 @@ class Annotation {
     // SAME_FRAME_THRESHOLD away from the closest keyframe, then we're at that
     // keyframe.
     get SAME_FRAME_THRESHOLD() {
-        return 0.1 /* seconds */;
+        return 0.01 /* seconds */;
     }
 
 

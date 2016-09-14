@@ -5,13 +5,13 @@
 var RectConstants = {
     // Mousing over the RESIZE_BORDER px-border around each rectangle
     // initiates resize, else initiates move.
-    RESIZE_BORDER_EDGE: 10 /* px */,
-    RESIZE_BORDER_CORNER: 20 /* px */,
+    RESIZE_BORDER_EDGE: 5 /* px */,
+    RESIZE_BORDER_CORNER: 10 /* px */,
 
     // Minimum dimensions allowed for box
     MIN_RECT_DIMENSIONS: {
-        width: 30 /* px */,
-        height: 30 /* px */,
+        width: 10 /* px */,
+        height: 15 /* px */,
     },
 
     // Map of dragIntent => cursor
