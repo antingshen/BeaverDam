@@ -22,7 +22,7 @@ class PlayerView {
         // Namespaced className generator
         this.classBaseName = new Misc.ClassNameGenerator('player');
 
-        // The invisible rect that receives drag events not targeted at speciifc 
+        // The invisible rect that receives drag events not targeted at speciifc
         this.creationRect = null;
 
         // The keyframebar
@@ -166,15 +166,15 @@ class PlayerView {
 
             // better key events => video
             // play/pause
-            $(this).on('keydn-space            ', () => this.playPause());
+            $(this).on('keydn-space keydn-slash     ', () => this.playPause());
             // rewind-play
-            $(this).on('keydn-semicolon keydn-q', () => this.rewind());
-            $(this).on('keyup-semicolon keyup-q', () => this.stopRewind());
+            $(this).on('keydn-comma                 ', () => this.rewind());
+            $(this).on('keyup-comma                 ', () => this.stopRewind());
             // step-play
-            $(this).on('keydn-period    keydn-e', () => this.play());
-            $(this).on('keyup-period    keyup-e', () => this.pause());
+            $(this).on('keydn-period                ', () => this.play());
+            $(this).on('keyup-period', () => this.pause());
             // Delete keyframe
-            $(this).on('                keydn-d', () => this.deleteKeyframe());
+            $(this).on('keydn-backspace             ', () => this.deleteKeyframe());
         });
     }
 
@@ -218,7 +218,7 @@ class PlayerView {
         }
         else {
             this.video.currentTime -= 0.1;
-        }        
+        }
     }
 
     rewind() {

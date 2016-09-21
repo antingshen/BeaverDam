@@ -27,6 +27,19 @@ var RectConstants = {
         'move': 'move',
         'create': 'crosshair',
     },
+
+    // Map of dragIntent => cursor
+    DRAG_INTENT_BY_KEY: {
+        q: 'nw-resize',
+        w: 'n-resize',
+        e: 'ne-resize',
+        a: 'w-resize',
+        s: 'move',
+        d: 'e-resize',
+        z: 'sw-resize',
+        x: 's-resize',
+        c: 'se-resize',
+    },
 };
 
 
@@ -55,6 +68,15 @@ class Rect {
         // If a key has value true, then we add the class player-rect-KEY
         // If a key has value false, then we add the class player-rect-noKEY
         this.classNameExtBooleans = {};
+
+        // 
+        this.absMouse = null;
+
+        // // Ideally this should be a class variable
+        // this.rectBeingDragged = null;
+
+        // 
+        this.absMouseBeforeDrag = null;
 
         // Used to calculate new bounds after dragging
         this.boundsBeforeDrag = null;
@@ -309,6 +331,25 @@ class Rect {
         this.$el.drag(this.onDragMove.bind(this), this.onDragStart.bind(this), this.onDragEnd.bind(this));
         this.$el.mousemove(this.onMouseover.bind(this));
         this.$el.dblclick(this.onDoubleclick.bind(this));
+
+        $(document).keydown(Misc.fireEventByKeyCode.bind(this));
+        $(document).keyup(Misc.fireEventByKeyCode.bind(this));
+
+        for (let key in this.DRAG_INTENT_BY_KEY) {
+            let dragIntent = this.DRAG_INTENT_BY_KEY[key];
+
+            /* jshint loopfunc: true */
+            $(this).on(`keydn-${key}`, () => {
+                this.dragIntent = dragIntent;
+                this.absMouseBeforeDrag = this.absMouse;
+                // this.rectBeingDragged = null;
+                this.onDragStart();
+            });
+            $(this).on(`keyup-${key}`, () => {
+                this.absMouseBeforeDrag = null;
+                this.onDragEnd();
+            });
+        }
     }
 
 
@@ -324,6 +365,10 @@ class Rect {
 
     isBeingDragged() {
         return this.boundsBeforeDrag != null;
+    }
+
+    isBeingDraggedViaKeydown() {
+        return this.absMouseBeforeDrag != null;
     }
 
     onDragStart() {
@@ -409,6 +454,17 @@ class Rect {
     }
 
     onMouseover(e, absMouseX, absMouseY) {
+        this.absMouse = {
+            x: absMouseX,
+            y: absMouseY,
+        };
+        if (this.isBeingDraggedViaKeydown() /*&& (this.rectBeingDragged == null || this.rectBeingDragged == this)*/) {
+            this.focus();
+            // this.rectBeingDragged = this;
+            this.onDragMove(this.absMouse.x - this.absMouseBeforeDrag.x, this.absMouse.y - this.absMouseBeforeDrag.y);
+            return;
+        }
+
         // Don't change cursor during a drag operation
         if (this.isBeingDragged()) return;
 
