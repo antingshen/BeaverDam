@@ -175,11 +175,21 @@ class PlayerView {
             $(this).on('keyup-period    keyup-e', () => this.pause());
             // Delete keyframe
             $(this).on('                keydn-d', () => this.deleteKeyframe());
+            // Keyframe stepping
+            $(this).on('keydn-g                ', () => this.stepforward());
+            $(this).on('keydn-f                ', () => this.stepbackward());
         });
     }
 
 
     // Time control
+    stepforward() {
+        $(this).trigger('step-forward-keyframe');
+    }
+
+    stepbackward() {
+        $(this).trigger('step-backward-keyframe');
+    }
 
     play() {
         if (this.video.currentTime < this.video.duration) {

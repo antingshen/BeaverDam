@@ -176,6 +176,34 @@ class Player {
                 $(this).triggerHandler('change-keyframes');
             });
 
+            $(this.view).on('step-forward-keyframe', () => {
+                var time = this.view.video.currentTime;
+                for(var i = 0; i < this.selectedAnnotation.keyframes.length; i++) {
+                    var kf = this.selectedAnnotation.keyframes[i]
+                    if (time == kf.time) {
+                        if (i != this.selectedAnnotation.keyframes.length - 1) {
+                            var nf = this.selectedAnnotation.keyframes[i+1];
+                            this.view.video.currentTime = nf.time;
+                            break;
+                        }
+                    }
+                }
+            });
+
+            $(this.view).on('step-backward-keyframe', () => {
+                var time = this.view.video.currentTime;
+                for(var i = 0; i < this.selectedAnnotation.keyframes.length; i++) {
+                    var kf = this.selectedAnnotation.keyframes[i]
+                    if (time == kf.time) {
+                        if (i != 0) {
+                            var nf = this.selectedAnnotation.keyframes[i-1];
+                            this.view.video.currentTime = nf.time;
+                            break;
+                        }
+                    }
+                }
+            });
+
         });
     }
 
