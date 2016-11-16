@@ -158,8 +158,8 @@ class PlayerView {
             $(this.keyframebar).on('jump-to-time', (e, time) => this.jumpToTimeAndPause(time));
 
             // controls => video
-            this.$on('control-play', 'click', () => this.play());
-            this.$on('control-pause', 'click', () => this.pause());
+            this.$on('control-play-pause', 'click', () => this.playPause());
+            //this.$on('control-pause', 'click', () => this.pause());
             this.$on('control-goto-start', 'click', () => this.jumpToTimeAndPause(0));
             this.$on('control-goto-end', 'click', () => this.jumpToTimeAndPause(this.video.duration));
             this.$on('control-delete-keyframe', 'click', () => this.deleteKeyframe());
@@ -205,6 +205,7 @@ class PlayerView {
 
     playPause() {
         if (this.video.paused) {
+
             return this.play();
         }
         else {
