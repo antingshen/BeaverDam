@@ -35,7 +35,10 @@
     // views
     "Keyframebar",
     "PlayerView",
-    "Rect"
+    "Rect",
+    "VideoFramePlayer",
+    "AbstractFramePlayer",
+    "ImgFramePlayer"
   ],
   // "quotmark": "double",
   "regexp": true,

@@ -117,25 +117,42 @@ class PlayerView {
 
     initVideo() {
         // Set video props
-        this.video = this.$('video')[0];
-        if (this.videoStart != null) {
-            this.video.currentTime = this.videoStart;
-        }
-        $('video').attr('src', this.videoSrc);
+        // this.video = this.$('video')[0];
+        // if (this.videoStart != null) {
+        //     this.video.currentTime = this.videoStart;
+        // }
+        // $('video').attr('src', this.videoSrc);
 
-        // updates time more frequently by using setInterval
-        $(this.video).on('playing', () => {
+        // // updates time more frequently by using setInterval
+        // $(this.video).on('playing', () => {
+        //     clearInterval(this.manualTimeupdateTimerId);
+        //     this.manualTimeupdateTimerId = setInterval(() => {
+        //         this.$('video').triggerHandler('timeupdate');
+        //     }, this.TIME_UPDATE_DELAY);
+        // }).on('pause', () => {
+        //     clearInterval(this.manualTimeupdateTimerId);
+        // });
+
+        // $(this.video).on("loadedmetadata", () => {
+        //     this.videoReady.resolve();
+        // }).on("abort", () => {
+        //     this.videoReady.reject();
+        // });
+
+        
+        this.video = AbstractFramePlayer.newFramePlayer(this.videoSrc, this.$('video')[0], 'video');
+
+        // need to set the current time by default -  if (this.videoStart != null) { this.video.currentTime = this.videoStart; }
+        this.video.onPlaying(() => {
             clearInterval(this.manualTimeupdateTimerId);
             this.manualTimeupdateTimerId = setInterval(() => {
-                this.$('video').triggerHandler('timeupdate');
+                this.video.triggerTimerUpdateHandler();
             }, this.TIME_UPDATE_DELAY);
-        }).on('pause', () => {
-            clearInterval(this.manualTimeupdateTimerId);
         });
-
-        $(this.video).on("loadedmetadata", () => {
+        this.video.onLoadedMetadata(() => {
             this.videoReady.resolve();
-        }).on("abort", () => {
+        });
+        this.video.onAbort(() => {
             this.videoReady.reject();
         });
     }
@@ -148,11 +165,11 @@ class PlayerView {
 
             // control-time <=> video
             this.$on('control-time', 'change', () => this.video.currentTime = this.controlTime);
-            $(this.video).on('timeupdate', () => this.controlTimeUnfocused = this.video.currentTime);
+            this.video.onTimeUpdate(() => this.controlTimeUnfocused = this.video.currentTime);
 
             // control-scrubber <=> video
             this.$on('control-scrubber', 'change input', () => this.jumpToTimeAndPause(this.controlScrubber));
-            $(this.video).on('timeupdate', () => this.controlScrubberInactive = this.video.currentTime);
+            this.video.onTimeUpdate(() => this.controlScrubberInactive = this.video.currentTime);
 
             // keyframebar => video
             $(this.keyframebar).on('jump-to-time', (e, time) => this.jumpToTimeAndPause(time));
