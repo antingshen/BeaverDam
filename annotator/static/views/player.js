@@ -158,8 +158,7 @@ class PlayerView {
             $(this.keyframebar).on('jump-to-time', (e, time) => this.jumpToTimeAndPause(time));
 
             // controls => video
-            this.$on('control-play-pause', 'click', () => this.playPause());
-            //this.$on('control-pause', 'click', () => this.pause());
+            this.$on('control-play-pause', 'click', (event) => {this.onTogglePlayPause(event)});
             this.$on('control-goto-start', 'click', () => this.jumpToTimeAndPause(0));
             this.$on('control-goto-end', 'click', () => this.jumpToTimeAndPause(this.video.duration));
             this.$on('control-delete-keyframe', 'click', () => this.deleteKeyframe());
@@ -326,6 +325,22 @@ class PlayerView {
             }
         }
         throw new Error("PlayerView.deleteRect: rect not found", rect);
+    }
+
+    onTogglePlayPause(event) {
+        this.playPause()
+        this.togglePlayPauseIcon(event.currentTarget);
+    }
+
+    togglePlayPauseIcon(btnIcon) {
+        if (this.video.paused) { 
+            $(btnIcon).addClass('glyphicon-play');
+            $(btnIcon).removeClass('glyphicon-pause');
+        }
+        else {
+            $(btnIcon).addClass('glyphicon-pause');
+            $(btnIcon).removeClass('glyphicon-play');
+        }
     }
 
 
