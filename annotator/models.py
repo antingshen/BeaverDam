@@ -18,7 +18,7 @@ class Video(models.Model):
                 video.save()
                 created.append(video)
         return created
-    
+
     def __str__(self):
         return '/video/{}'.format(self.id)
 
@@ -36,3 +36,11 @@ class Video(models.Model):
             return self.annotation.count('"frame"')
         else:
             return self.annotation.count('"frame": {}'.format(at_time))
+
+class Label(models.Model):
+    id = models.AutoField(primary_key=True)
+    name = models.CharField(blank=True, max_length=100, unique=True)
+    color = models.CharField(blank=True, max_length=6)
+
+    def __str__(self):
+        return self.name

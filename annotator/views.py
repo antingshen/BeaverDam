@@ -34,6 +34,7 @@ def next_unannotated(request, video_id):
 def video(request, video_id):
     try:
         video = Video.objects.get(id=video_id)
+        labels = Label.objects.all()
     except Video.DoesNotExist:
         raise Http404('No video with id "{}". Possible fixes: \n1) Download an up to date DB, see README. \n2) Add this video to the DB via /admin'.format(video_id))
 
@@ -55,7 +56,12 @@ def video(request, video_id):
         'end_time' : end_time,
     })
 
+    label_data = []
+    for l in labels:
+        label_data.append({'name': l.name, 'color': l.color})
+
     response = render(request, 'video.html', context={
+        'label_data': label_data,
         'video_data': video_data,
         'mturk_data': mturk_data,
         'iframe_mode': mturk_data['authenticated'],
@@ -67,11 +73,11 @@ def video(request, video_id):
 
 
 class AnnotationView(View):
-    
+
     def get(self, request, video_id):
         video = Video.objects.get(id=video_id)
         return HttpResponse(video.annotation, content_type='application/json')
-    
+
     def post(self, request, video_id):
         data = json.loads(request.body.decode('utf-8'))
         hit_id = data.get('hitId', None)
