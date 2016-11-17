@@ -179,8 +179,8 @@ class PlayerView {
             $(this).on('keydn-g                ', () => this.stepforward());
             $(this).on('keydn-f                ', () => this.stepbackward());
             // video frame stepping 
-            $(this).on('keydn-bracketleft      ', () => this.jumpByFrame(-1));
-            $(this).on('keydn-bracketright     ', () => this.jumpByFrame(1));
+            $(this).on('keydn-q      ', () => this.jumpByFrame(-1));
+            $(this).on('keydn-w     ', () => this.jumpByFrame(1));
         });
     }
 
