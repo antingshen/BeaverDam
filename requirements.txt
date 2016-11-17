@@ -1,3 +1,4 @@
 Django==1.10
 uWSGI
 tqdm
+sqlparse
