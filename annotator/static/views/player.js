@@ -178,9 +178,20 @@ class PlayerView {
             // Keyframe stepping
             $(this).on('keydn-g                ', () => this.stepforward());
             $(this).on('keydn-f                ', () => this.stepbackward());
+            // video frame stepping 
+            $(this).on('keydn-bracketleft      ', () => this.jumpByFrame(-1));
+            $(this).on('keydn-bracketright     ', () => this.jumpByFrame(1));
         });
     }
 
+    jumpByFrame(numFrames) {
+        var frameRate = 1/10;
+        var newTime = this.video.currentTime + frameRate * numFrames;
+        newTime = Math.min(newTime, this.video.duration);
+        newTime = Math.max(0, newTime);
+        
+        this.video.currentTime = newTime;
+    }
 
     // Time control
     stepforward() {
