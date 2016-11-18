@@ -172,7 +172,7 @@ class ImageFramePlayer extends AbstractFramePlayer {
     }
 
     get duration() {
-        return this.imgPlayer.data('imgplay').frames.length;
+        return this.imgPlayer.data('imgplay').frames.length - 1;
     }
 
     get currentTime() {
