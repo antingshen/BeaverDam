@@ -19,6 +19,7 @@
 .player-video canvas {
     height: 100% !important;
     width: 100% !important;
+    background-color: #fff;
 }
 
 div.imgplay {
