@@ -38,7 +38,7 @@
     "Rect",
     "VideoFramePlayer",
     "AbstractFramePlayer",
-    "ImgFramePlayer"
+    "ImageFramePlayer"
   ],
   // "quotmark": "double",
   "regexp": true,
