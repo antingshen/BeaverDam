@@ -4,9 +4,7 @@
     margin: 1em 0 0.5em;
     position: relative;
     overflow: hidden;
-    /*padding: 30px;*/
-    /*background-color: #b2b2b2;*/
-    /*border-radius: 5px;*/
+    text-align: center;
 }
 .player-video {
     top: 0;

@@ -87,8 +87,6 @@ class PlayerView {
         this.videoReady().then(() => {
             var {videoWidth, videoHeight} = this.video;
             this.$paper = Raphael(this.$('paper')[0], videoWidth, videoHeight);
-            var offsetLeft = (this.$('paper').width() - videoWidth) / 2;
-            var offsetTop = (this.$('paper').height() - videoHeight) / 2
 
             $(this.$paper.canvas).attr({
                 viewBox: `0 0 ${videoWidth} ${videoHeight}`
@@ -98,8 +96,6 @@ class PlayerView {
                 'height'
             ).css({
                 position: 'relative',
-                left: (offsetLeft > 0 ? offsetLeft : 0) + 'px',
-                top: (offsetTop > 0 ? offsetTop : 0) + 'px',
                 'max-width': `${videoWidth}px`,
                 'max-height': `${videoHeight}px`,
             });

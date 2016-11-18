@@ -99,6 +99,7 @@ class VideoFramePlayer extends AbstractFramePlayer {
     }
     set currentTime(val) {
         this.videoElement.currentTime = val;
+        this.triggerTimerUpdateHandler();
     }
 
     get paused() {
