@@ -159,7 +159,7 @@ class Player {
                 $(this).triggerHandler('change-keyframes');
             });
 
-            $(this.view.video).on('timeupdate', () => {
+            this.view.video.onTimeUpdate(() => {
                 $(this).triggerHandler('change-onscreen-annotations');
             });
 
