@@ -115,9 +115,9 @@ class VideoFramePlayer extends AbstractFramePlayer {
 
     // We can't skip single frames in html video, so we'll assume a low FPS
     nextFrame() {
-        var frameRate = 1/10;
-        var newTime = this.video.currentTime + frameRate * 1;
-        newTime = Math.min(newTime, this.video.duration);
+        var frameRate = 1/20;
+        var newTime = this.currentTime + frameRate * 1;
+        newTime = Math.min(newTime, this.duration);
         newTime = Math.max(0, newTime);
 
         this.currentTime = newTime;
@@ -125,8 +125,8 @@ class VideoFramePlayer extends AbstractFramePlayer {
 
     previousFrame() {
         var frameRate = 1/10;
-        var newTime = this.video.currentTime + frameRate * -1;
-        newTime = Math.min(newTime, this.video.duration);
+        var newTime = this.currentTime + frameRate * -1;
+        newTime = Math.min(newTime, this.duration);
         newTime = Math.max(0, newTime);
 
         this.currentTime = newTime;
