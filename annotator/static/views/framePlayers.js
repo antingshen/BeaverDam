@@ -61,6 +61,9 @@ class AbstractFramePlayer {
 
     }
 
+    nextFrame() {}
+    previousFrame() {}
+
     onTimeUpdate(callback) {
         this.onTimeUpdates.push(callback);
     }
@@ -108,6 +111,25 @@ class VideoFramePlayer extends AbstractFramePlayer {
 
     play() {
         this.videoElement.play();
+    }
+
+    // We can't skip single frames in html video, so we'll assume a low FPS
+    nextFrame() {
+        var frameRate = 1/10;
+        var newTime = this.video.currentTime + frameRate * 1;
+        newTime = Math.min(newTime, this.video.duration);
+        newTime = Math.max(0, newTime);
+
+        this.currentTime = newTime;
+    }
+
+    previousFrame() {
+        var frameRate = 1/10;
+        var newTime = this.video.currentTime + frameRate * -1;
+        newTime = Math.min(newTime, this.video.duration);
+        newTime = Math.max(0, newTime);
+
+        this.currentTime = newTime;
     }
 
     /**
@@ -174,6 +196,14 @@ class ImageFramePlayer extends AbstractFramePlayer {
     play() {
         this.imgPlayer.data('imgplay').play();
         this.triggerCallbacks(this.onPlayingHandlers);
+    }
+
+    nextFrame() {
+        this.currentTime = this.currentTime + 1;
+    }
+
+    previousFrame() {
+        this.currentTime = this.currentTime - 1;
     }
 
     /**

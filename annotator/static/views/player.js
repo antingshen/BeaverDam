@@ -176,18 +176,9 @@ class PlayerView {
             $(this).on('keydn-g                ', () => this.stepforward());
             $(this).on('keydn-f                ', () => this.stepbackward());
             // video frame stepping
-            $(this).on('keydn-q      ', () => this.jumpByFrame(-1));
-            $(this).on('keydn-w     ', () => this.jumpByFrame(1));
+            $(this).on('keydn-q      ', () => this.video.previousFrame());
+            $(this).on('keydn-w     ', () => this.video.nextFrame());
         });
-    }
-
-    jumpByFrame(numFrames) {
-        var frameRate = 1/10;
-        var newTime = this.video.currentTime + frameRate * numFrames;
-        newTime = Math.min(newTime, this.video.duration);
-        newTime = Math.max(0, newTime);
-
-        this.video.currentTime = newTime;
     }
 
     // Time control
