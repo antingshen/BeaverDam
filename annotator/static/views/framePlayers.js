@@ -2,15 +2,14 @@
 
 class AbstractFramePlayer {
     constructor(src, element) {
-        this.videoElement = element;
-        this.videoElement.src = src;
+        this.onTimeUpdates = [];
     }
 
-    static newFramePlayer(src, element, type) {
-        if (type == 'video')
-            return new VideoFramePlayer(src, element);
-        else if (type == 'image')
-            return new ImageFramePlayer(src, slement);
+    static newFramePlayer(element, options) {
+        if (options.images)
+            return new ImageFramePlayer(options.images, element);
+        else if (options.videoSrc)
+            return new VideoFramePlayer(options.videoSrc, element);
         else throw new Error("Unknown Frame Player specified - [" + type + "], currently only support 'video' and 'image'");
     }
     get videoWidth() {
@@ -23,10 +22,10 @@ class AbstractFramePlayer {
         return 0;
     }
     get currentTime() {
-        return 0; 
+        return 0;
     }
     set currentTime(val) {
-        
+
     }
 
     get paused() {
@@ -34,11 +33,11 @@ class AbstractFramePlayer {
     }
 
     pause() {
-        
+
     }
 
     play() {
-        
+
     }
 
     /**
@@ -50,26 +49,38 @@ class AbstractFramePlayer {
      *  - timeupdate
      */
     onPlaying(callback) {
-        
+
     }
     onPause(callback) {
-        
+
     }
     onLoadedMetadata(callback) {
-        
+
     }
     onAbort(callback) {
-        
+
     }
+
     onTimeUpdate(callback) {
-        
+        this.onTimeUpdates.push(callback);
     }
     triggerTimerUpdateHandler() {
-        
+        this.triggerCallbacks(this.onTimeUpdates);
+    }
+
+    triggerCallbacks(handlers) {
+        for (var i = 0; i < handlers.length; i++) {
+            handlers[i]();
+        }
     }
 }
 
 class VideoFramePlayer extends AbstractFramePlayer {
+    constructor(src, element) {
+        super(src, element);
+        this.videoElement = element;
+        this.videoElement.src = src;
+    }
 
     get videoWidth() {
         return this.videoElement.videoWidth;
@@ -81,7 +92,7 @@ class VideoFramePlayer extends AbstractFramePlayer {
         return this.videoElement.duration;
     }
     get currentTime() {
-        return this.videoElement.currentTime; 
+        return this.videoElement.currentTime;
     }
     set currentTime(val) {
         this.videoElement.currentTime = val;
@@ -119,37 +130,50 @@ class VideoFramePlayer extends AbstractFramePlayer {
     onAbort(callback) {
         $(this.videoElement).on('abort', callback);
     }
-    onTimeUpdate(callback) {
-        $(this.videoElement).on('timeupdate', callback);
-    }
-    triggerTimerUpdateHandler() {
-        $(this.videoElement).triggerHandler('timeupdate');
-    }
 }
-class ImgFramePlayer extends AbstractFramePlayer{
-    constructor(src, element) {
-        
+
+class ImageFramePlayer extends AbstractFramePlayer {
+    constructor(images, element) {
+        super(images, element);
+        // image list
+        this.imgPlayer = $(element);
+        this.imgPlayer.imgplay({rate: 10, controls: false, pageSize: 150});
+        this.imgPlayer.data('imgplay').toFrame(0);
+        this.onPauseHandlers = [];
+        this.onPlayingHandlers = [];
     }
+    get videoWidth() {
+        return this.imgPlayer.width();
+    }
+    get videoHeight() {
+        return this.imgPlayer.height();
+    }
+
     get duration() {
-
+        return this.imgPlayer.data('imgplay').frames.length;
     }
+
     get currentTime() {
-
+        return this.imgPlayer.data('imgplay').getCurrentFrame();
     }
-    set currentTime(val) {
 
+    set currentTime(val) {
+        this.imgPlayer.data('imgplay').toFrame(Math.floor(val));
+        this.triggerTimerUpdateHandler();
     }
 
     get paused() {
-        return true;
+        return !this.imgPlayer.data('imgplay').isPlaying();
     }
 
     pause() {
-
+        this.imgPlayer.data('imgplay').pause();
+        this.triggerCallbacks(this.onPauseHandlers);
     }
 
     play() {
-
+        this.imgPlayer.data('imgplay').play();
+        this.triggerCallbacks(this.onPlayingHandlers);
     }
 
     /**
@@ -158,12 +182,27 @@ class ImgFramePlayer extends AbstractFramePlayer{
      *  - pause
      *  - loadedmetadata
      *  - abort
+     *  - timeupdate
      */
-    playingCallback() {
+    onPlaying(callback) {
+        this.onPlayingHandlers.push(callback);
+        if (!this.paused && callback)
+            callback();
 
+    }
+    onPause(callback) {
+        this.onPauseHandlers.push(callback);
+    }
+
+    onLoadedMetadata(callback) {
+        // we are already ready
+        callback();
+    }
+    onAbort(callback) {
+        this.onAbort = callback;
     }
 }
 
-void ImgFramePlayer;
+void ImageFramePlayer;
 void AbstractFramePlayer;
 void VideoFramePlayer;

@@ -15,6 +15,16 @@
     max-width: 100%;
     max-height: 100%;
 }
+
+.player-video canvas {
+    height: 100% !important;
+    width: 100% !important;
+}
+
+div.imgplay {
+    padding-bottom: 0;
+}
+
 .player-paper {
     position: absolute;
     top: 0;

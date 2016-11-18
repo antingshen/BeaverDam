@@ -2,14 +2,18 @@
 
 {% block head %}
   <link rel="stylesheet" type="text/css" href="/static/app.css"/>
+  <link rel="stylesheet" href="/static/vendor/imgplay/jquery.imgplay.css" />
+
   <script>
     video = {{ video_data|safe }};
+    imageList = {{image_list|safe}};
     mturk = {{ mturk_data.assignment_id|yesno:'true,false,false' }};
     hitId = '{{ mturk_data.hit_id }}';
     workerId = '{{ mturk_data.worker_id }}';
     assignmentId = '{{ mturk_data.assignment_id }}';
   </script>
   <script src="/static/vendor/raphael/raphael.min.js"></script>
+  <script src="/static/vendor/imgplay/jquery.imgplay.min.js"></script>
   <script type="text/javascript" src="/static/views/framePlayers.js"></script>
   <script type="text/javascript" src="/static/app.js"></script>
   <script type="text/javascript" src="/static/bounds.js"></script>
@@ -66,7 +70,19 @@
           </div>
 
           <div class="player-screen">
-            <video class="player-video"></video>
+            {% if image_list %}
+              <div class="player-video">
+                {% for image in image_list %}
+                  {% if forloop.counter0 < 15 %}
+                    <img src="/static/videos/sample1/{{image}}" />
+                  {% else %}
+                    <img src="/static/videos/sample1/{{image}}" />
+                  {% endif %}
+                {% endfor %}
+              </div>
+            {% else %}
+              <video class="player-video"></video>
+            {% endif %}
             <div class="player-paper"></div>
           </div>
 

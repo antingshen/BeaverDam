@@ -50,6 +50,8 @@ def video(request, video_id):
     video_data = json.dumps({
         'id': video.id,
         'location': video.url,
+        'path': video.host,
+        'is_video': not video.image_list,
         'annotated': video.annotation != '',
         'verified': video.verified,
         'start_time': start_time,
@@ -63,6 +65,7 @@ def video(request, video_id):
     response = render(request, 'video.html', context={
         'label_data': label_data,
         'video_data': video_data,
+        'image_list': json.loads(video.image_list) if video.image_list else 0,
         'mturk_data': mturk_data,
         'iframe_mode': mturk_data['authenticated'],
         'survey': False,
