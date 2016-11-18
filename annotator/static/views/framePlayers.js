@@ -158,43 +158,43 @@ class ImageFramePlayer extends AbstractFramePlayer {
     constructor(images, element) {
         super(images, element);
         // image list
-        this.imgPlayer = $(element);
-        this.imgPlayer.imgplay({rate: 10, controls: false, pageSize: 150});
-        this.imgPlayer.data('imgplay').toFrame(0);
+        $(element).imgplay({rate: 15, controls: false, pageSize: 150});
+        this.imgPlayer = $(element).data('imgplay');
+        this.imgPlayer.toFrame(0);
         this.onPauseHandlers = [];
         this.onPlayingHandlers = [];
     }
     get videoWidth() {
-        return this.imgPlayer.width();
+        return this.imgPlayer.frames[0].width;
     }
     get videoHeight() {
-        return this.imgPlayer.height();
+        return this.imgPlayer.frames[0].height;
     }
 
     get duration() {
-        return this.imgPlayer.data('imgplay').frames.length - 1;
+        return this.imgPlayer.getTotalFrames() - 1;
     }
 
     get currentTime() {
-        return this.imgPlayer.data('imgplay').getCurrentFrame();
+        return this.imgPlayer.getCurrentFrame();
     }
 
     set currentTime(val) {
-        this.imgPlayer.data('imgplay').toFrame(Math.floor(val));
+        this.imgPlayer.toFrame(Math.floor(val));
         this.triggerTimerUpdateHandler();
     }
 
     get paused() {
-        return !this.imgPlayer.data('imgplay').isPlaying();
+        return !this.imgPlayer.isPlaying();
     }
 
     pause() {
-        this.imgPlayer.data('imgplay').pause();
+        this.imgPlayer.pause();
         this.triggerCallbacks(this.onPauseHandlers);
     }
 
     play() {
-        this.imgPlayer.data('imgplay').play();
+        this.imgPlayer.play();
         this.triggerCallbacks(this.onPlayingHandlers);
     }
 
@@ -225,8 +225,7 @@ class ImageFramePlayer extends AbstractFramePlayer {
     }
 
     onLoadedMetadata(callback) {
-        // we are already ready
-        callback();
+        callback(); // we are already ready
     }
     onAbort(callback) {
         this.onAbort = callback;
