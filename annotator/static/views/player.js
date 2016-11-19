@@ -22,7 +22,7 @@ class PlayerView {
         // Namespaced className generator
         this.classBaseName = new Misc.ClassNameGenerator('player');
 
-        // The invisible rect that receives drag events not targeted at speciifc 
+        // The invisible rect that receives drag events not targeted at speciifc
         this.creationRect = null;
 
         // The keyframebar
@@ -86,8 +86,8 @@ class PlayerView {
         // Depends on this.videoReady for this.video.videoWidth/Height
         this.videoReady().then(() => {
             var {videoWidth, videoHeight} = this.video;
-
             this.$paper = Raphael(this.$('paper')[0], videoWidth, videoHeight);
+
             $(this.$paper.canvas).attr({
                 viewBox: `0 0 ${videoWidth} ${videoHeight}`
             }).removeAttr(
@@ -95,9 +95,7 @@ class PlayerView {
             ).removeAttr(
                 'height'
             ).css({
-                position: 'static',
-                left: '',
-                top: '',
+                position: 'relative',
                 'max-width': `${videoWidth}px`,
                 'max-height': `${videoHeight}px`,
             });
@@ -116,26 +114,22 @@ class PlayerView {
     }
 
     initVideo() {
-        // Set video props
-        this.video = this.$('video')[0];
-        if (this.videoStart != null) {
-            this.video.currentTime = this.videoStart;
-        }
-        $('video').attr('src', this.videoSrc);
+        this.video = AbstractFramePlayer.newFramePlayer(this.$('video')[0], { images: imageList, videoSrc: this.videoSrc });
 
-        // updates time more frequently by using setInterval
-        $(this.video).on('playing', () => {
+        // need to set the current time by default -  if (this.videoStart != null) { this.video.currentTime = this.videoStart; }
+        this.video.onPlaying(() => {
             clearInterval(this.manualTimeupdateTimerId);
             this.manualTimeupdateTimerId = setInterval(() => {
-                this.$('video').triggerHandler('timeupdate');
+                this.video.triggerTimerUpdateHandler();
             }, this.TIME_UPDATE_DELAY);
-        }).on('pause', () => {
+        });
+        this.video.onPause(() => {
             clearInterval(this.manualTimeupdateTimerId);
         });
-
-        $(this.video).on("loadedmetadata", () => {
+        this.video.onLoadedMetadata(() => {
             this.videoReady.resolve();
-        }).on("abort", () => {
+        });
+        this.video.onAbort(() => {
             this.videoReady.reject();
         });
     }
@@ -148,17 +142,19 @@ class PlayerView {
 
             // control-time <=> video
             this.$on('control-time', 'change', () => this.video.currentTime = this.controlTime);
-            $(this.video).on('timeupdate', () => this.controlTimeUnfocused = this.video.currentTime);
+            this.video.onTimeUpdate(() => this.controlTimeUnfocused = this.video.currentTime);
+            this.video.onPlaying(() => this.togglePlayPauseIcon())
+            this.video.onPause(() => this.togglePlayPauseIcon())
 
             // control-scrubber <=> video
             this.$on('control-scrubber', 'change input', () => this.jumpToTimeAndPause(this.controlScrubber));
-            $(this.video).on('timeupdate', () => this.controlScrubberInactive = this.video.currentTime);
+            this.video.onTimeUpdate(() => this.controlScrubberInactive = this.video.currentTime);
 
             // keyframebar => video
             $(this.keyframebar).on('jump-to-time', (e, time) => this.jumpToTimeAndPause(time));
 
             // controls => video
-            this.$on('control-play-pause', 'click', (event) => {this.onTogglePlayPause(event)});
+            this.$on('control-play-pause', 'click', (event) => {this.playPause()});
             this.$on('control-goto-start', 'click', () => this.jumpToTimeAndPause(0));
             this.$on('control-goto-end', 'click', () => this.jumpToTimeAndPause(this.video.duration));
             this.$on('control-delete-keyframe', 'click', () => this.deleteKeyframe());
@@ -177,9 +173,11 @@ class PlayerView {
             // Keyframe stepping
             $(this).on('keydn-g                ', () => this.stepforward());
             $(this).on('keydn-f                ', () => this.stepbackward());
+            // video frame stepping
+            $(this).on('keydn-q      ', () => this.video.previousFrame());
+            $(this).on('keydn-w     ', () => this.video.nextFrame());
         });
     }
-
 
     // Time control
     stepforward() {
@@ -228,7 +226,7 @@ class PlayerView {
         }
         else {
             this.video.currentTime -= 0.1;
-        }        
+        }
     }
 
     rewind() {
@@ -273,7 +271,7 @@ class PlayerView {
     }
 
     // Rect control
-    
+
     metrics() {
         return {
             offset: $(this.$paper.canvas).offset(),
@@ -327,19 +325,15 @@ class PlayerView {
         throw new Error("PlayerView.deleteRect: rect not found", rect);
     }
 
-    onTogglePlayPause(event) {
-        this.playPause()
-        this.togglePlayPauseIcon(event.currentTarget);
-    }
-
-    togglePlayPauseIcon(btnIcon) {
-        if (this.video.paused) { 
-            $(btnIcon).addClass('glyphicon-play');
-            $(btnIcon).removeClass('glyphicon-pause');
+    togglePlayPauseIcon() {
+        var btnIcon = $('.player-control-play-pause');
+        if (this.video.paused) {
+            btnIcon.addClass('glyphicon-play');
+            btnIcon.removeClass('glyphicon-pause');
         }
         else {
-            $(btnIcon).addClass('glyphicon-pause');
-            $(btnIcon).removeClass('glyphicon-play');
+            btnIcon.addClass('glyphicon-pause');
+            btnIcon.removeClass('glyphicon-play');
         }
     }
 

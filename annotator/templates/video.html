@@ -2,14 +2,19 @@
 
 {% block head %}
   <link rel="stylesheet" type="text/css" href="/static/app.css"/>
+  <link rel="stylesheet" href="/static/vendor/imgplay/jquery.imgplay.css" />
+
   <script>
     video = {{ video_data|safe }};
+    imageList = {{image_list|safe}};
     mturk = {{ mturk_data.assignment_id|yesno:'true,false,false' }};
     hitId = '{{ mturk_data.hit_id }}';
     workerId = '{{ mturk_data.worker_id }}';
     assignmentId = '{{ mturk_data.assignment_id }}';
   </script>
   <script src="/static/vendor/raphael/raphael.min.js"></script>
+  <script src="/static/vendor/imgplay/jquery.imgplay.min.js"></script>
+  <script type="text/javascript" src="/static/views/framePlayers.js"></script>
   <script type="text/javascript" src="/static/app.js"></script>
   <script type="text/javascript" src="/static/bounds.js"></script>
   <script type="text/javascript" src="/static/datasources.js"></script>
@@ -19,6 +24,7 @@
   <script type="text/javascript" src="/static/views/keyframebar.js"></script>
   <script type="text/javascript" src="/static/views/player.js"></script>
   <script type="text/javascript" src="/static/views/rect.js"></script>
+
 {% endblock %}
 
 {% block body %}
@@ -64,7 +70,19 @@
           </div>
 
           <div class="player-screen">
-            <video class="player-video"></video>
+            {% if image_list %}
+              <div class="player-video">
+                {% for image in image_list %}
+                  {% if forloop.counter0 < 25 %}
+                    <img src="/static/videos/sample1/{{image}}" />
+                  {% else %}
+                    <img data-src="/static/videos/sample1/{{image}}" />
+                  {% endif %}
+                {% endfor %}
+              </div>
+            {% else %}
+              <video class="player-video"></video>
+            {% endif %}
             <div class="player-paper"></div>
           </div>
 
@@ -77,9 +95,8 @@
                 <!-- </div> -->
               </div>
 
-              <div class="glyphicon glyphicon-step-backward player-control-goto-start"></div>
-              <div class="glyphicon glyphicon-play player-control-play-pause"></div>
-              <!--<div class="glyphicon glyphicon-pause player-control-pause"></div>-->
+              <div class="glyphicon glyphicon-step-backward player-control-goto-start" title="Go to start"></div>
+              <div class="glyphicon glyphicon-play player-control-play-pause" title="Play / Pause (space)"></div>
               <div class="glyphicon glyphicon-step-forward player-control-goto-end"></div>
               <div class="glyphicon glyphicon-trash player-control-delete-keyframe"></div>
               <input class="form-control player-control-time" id="frame-number" placeholder="0">
