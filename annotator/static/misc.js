@@ -177,9 +177,11 @@ var Misc = {
         if (keyName == null) return;
         var eventType = e.type.replace(/^keydown$/, 'keydn');
 
+        var alreadyDown = false;
         // Prevent the browser from firing multiple keydown events
         if (eventType === 'keydn') {
-            if ($(this).data('preventKeydownFor') === keyName) return;
+            alreadyDown = ($(this).data('preventKeydownFor') === keyName);
+
             $(this).data('preventKeydownFor', keyName);
         }
         else if (eventType === 'keyup') {
@@ -193,7 +195,10 @@ var Misc = {
         if (e.shiftKey) words.push('shift');
         if (e.metaKey)  words.push('meta');
         words.push(keyName);
-        Misc.fireSubEvent.call(this, e, `${eventType}-${words.join('-')}`);
+        if (alreadyDown)
+            Misc.fireSubEvent.call(this, e, `${eventType}r-${words.join('-')}`);
+        else
+            Misc.fireSubEvent.call(this, e, `${eventType}-${words.join('-')}`);
 
         var cmdKey = Misc.metaKeyIsCmd() ? e.metaKey : e.ctrlKey;
         if (cmdKey) {

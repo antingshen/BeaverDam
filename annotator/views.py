@@ -66,6 +66,7 @@ def video(request, video_id):
         'label_data': label_data,
         'video_data': video_data,
         'image_list': json.loads(video.image_list) if video.image_list else 0,
+        'image_list_path': video.host,
         'mturk_data': mturk_data,
         'iframe_mode': mturk_data['authenticated'],
         'survey': False,
