@@ -3,13 +3,10 @@
 .player-screen {
     margin: 1em 0 0.5em;
     position: relative;
-    overflow: hidden;
     text-align: center;
 }
 .player-video {
     top: 0;
-    width: auto;
-    height: auto;
     max-width: 100%;
     max-height: 100%;
 }
@@ -30,6 +27,47 @@ div.imgplay {
     bottom: 0;
     left: 0;
     right: 0;
+}
+
+.player-loader {
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    background-color: #000;
+    opacity: 0.7;
+    display: none;
+
+    align-items: center;
+}
+
+.player-loader > div {
+  width: 32px;
+  height: 32px;
+  background-color: #fff;
+
+  border-radius: 100%;
+  display: inline-block;
+  animation: sk-bouncedelay 1.4s infinite ease-in-out both;
+}
+
+.player-loader .bounce1 {
+  animation-delay: -0.32s;
+}
+
+.player-loader .bounce2 {
+  animation-delay: -0.16s;
+}
+
+@keyframes sk-bouncedelay {
+  0%, 80%, 100% {
+    transform: scale(0);
+  } 40% {
+    transform: scale(1.0);
+  }
 }
 
 .player-keyframebar {
