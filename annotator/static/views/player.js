@@ -173,9 +173,9 @@ class PlayerView {
             // Keyframe stepping
             $(this).on('keydn-g                ', () => this.stepforward());
             $(this).on('keydn-f                ', () => this.stepbackward());
-            // video frame stepping
-            $(this).on('keydn-q      ', () => this.video.previousFrame());
-            $(this).on('keydn-w     ', () => this.video.nextFrame());
+            // video frame stepping - capture the repeat events with the 'r' handler
+            $(this).on('keydn-a keydnr-a     ', () => this.video.previousFrame());
+            $(this).on('keydn-s keydnr-s    ', () => this.video.nextFrame());
         });
     }
 

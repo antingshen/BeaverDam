@@ -68,15 +68,14 @@
             {% endif %}
             </div>
           </div>
-
           <div class="player-screen">
             {% if image_list %}
               <div class="player-video">
                 {% for image in image_list %}
                   {% if forloop.counter0 < 25 %}
-                    <img src="/static/videos/sample1/{{image}}" />
+                    <img src="{{image_list_path}}/{{image}}" />
                   {% else %}
-                    <img data-src="/static/videos/sample1/{{image}}" />
+                    <img data-src="{{image_list_path}}/{{image}}" />
                   {% endif %}
                 {% endfor %}
               </div>
