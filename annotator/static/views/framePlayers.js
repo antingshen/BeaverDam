@@ -24,7 +24,8 @@ class AbstractFramePlayer {
     get currentTime() {
         return 0;
     }
-    set currentTime(val) {
+    // should return a promise
+    setCurrentTime(val) {
 
     }
 
@@ -97,7 +98,7 @@ class VideoFramePlayer extends AbstractFramePlayer {
     get currentTime() {
         return this.videoElement.currentTime;
     }
-    set currentTime(val) {
+    setCurrentTime(val) {
         this.videoElement.currentTime = val;
         this.triggerTimerUpdateHandler();
     }
@@ -121,7 +122,7 @@ class VideoFramePlayer extends AbstractFramePlayer {
         newTime = Math.min(newTime, this.duration);
         newTime = Math.max(0, newTime);
 
-        this.currentTime = newTime;
+        return this.setCurrentTime(newTime);
     }
 
     previousFrame() {
@@ -130,7 +131,7 @@ class VideoFramePlayer extends AbstractFramePlayer {
         newTime = Math.min(newTime, this.duration);
         newTime = Math.max(0, newTime);
 
-        this.currentTime = newTime;
+        return this.setCurrentTime(newTime);
     }
 
     /**
@@ -164,6 +165,21 @@ class ImageFramePlayer extends AbstractFramePlayer {
         this.imgPlayer.toFrame(0);
         this.onPauseHandlers = [];
         this.onPlayingHandlers = [];
+        // hack but we don't want to trigger ready until we have frame 0 loaded and can read the height
+        var image = new Image();
+        image.onload = () => {
+            if (this.onLoadedMetadata) {
+                this.onLoadedMetadata();
+                this.hasInit = true;
+            }
+            $(element).css({
+                'max-height': this.imgPlayer.frames[0].height + 'px',
+                'min-width': this.imgPlayer.frames[0].width + 'px',
+                'min-height': this.imgPlayer.frames[0].height + 'px',
+            });
+            this.imgPlayer.toFrame(0);
+        }
+        image.src = this.imgPlayer.frames[0].src;
     }
     get videoWidth() {
         return this.imgPlayer.frames[0].width;
@@ -180,9 +196,13 @@ class ImageFramePlayer extends AbstractFramePlayer {
         return this.imgPlayer.getCurrentFrame();
     }
 
-    set currentTime(val) {
-        this.imgPlayer.toFrame(Math.floor(val));
+    setCurrentTime(val) {
+        var deferred = jQuery.Deferred();
+        this.imgPlayer.toFrame(Math.floor(val)).then(() => {
+            deferred.resolve();
+        });
         this.triggerTimerUpdateHandler();
+        return deferred;
     }
 
     get paused() {
@@ -200,11 +220,11 @@ class ImageFramePlayer extends AbstractFramePlayer {
     }
 
     nextFrame() {
-        this.currentTime = this.currentTime + 1;
+        return this.setCurrentTime(this.currentTime + 1);
     }
 
     previousFrame() {
-        this.currentTime = this.currentTime - 1;
+        return this.setCurrentTime(this.currentTime - 1);
     }
 
     /**
@@ -226,7 +246,9 @@ class ImageFramePlayer extends AbstractFramePlayer {
     }
 
     onLoadedMetadata(callback) {
-        callback(); // we are already ready
+        this.onLoadedMetadata = callback;
+        if (this.hasInit)
+            callback();
     }
     onAbort(callback) {
         this.onAbort = callback;

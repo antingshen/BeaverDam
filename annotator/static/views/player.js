@@ -52,6 +52,9 @@ class PlayerView {
         // Video end time
         this.videoEnd = videoEnd;
 
+        // are we waiting for buffering
+        this.loading = true;
+
         // Promises
         this.keyframebarReady = Misc.CustomPromise();
         this.paperReady = Misc.CustomPromise();
@@ -73,6 +76,14 @@ class PlayerView {
         this.initKeyframebar();
     }
 
+    set loading(val) {
+        if (val) {
+            this.$('loader').css({display: 'flex'});
+        }
+        else {
+            this.$('loader').css({display: 'none'});
+        }
+    }
 
     // Init ALL the annotations!
 
@@ -98,6 +109,8 @@ class PlayerView {
                 position: 'relative',
                 'max-width': `${videoWidth}px`,
                 'max-height': `${videoHeight}px`,
+                'min-width': `${videoWidth}px`,
+                'min-height': `${videoHeight}px`,
             });
             this.creationRect = this.makeAndAttachRect(CreationRect);
             this.rects = [];
@@ -134,6 +147,11 @@ class PlayerView {
         });
     }
 
+    updateVideoTime(time) {
+        this.loading = true;
+        return this.video.setCurrentTime(time).then(() => this.loading = false);
+    }
+
     initHandlers() {
         this.ready().then(() => {
             // key => better key events
@@ -141,14 +159,20 @@ class PlayerView {
             $(document).keyup(Misc.fireEventByKeyCode.bind(this));
 
             // control-time <=> video
-            this.$on('control-time', 'change', () => this.video.currentTime = this.controlTime);
-            this.video.onTimeUpdate(() => this.controlTimeUnfocused = this.video.currentTime);
+            this.$on('control-time', 'change', () => this.updateVideoTime(this.controlTime));
+            this.video.onTimeUpdate(() => {
+                if (!this.loading)
+                    this.controlTimeUnfocused = this.video.currentTime
+            });
             this.video.onPlaying(() => this.togglePlayPauseIcon())
             this.video.onPause(() => this.togglePlayPauseIcon())
 
             // control-scrubber <=> video
             this.$on('control-scrubber', 'change input', () => this.jumpToTimeAndPause(this.controlScrubber));
-            this.video.onTimeUpdate(() => this.controlScrubberInactive = this.video.currentTime);
+            this.video.onTimeUpdate(() => {
+                if (!this.loading)
+                    this.controlScrubberInactive = this.video.currentTime
+            });
 
             // keyframebar => video
             $(this.keyframebar).on('jump-to-time', (e, time) => this.jumpToTimeAndPause(time));
@@ -176,6 +200,7 @@ class PlayerView {
             // video frame stepping - capture the repeat events with the 'r' handler
             $(this).on('keydn-a keydnr-a     ', () => this.video.previousFrame());
             $(this).on('keydn-s keydnr-s    ', () => this.video.nextFrame());
+            this.loading = false;
         });
     }
 
@@ -211,12 +236,12 @@ class PlayerView {
     }
 
     jumpToTimeAndPause(time) {
-        this.video.currentTime = time;
         this.video.pause();
+        this.updateVideoTime(time);
     }
 
     stepTime(timeDelta) {
-        this.video.currentTime += timeDelta;
+        this.updateVideoTime(this.video.currentTime + timeDelta);
         return false;
     }
 
@@ -265,7 +290,7 @@ class PlayerView {
 
     fixVideoTime(newTime) {
         if (newTime != null) {
-            this.video.currentTime = newTime;
+            this.updateVideoTime(newTime);
         }
         this.pause();
     }
