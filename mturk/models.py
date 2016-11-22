@@ -21,7 +21,7 @@ class Task(models.Model):
     lifetime = 2592000 # 30 days
     worker_id = models.CharField(max_length=64, blank=True)
     assignment_id = models.CharField(max_length=64, blank=True)
-    time_completed = models.DateTimeField(null=True)
+    time_completed = models.DateTimeField(null=True, blank=True)
     bonus = models.DecimalField(max_digits=3, decimal_places=2, default=0)
     paid = models.BooleanField(default=False)
     sandbox = models.BooleanField(default=settings.MTURK_SANDBOX)
