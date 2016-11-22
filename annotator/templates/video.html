@@ -41,7 +41,7 @@
                 <input type="radio" name="object" id="object-radio-{{label.name}}" value="{{label.name}}" {% if forloop.first %} checked {% endif %}>
               </label>
             {% endfor %}
-            <a class="btn btn-default" href="https://github.com/antingshen/BeaverDam/wiki/Single-Image-Labeling-Task" target="_blank" style="margin-left: 25px;">Instructions &amp; Requirements</a>
+            <a class="btn btn-default" href="{{help_url}}" target="_blank" style="margin-left: 25px;">Instructions &amp; Requirements</a>
 
             <div id="submit-container">
             {% if mturk_data.preview == False %}
