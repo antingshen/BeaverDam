@@ -104,16 +104,16 @@ div.imgplay {
 }
 
 .player-rect-normal {
-    stroke: black;
-    stroke-width: 3px;
+    stroke: white;
+    stroke-width: 1px;
 }
 .player-rect-selected {
     stroke-opacity: 1;
-    opacity: 0.5;
+    fill-opacity: 0.2;
 }
 .player-rect-noselected {
     stroke-opacity: 0.5;
-    opacity: 0.4;
+    fill-opacity: 0.5;
 }
 .player-rect-real {
     stroke-dasharray: none;
@@ -131,7 +131,7 @@ div.imgplay {
     opacity: 0.5;
     stroke: white;
     stroke-opacity: 1;
-    stroke-width: 3px;
+    stroke-width: 1px;
 }
 .player-rect-noactive {
     fill: transparent;
