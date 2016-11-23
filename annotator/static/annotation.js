@@ -49,7 +49,7 @@ class Annotation {
      * - If we're "at" (<= this.SAME_FRAME_THRESHOLD away from) a keyframe
      * - The bounds for the annotation at this time
      */
-    getFrameAtTime(time) {
+    getFrameAtTime(time, usePreciseFrameMatching) {
         if (!this.keyframes.length) {
             return {
                 time: time,
@@ -57,6 +57,7 @@ class Annotation {
                 prevIndex: null,
                 nextIndex: null,
                 closestIndex: null,
+                continueInterpolation: false,
             };
         }
 
@@ -96,7 +97,11 @@ class Annotation {
         }
 
         var closest = this.keyframes[closestIndex];
-        if (Math.abs(closest.time - time) > this.SAME_FRAME_THRESHOLD)
+        // if we're not using precise frame matching (ie video) we need to check within a tolerance
+        if (!usePreciseFrameMatching && Math.abs(closest.time - time) > this.SAME_FRAME_THRESHOLD)
+            closestIndex = null;
+        // otherwise we can do a boolean match (ie image sequence)
+        else if (usePreciseFrameMatching && closest.time != time)
             closestIndex = null;
 
         return {
@@ -105,11 +110,12 @@ class Annotation {
             prevIndex: prevIndex,
             nextIndex: nextIndex,
             closestIndex: closestIndex,
+            continueInterpolation: this.keyframes[prevIndex].continueInterpolation,
         };
     }
 
     /* Insert or update keyframe at time. */
-    updateKeyframe(frame) {
+    updateKeyframe(frame, usePreciseFrameMatching)  {
         var {prevIndex, nextIndex, closestIndex} = this.getFrameAtTime(frame.time);
 
         // Update the closestIndex-th frame
@@ -141,18 +147,30 @@ class Annotation {
         }
     }
 
-    deleteKeyframeAtTime(time) {
-        var {closestIndex} = this.getFrameAtTime(time);
+    deleteKeyframeAtTime(time, usePreciseFrameMatching) {
+        var {closestIndex, nextIndex, bounds} = this.getFrameAtTime(time);
 
-        if (closestIndex == null) return false;
+        if (closestIndex == null && nextIndex != null) return false;
 
-        this.keyframes.splice(closestIndex, 1);
+        // if we're the last frame - get or create a key frame just before this and mark it as continueInterpolation = false
+        if (nextIndex == null && time != 0) {
+            var justBeforeTime = usePreciseFrameMatching ? time - 1 : time - 2*SAME_FRAME_THRESHOLD;
+            var newFrame = {
+                                time: justBeforeTime, 
+                                bounds: bounds,
+                                continueInterpolation: false
+                            }
+            this.updateKeyframe(newFrame, usePreciseFrameMatching);
+        }
+        else
+            this.keyframes.splice(closestIndex, 1);
 
         // Trigger event
         $(this).triggerHandler('change');
 
         return true;
     }
+
 
     // Delete the entire annotation
     delete() {
