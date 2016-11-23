@@ -101,6 +101,7 @@ class VideoFramePlayer extends AbstractFramePlayer {
     setCurrentTime(val) {
         this.videoElement.currentTime = val;
         this.triggerTimerUpdateHandler();
+        return jQuery.Deferred().resolve();
     }
 
     get paused() {
