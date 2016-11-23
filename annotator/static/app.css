@@ -8,6 +8,7 @@
     margin: 1em 0 0.5em;
     position: relative;
     text-align: center;
+    flex-basis: 200px;
 }
 .player-video {
     top: 0;
