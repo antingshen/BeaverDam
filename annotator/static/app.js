@@ -17,5 +17,6 @@ $(() => {
         videoId: window.video.id,
         videoStart: window.video.start_time,
         videoEnd: window.video.end_time,
+        isImageSequence: window.video.is_image_sequence,
     });
 });

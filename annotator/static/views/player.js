@@ -12,7 +12,7 @@ var PlayerViewConstants = {
 
 
 class PlayerView {
-    constructor({$container, videoSrc, videoStart, videoEnd}) {
+    constructor({$container, videoSrc, videoStart, videoEnd, isImageSequence}) {
         // This container of the player
         this.$container = $container;
 
@@ -54,6 +54,9 @@ class PlayerView {
 
         // are we waiting for buffering
         this.loading = true;
+
+        // whether or not we are using an image sequence or a video style renderer
+        this.isImageSequence = isImageSequence;
 
         // Promises
         this.keyframebarReady = Misc.CustomPromise();
