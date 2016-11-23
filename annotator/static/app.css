@@ -16,13 +16,16 @@
 }
 
 .player-video canvas {
-    height: 100% !important;
-    width: 100% !important;
     background-color: #fff;
+}
+
+.player-video img {
+    display: none;
 }
 
 div.imgplay {
     padding-bottom: 0;
+    background: #fff;
 }
 
 .player-paper {
@@ -139,7 +142,6 @@ div.imgplay {
     stroke-width: 0;
     opacity: 0;
 }
-
 
 
 /* Uncategorized rules below */
