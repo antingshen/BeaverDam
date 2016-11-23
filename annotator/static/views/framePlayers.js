@@ -172,11 +172,13 @@ class ImageFramePlayer extends AbstractFramePlayer {
                 this.onLoadedMetadata();
                 this.hasInit = true;
             }
-            $(element).css({
+            var css = {
                 'max-height': this.imgPlayer.frames[0].height + 'px',
                 'min-width': this.imgPlayer.frames[0].width + 'px',
                 'min-height': this.imgPlayer.frames[0].height + 'px',
-            });
+            };
+            $(element).css(css);
+            this.imgPlayer.fitCanvas();
             this.imgPlayer.toFrame(0);
         }
         image.src = this.imgPlayer.frames[0].src;
