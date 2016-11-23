@@ -234,10 +234,14 @@ class Player {
         
         var {bounds, prevIndex, nextIndex, closestIndex, continueInterpolation} = annotation.getFrameAtTime(time, this.isImageSequence);
 
+        // singlekeyframe determines whether we show or hide the object
+        // we want to hide if:
+        //   - the very first frame object is in the future (nextIndex == 0 && closestIndex is null)
+        //   - we're after the last frame and that last frame was marked as continueInterpolation false
         rect.appear({
             real: closestIndex != null,
             selected: this.selectedAnnotation === annotation,
-            singlekeyframe: nextIndex != null || continueInterpolation
+            singlekeyframe: continueInterpolation && !(nextIndex == 0 && closestIndex === null)
         });
 
         // Don't mess up our drag

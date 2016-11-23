@@ -154,7 +154,7 @@ class Annotation {
 
         // if we're the last frame - get or create a key frame just before this and mark it as continueInterpolation = false
         if (nextIndex == null && time != 0) {
-            var justBeforeTime = usePreciseFrameMatching ? time - 1 : time - 2*SAME_FRAME_THRESHOLD;
+            var justBeforeTime = usePreciseFrameMatching ? time - 1 : time - 2*this.SAME_FRAME_THRESHOLD;
             var newFrame = {
                                 time: justBeforeTime, 
                                 bounds: bounds,
