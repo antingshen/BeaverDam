@@ -196,7 +196,7 @@ class PlayerView {
             $(this).on('keydn-period    keydn-e', () => this.play());
             $(this).on('keyup-period    keyup-e', () => this.pause());
             // Delete keyframe
-            $(this).on('                keydn-d', () => this.deleteKeyframe());
+            $(this).on('keyup-delete    keyup-d', () => this.deleteKeyframe());
             // Keyframe stepping
             $(this).on('keydn-g                ', () => this.stepforward());
             $(this).on('keydn-f                ', () => this.stepbackward());

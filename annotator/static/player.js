@@ -180,11 +180,13 @@ class Player {
 
             $(this.view).on('step-forward-keyframe', () => {
                 var time = this.view.video.currentTime;
+                if (!this.selectedAnnotation || !this.selectedAnnotation.keyframes)
+                    return;
                 for (let [i, kf] of this.selectedAnnotation.keyframes.entries()) {
-                    if (time == kf.time) {
+                    if (Math.abs(time - kf.time) < this.selectedAnnotation.SAME_FRAME_THRESHOLD) {
                         if (i != this.selectedAnnotation.keyframes.length - 1) {
                             var nf = this.selectedAnnotation.keyframes[i + 1];
-                            this.view.video.currentTime = nf.time;
+                            this.view.video.setCurrentTime(nf.time);
                             break;
                         }
                     }
@@ -193,11 +195,14 @@ class Player {
 
             $(this.view).on('step-backward-keyframe', () => {
                 var time = this.view.video.currentTime;
+                var selected = this.selectedAnnotation;
+                if (!this.selectedAnnotation || !this.selectedAnnotation.keyframes)
+                    return;
                 for (let [i, kf] of this.selectedAnnotation.keyframes.entries()) {
-                    if (time == kf.time) {
+                    if (Math.abs(time - kf.time) < this.selectedAnnotation.SAME_FRAME_THRESHOLD) {
                         if (i !== 0) {
                             var nf = this.selectedAnnotation.keyframes[i - 1];
-                            this.view.video.currentTime = nf.time;
+                            this.view.video.setCurrentTime(nf.time);
                             break;
                         }
                     }
