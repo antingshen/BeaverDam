@@ -110,7 +110,7 @@ class Annotation {
             prevIndex: prevIndex,
             nextIndex: nextIndex,
             closestIndex: closestIndex,
-            continueInterpolation: this.keyframes[prevIndex].continueInterpolation,
+            continueInterpolation: prevIndex != null ? this.keyframes[prevIndex].continueInterpolation : true,
         };
     }
 
