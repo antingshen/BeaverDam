@@ -118,6 +118,9 @@ class Annotation {
     updateKeyframe(frame, usePreciseFrameMatching)  {
         var {prevIndex, nextIndex, closestIndex} = this.getFrameAtTime(frame.time);
 
+        if (frame.continueInterpolation === undefined)
+            frame.continueInterpolation = true;
+
         // Update the closestIndex-th frame
         if (closestIndex != null) {
             this.keyframes[closestIndex] = frame;
