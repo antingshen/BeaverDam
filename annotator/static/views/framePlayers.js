@@ -225,11 +225,11 @@ class ImageFramePlayer extends AbstractFramePlayer {
     }
 
     nextFrame() {
-        return this.currentTime = this.currentTime + 1;
+        this.currentTime  = Math.min(this.duration, this.currentTime + 1)
     }
 
     previousFrame() {
-        return this.currentTime = this.currentTime - 1;
+        return this.currentTime = Math.max(0, this.currentTime - 1);
     }
 
     /**
