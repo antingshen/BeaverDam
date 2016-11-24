@@ -1,6 +1,6 @@
 from mturk.models import FullVideoTask
 
-arr = FullVideoTask.objects.filter(hit_id = "")[1:5]
+arr = FullVideoTask.objects.filter(hit_id = "", video__verified = False)[1:5]
 
 def publish(arr):
     print("{} tasks to publish".format(len(arr)))
