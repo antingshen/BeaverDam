@@ -83,7 +83,9 @@ class PlayerView {
         else {
             this.$('loader').css({display: 'none'});
         }
+        this._loading = val;
     }
+    get loading() { return this._loading; }
 
     // Init ALL the annotations!
 
@@ -145,11 +147,9 @@ class PlayerView {
         this.video.onAbort(() => {
             this.videoReady.reject();
         });
-    }
-
-    updateVideoTime(time) {
-        this.loading = true;
-        return this.video.setCurrentTime(time).then(() => this.loading = false);
+        this.video.onBuffering((isBuffering) => {
+            this.loading = isBuffering;
+        })
     }
 
     initHandlers() {
@@ -159,7 +159,7 @@ class PlayerView {
             $(document).keyup(Misc.fireEventByKeyCode.bind(this));
 
             // control-time <=> video
-            this.$on('control-time', 'change', () => this.updateVideoTime(this.controlTime));
+            this.$on('control-time', 'change', () => this.video.currentTime = this.controlTime);
             this.video.onTimeUpdate(() => {
                 if (!this.loading)
                     this.controlTimeUnfocused = this.video.currentTime
@@ -168,7 +168,7 @@ class PlayerView {
             this.video.onPause(() => this.togglePlayPauseIcon())
 
             // control-scrubber <=> video
-            this.$on('control-scrubber', 'change input', () => this.jumpToTimeAndPause(this.controlScrubber));
+            this.$on('control-scrubber', 'input', () => this.jumpToTimeAndPause(this.controlScrubber));
             this.video.onTimeUpdate(() => {
                 if (!this.loading)
                     this.controlScrubberInactive = this.video.currentTime
@@ -198,8 +198,14 @@ class PlayerView {
             $(this).on('keydn-g                ', () => this.stepforward());
             $(this).on('keydn-f                ', () => this.stepbackward());
             // video frame stepping - capture the repeat events with the 'r' handler
-            $(this).on('keydn-a keydnr-a     ', () => this.video.previousFrame());
-            $(this).on('keydn-s keydnr-s    ', () => this.video.nextFrame());
+            $(this).on('keydn-a keydnr-a     ', () => {
+                if (!this.loading)
+                    this.video.previousFrame()
+            });
+            $(this).on('keydn-s keydnr-s    ', () => {
+                if (!this.loading)
+                    this.video.nextFrame()
+            });
             this.loading = false;
         });
     }
@@ -237,11 +243,11 @@ class PlayerView {
 
     jumpToTimeAndPause(time) {
         this.video.pause();
-        this.updateVideoTime(time);
+        this.video.currentTime = time;
     }
 
     stepTime(timeDelta) {
-        this.updateVideoTime(this.video.currentTime + timeDelta);
+        this.video.currentTime = this.video.currentTime + timeDelta;
         return false;
     }
 
@@ -250,7 +256,7 @@ class PlayerView {
             this.stopRewind();
         }
         else {
-            this.video.currentTime -= 0.1;
+            this.video.rewindStep();
         }
     }
 
@@ -290,7 +296,7 @@ class PlayerView {
 
     fixVideoTime(newTime) {
         if (newTime != null) {
-            this.updateVideoTime(newTime);
+            this.video.currentTime = newTime;
         }
         this.pause();
     }

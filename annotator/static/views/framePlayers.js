@@ -24,8 +24,8 @@ class AbstractFramePlayer {
     get currentTime() {
         return 0;
     }
-    // should return a promise
-    setCurrentTime(val) {
+
+    set currentTime(val) {
 
     }
 
@@ -41,6 +41,8 @@ class AbstractFramePlayer {
 
     }
 
+    rewindStep() {}
+
     /**
      * Events:
      *  - playing
@@ -48,19 +50,13 @@ class AbstractFramePlayer {
      *  - loadedmetadata
      *  - abort
      *  - timeupdate
+     *  - buffering
      */
-    onPlaying(callback) {
-
-    }
-    onPause(callback) {
-
-    }
-    onLoadedMetadata(callback) {
-
-    }
-    onAbort(callback) {
-
-    }
+    onPlaying(callback) {}
+    onPause(callback) {}
+    onLoadedMetadata(callback) {}
+    onAbort(callback) {}
+    onBuffering(callback) {}
 
     nextFrame() {}
     previousFrame() {}
@@ -98,10 +94,9 @@ class VideoFramePlayer extends AbstractFramePlayer {
     get currentTime() {
         return this.videoElement.currentTime;
     }
-    setCurrentTime(val) {
+    set currentTime(val) {
         this.videoElement.currentTime = val;
         this.triggerTimerUpdateHandler();
-        return jQuery.Deferred().resolve();
     }
 
     get paused() {
@@ -116,14 +111,18 @@ class VideoFramePlayer extends AbstractFramePlayer {
         this.videoElement.play();
     }
 
+    rewindStep() {
+        this.video.currentTime = this.video.currentTime - 0.1;
+    }
+
     // We can't skip single frames in html video, so we'll assume a low FPS
     nextFrame() {
         var frameRate = 1/20;
-        var newTime = this.currentTime + frameRate * 1;
+        var newTime = this.currentTime + frameRate;
         newTime = Math.min(newTime, this.duration);
         newTime = Math.max(0, newTime);
 
-        return this.setCurrentTime(newTime);
+        return this.currentTime = newTime;
     }
 
     previousFrame() {
@@ -132,7 +131,7 @@ class VideoFramePlayer extends AbstractFramePlayer {
         newTime = Math.min(newTime, this.duration);
         newTime = Math.max(0, newTime);
 
-        return this.setCurrentTime(newTime);
+        return this.currentTime = newTime;
     }
 
     /**
@@ -161,7 +160,10 @@ class ImageFramePlayer extends AbstractFramePlayer {
     constructor(images, element) {
         super(images, element);
         // image list
-        $(element).imgplay({rate: 15, controls: false, pageSize: 150});
+        $(element).imgplay({rate: 15, controls: false, pageSize: 100, onLoading: (isLoading) => {
+            if (this.onBuffering)
+                this.onBuffering(isLoading);
+        }});
         this.imgPlayer = $(element).data('imgplay');
         this.imgPlayer.toFrame(0);
         this.onPauseHandlers = [];
@@ -199,13 +201,9 @@ class ImageFramePlayer extends AbstractFramePlayer {
         return this.imgPlayer.getCurrentFrame();
     }
 
-    setCurrentTime(val) {
-        var deferred = jQuery.Deferred();
-        this.imgPlayer.toFrame(Math.floor(val)).then(() => {
-            deferred.resolve();
-        });
+    set currentTime(val) {
+        this.imgPlayer.toFrame(Math.floor(val));
         this.triggerTimerUpdateHandler();
-        return deferred;
     }
 
     get paused() {
@@ -222,12 +220,16 @@ class ImageFramePlayer extends AbstractFramePlayer {
         this.triggerCallbacks(this.onPlayingHandlers);
     }
 
+    rewindStep() {
+        this.previousFrame();
+    }
+
     nextFrame() {
-        return this.setCurrentTime(this.currentTime + 1);
+        return this.currentTime = this.currentTime + 1;
     }
 
     previousFrame() {
-        return this.setCurrentTime(this.currentTime - 1);
+        return this.currentTime = this.currentTime - 1;
     }
 
     /**
@@ -255,6 +257,9 @@ class ImageFramePlayer extends AbstractFramePlayer {
     }
     onAbort(callback) {
         this.onAbort = callback;
+    }
+    onBuffering(callback) {
+        this.onBuffering = callback;
     }
 }
 

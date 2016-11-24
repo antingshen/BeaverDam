@@ -4,7 +4,7 @@
 class Player {
     constructor({$container, videoSrc, videoId, videoStart, videoEnd}) {
         this.$container = $container;
-        
+
         this.videoId = videoId;
 
         this.selectedAnnotation = null;
@@ -48,7 +48,7 @@ class Player {
 
 
     // Init ALL the annotations!
-    
+
     initView() {
         var {$container, videoSrc, videoStart, videoEnd} = this;
 
