@@ -202,6 +202,8 @@ class ImageFramePlayer extends AbstractFramePlayer {
     }
 
     set currentTime(val) {
+        val = Math.min(this.duration, val);
+        val = Math.max(0, val);
         this.imgPlayer.toFrame(Math.floor(val));
         this.triggerTimerUpdateHandler();
     }
