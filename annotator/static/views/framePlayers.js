@@ -112,7 +112,7 @@ class VideoFramePlayer extends AbstractFramePlayer {
     }
 
     rewindStep() {
-        this.video.currentTime = this.video.currentTime - 0.1;
+        this.currentTime = this.currentTime - 0.1;
     }
 
     // We can't skip single frames in html video, so we'll assume a low FPS
