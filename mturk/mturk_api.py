@@ -281,6 +281,7 @@ class Response(object):
         self.data = httpresponse.read()
         self.tree = ElementTree.fromstring(self.data)
         self.values = {}
+        #print('HTTP Response = ' + str(self.data))
 
     def validate(self, valid, errormessage = None):
         """
@@ -303,6 +304,12 @@ class Response(object):
                 raise CommunicationError(errormessage.text.strip(), self)
             else:
                 raise CommunicationError("Response not valid", self)
+
+    def has_path(self, path):
+        result = self.tree.find(path)
+        if result is None:
+            return False
+        return True
 
     def store(self, path, name, type = str):
         """

@@ -23,6 +23,10 @@ HELP_URL = os.environ.get('HELP_URL', 'https://github.com/antingshen/BeaverDam/w
 URL_ROOT = os.environ.get('URL_ROOT', 'url_root')
 AWS_ID = os.environ.get('AWS_ID', 'aws_id')
 AWS_KEY = os.environ.get('AWS_KEY', 'aws_key')
+
+MTURK_TITLE = "Video annotation"
+MTURK_DESCRIPTION = "Draw accurate boxes around every person in the video, with bonus per accurate box drawn"
+
 MTURK_SANDBOX = True
 assert MTURK_SANDBOX or not DEBUG
 
