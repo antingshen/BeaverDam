@@ -1,16 +1,13 @@
 {% extends "base.html" %}
 
 {% block body %}
-<table class="table table-hover" style="width:500px; margin: 0 auto;">
+<table class="table table-hover" style="width:1280; margin: 0 auto;">
   <thead>
     <tr>
       <th>Id</th>
       <th>Annotations</th>
       <th>Verified</th>
-      <th>Source</th>
-      {% if thumbnail %}
-        <th>Video</th>
-      {% endif %}
+      <th>File</th>
     </tr>
   </thead>
   <tbody>
@@ -19,10 +16,7 @@
       <td>{{ video.id }}</td>
       <td>{{ video.annotation|yesno }}</td>
       <td>{{ video.verified|yesno }}</td>
-      <td>{{ video.source }}</td>
-      {% if thumbnail %}
-        <td><video height="100"><source src="{{ video.url }}" type="video/mp4"></video>
-      {% endif %}
+      <td>{{ video.filename }}</td>
     </tr>
     {% endfor %}
   </tbody>
