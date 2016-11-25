@@ -18,7 +18,7 @@ class Task(models.Model):
     hit_id = models.CharField(max_length=64, blank=True)
     hit_group = models.CharField(max_length=64, blank=True)
     metrics = models.TextField(blank=True)
-    duration = 7200 # 2 hours
+    duration = 10800 # 3 hours
     lifetime = 2592000 # 30 days
     worker_id = models.CharField(max_length=64, blank=True)
     assignment_id = models.CharField(max_length=64, blank=True)
@@ -53,7 +53,7 @@ class Task(models.Model):
         self.save()
 
         #mturk.bonus(self.worker_id, assignment_id, self.calculate_bonus(), self.verbalise_bonus())
-        mturk.accept(assignment_id)
+        #mturk.accept(assignment_id)
 
     def calculate_bonus(self):
         return 0
@@ -96,7 +96,7 @@ class Task(models.Model):
 class FullVideoTask(Task):
     video = models.ForeignKey(Video)
     title = settings.MTURK_TITLE
-    pay = 0.10
+    pay = 0.04
     bonus_per_box = 0.02
     description = settings.MTURK_DESCRIPTION
 

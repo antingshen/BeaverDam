@@ -281,7 +281,9 @@ class Response(object):
         self.data = httpresponse.read()
         self.tree = ElementTree.fromstring(self.data)
         self.values = {}
-        #print('HTTP Response = ' + str(self.data))
+        #print("------------------------------------------------------")
+        logger.error('HTTP Response = ' + str(self.data))
+        #print("------------------------------------------------------")
 
     def validate(self, valid, errormessage = None):
         """
