@@ -156,7 +156,8 @@ class Annotation {
         if (closestIndex == null && nextIndex != null) return false;
 
         // if we're the last frame - get or create a key frame just before this and mark it as continueInterpolation = false
-        if (nextIndex == null && time != 0) {
+        // if we've actually selected a frame rather than just an interpolation frame simply delete it (that's the closestIndex === null part)
+        if (nextIndex == null && time != 0 && closestIndex === null) {
             var justBeforeTime = usePreciseFrameMatching ? time - 1 : time - 2*this.SAME_FRAME_THRESHOLD;
             var newFrame = {
                                 time: justBeforeTime, 
