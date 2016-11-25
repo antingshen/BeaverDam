@@ -10,14 +10,15 @@ admin.site.site_header = 'BeaverDam'
 urlpatterns = [
     url(r'^$', home),
     url(r'^verify/$', verify_list),
+    url(r'^verified/$', verified_list),
 
     url(r'^video/(\d+)/$', video, name='video'),
     url(r'^video/(\d+)/next/$', next_unannotated),
     url(r'^video/(\d+)/verify/$', verify),
     url(r'^annotation/(\d+)/$', AnnotationView.as_view()),
 
-    url(r'^login/$', login, 
-        {'template_name': 'admin/login.html', 
+    url(r'^login/$', login,
+        {'template_name': 'admin/login.html',
             'extra_context': {'site_header': 'BeaverDam Login'}
         }, name='login'),
     url(r'^logout/$', logout),
