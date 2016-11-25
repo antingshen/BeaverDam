@@ -26,6 +26,12 @@ def verify_list(request):
         'videos': need_verification,
     })
 
+def verified_list(request):
+    verified = Video.objects.filter(id__gt=0, verified=True).exclude(annotation='')[:100]
+    return render(request, 'video_list.html', context={
+        'videos': verified,
+    })
+
 def next_unannotated(request, video_id):
     id = Video.objects.filter(id__gt=video_id, annotation='')[0].id
     return redirect('video', id)
