@@ -11,10 +11,10 @@ import json
 
 import mturk.utils
 from .models import *
-
+from mturk.models import Task, FullVideoTask, SingleFrameTask
 
 def home(request):
-    need_annotating = Video.objects.filter(id__gt=0, verified=False)[:25]
+    need_annotating = Video.objects.filter(id__gt=0, verified=False)
     return render(request, 'video_list.html', context={
         'videos': need_annotating,
         'thumbnail': True,
@@ -30,6 +30,12 @@ def verified_list(request):
     verified = Video.objects.filter(id__gt=0, verified=True).exclude(annotation='')[:100]
     return render(request, 'video_list.html', context={
         'videos': verified,
+    })
+
+def ready_to_pay(request):
+    tasks = FullVideoTask.objects.filter(paid = False, video__verified = True).exclude(hit_id = '')
+    return render(request, 'turk_ready_to_pay.html', context={
+        'tasks': tasks,
     })
 
 def next_unannotated(request, video_id):
@@ -72,7 +78,7 @@ def video(request, video_id):
         'label_data': label_data,
         'video_data': video_data,
         'image_list': json.loads(video.image_list) if video.image_list else 0,
-        'image_list_path': video.host,
+        'image_list_path': video.host.replace('#', '%23'),
         'help_url': settings.HELP_URL,
         'mturk_data': mturk_data,
         'iframe_mode': mturk_data['authenticated'],

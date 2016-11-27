@@ -4,7 +4,7 @@ from beaverdam import settings
 
 mturk = Server(settings.AWS_ID, settings.AWS_KEY, settings.URL_ROOT, settings.MTURK_SANDBOX)
 
-tasks = FullVideoTask.objects.filter(paid = False, video__verified = True)
+tasks = FullVideoTask.objects.filter(paid = False, video__verified = True).exclude(hit_id = '')
 
 def calc_bonus(task):
     res = mturk.request('GetAssignmentsForHIT', {"HITId":tasks[0].hit_id})
@@ -20,6 +20,7 @@ def calc_bonus(task):
 def calc_bonuses(tasks):
     print("{} tasks to process".format(len(tasks)))
     for task in tasks:
+        print("Paying {}".format(task.video.filename))
         calc_bonus(task)
 
 calc_bonuses(tasks)
