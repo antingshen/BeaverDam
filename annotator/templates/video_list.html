@@ -8,15 +8,17 @@
       <th>Annotations</th>
       <th>Verified</th>
       <th>File</th>
+      <th>Link</th>
     </tr>
   </thead>
   <tbody>
     {% for video in videos %}
-    <tr onclick="window.document.location='{% url "video" video.id %}';" style="cursor: pointer;">
+    <trstyle>
       <td>{{ video.id }}</td>
       <td>{{ video.annotation|yesno }}</td>
       <td>{{ video.verified|yesno }}</td>
       <td>{{ video.filename }}</td>
+      <td><a href="{% url "video" video.id %}">view</a></td>
     </tr>
     {% endfor %}
   </tbody>

@@ -11,6 +11,7 @@ urlpatterns = [
     url(r'^$', home),
     url(r'^verify/$', verify_list),
     url(r'^verified/$', verified_list),
+    url(r'^readytopay/$', ready_to_pay),
 
     url(r'^video/(\d+)/$', video, name='video'),
     url(r'^video/(\d+)/next/$', next_unannotated),

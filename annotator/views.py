@@ -32,6 +32,12 @@ def verified_list(request):
         'videos': verified,
     })
 
+def ready_to_pay(request):
+    tasks = FullVideoTask.objects.filter(paid = False, video__verified = True).exclude(hit_id = '')
+    return render(request, 'turk_ready_to_pay.html', context={
+        'tasks': tasks,
+    })
+
 def next_unannotated(request, video_id):
     id = Video.objects.filter(id__gt=video_id, annotation='')[0].id
     return redirect('video', id)
