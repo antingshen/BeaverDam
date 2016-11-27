@@ -12,13 +12,13 @@
     </tr>
   </thead>
   <tbody>
-    {% for video_task in task %}
+    {% for video_task in tasks %}
     <trstyle>
       <td>{{ video_task.video.id }}</td>
       <td>{{ video_task.hit_id }}</td>
       <td>{{ video_task.bonus }}</td>
       <td>{{ video_task.filename }}</td>
-      <td><a href="{% url "video" video.id %}">view Video</a> | <a href="{% url "video" video.id %}">View Task</a></td>
+      <td><a href="{% url "video" video_task.video.id %}">View Video</a> | <a href="/admin/mturk/fullvideotask/{{video_task.id}}">View Task</a></td>
     </tr>
     {% endfor %}
   </tbody>

@@ -33,7 +33,9 @@ def verified_list(request):
     })
 
 def ready_to_pay(request):
-    tasks = FullVideoTask.objects.filter(paid = False, video__verified = True).exclude(hit_id = '')
+    #tasks = FullVideoTask.objects.filter(paid = False, video__verified = True).exclude(hit_id = '')
+    tasks = FullVideoTask.objects.all()#filter(paid = False, video__verified = True).exclude(hit_id = '')
+    print("there are {} tasks".format(len(tasks)))
     return render(request, 'turk_ready_to_pay.html', context={
         'tasks': tasks,
     })
