@@ -88,6 +88,13 @@ class VideoFramePlayer extends AbstractFramePlayer {
     get videoHeight() {
         return this.videoElement.videoHeight;
     }
+    get viewWidth() {
+        return $(this.videoElement).width();
+    }
+    get viewHeight() {
+        return $(this.videoElement).height();
+    }
+
     get duration() {
         return this.videoElement.duration;
     }

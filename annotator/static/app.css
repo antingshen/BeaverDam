@@ -29,6 +29,8 @@
     margin: 0;
     flex-grow: 1;
     display: flex;
+    align-items: center;
+    justify-content: center;
     position: relative;
     text-align: center;
     flex-basis: 200px;
