@@ -111,7 +111,7 @@ var DataSources = {
                     type: 'accept'
                 }),
             }).then((response) => {
-                response.json().then(function(data) {  
+                return response.json().then(function(data) {
                     return Promise.resolve(data);
                 })
             });
@@ -133,7 +133,9 @@ var DataSources = {
                     deleteBoxes: deleteBoxes
                 }),
             }).then((response) => {
-                return Promise.resolve('State saved successfully.');
+                return response.json().then(function(data) {
+                    return Promise.resolve(data);
+                })
             });
         }
 
