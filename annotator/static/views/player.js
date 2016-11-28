@@ -82,13 +82,14 @@ class PlayerView {
 
         if (helpEmbedded) {
             // check cookie
-            var hasSeen = $.cookie("has_seen_help")
-            if (hasSeen == null) {
+            console.log(document.cookie)
+            var hasSeen = document.cookie && document.cookie.indexOf('has_seen_help=') > -1
+            if (!hasSeen) {
                 $('#instructionModal').modal();
             }
             var date = new Date();
             date.setTime(date.getTime() + (7 * 24 * 60 * 60 * 1000)); // 7 days
-            $.cookie('has_seen_help', 'yes', { expires: date.toGMTString(), path: '/' });
+            document.cookie = 'has_seen_help=yes; expires=' + date.toGMTString() + '; path:/';
             $('#show-help').on('click', () => $('#instructionModal').modal());
         }
     }
