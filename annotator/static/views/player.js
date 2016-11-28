@@ -82,7 +82,6 @@ class PlayerView {
 
         if (helpEmbedded) {
             // check cookie
-            console.log(document.cookie)
             var hasSeen = document.cookie && document.cookie.indexOf('has_seen_help=') > -1
             if (!hasSeen) {
                 $('#instructionModal').modal();
