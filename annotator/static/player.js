@@ -270,13 +270,17 @@ class Player {
 
     acceptAnnotations(e) {
         e.preventDefault();
- 
+
         var bonus = $('#inputBonusAmt')[0];
         var message = $('#inputAcceptMessage')[0];
+        $('#acceptForm').find('.btn').attr("disabled", "disabled");
         DataSources.annotations.acceptAnnotation(this.videoId, parseFloat(bonus.value), message.value).then((response) => {
-            $('#acceptForm').modal('toggle');    
+            $('#acceptForm').modal('toggle');
+            $('#acceptForm').find('.btn').removeAttr("disabled");
+        }, (err) => {
+            alert("There was an error processing your request.");
+            $('#acceptForm').find('.btn').removeAttr("disabled");
         });
-
     }
 
     rejectAnnotations(e) {
@@ -285,8 +289,13 @@ class Player {
         var message = $('#inputRejectMessage')[0];
         var reopen = $('#inputReopen')[0];
         var deleteBoxes = $('#inputDeleteBoxes')[0];
+        $('#rejectForm').find('.btn').attr("disabled", "disabled");
         DataSources.annotations.rejectAnnotation(this.videoId, message.value, reopen.checked, deleteBoxes.checked).then((response) => {
-            $('#acceptForm').modal('toggle');    
+            $('#rejectForm').modal('toggle');
+            $('#rejectForm').find('.btn').removeAttr("disabled");
+        }, (err) => {
+            alert("There was an error processing your request:\n" + err);
+            $('#rejectForm').find('.btn').removeAttr("disabled");
         });
     }
 
