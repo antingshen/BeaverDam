@@ -9,6 +9,7 @@
         <th>Annotations</th>
         <th>Verified</th>
         <th>File</th>
+        <th>Type</th>
         <th>Link</th>
       </tr>
     </thead>
@@ -19,6 +20,11 @@
         <td>{{ video.annotation|yesno }}</td>
         <td>{{ video.verified|yesno }}</td>
         <td>{{ video.filename }}</td>
+        {% if video.image_list %}
+          <td>Sequence</td>
+        {% else %}
+          <td>Video</td>
+        {% endif %}
         <td><a href="{% url "video" video.id %}">view</a></td>
       </tr>
       {% endfor %}

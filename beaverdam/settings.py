@@ -17,7 +17,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # Use different key for production
 SECRET_KEY = '8pje5%pxibt2c=&j_c+ly5v@x)$r77%h-x3%jluq-@)4^75)ak'
-DEBUG = False 
+DEBUG = True
 
 HELP_URL = os.environ.get('HELP_URL', 'https://github.com/antingshen/BeaverDam/wiki/Single-Image-Labeling-Task')
 URL_ROOT = os.environ.get('URL_ROOT', 'url_root')
@@ -29,7 +29,7 @@ MTURK_DESCRIPTION = "Draw accurate boxes around every person in the video, we wi
 
 ALLOWED_HOSTS=["*"]
 
-MTURK_SANDBOX = False 
+MTURK_SANDBOX = True
 assert MTURK_SANDBOX or not DEBUG
 
 # Application definition
