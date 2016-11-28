@@ -4,6 +4,7 @@ from django.contrib.auth.views import login, logout
 from django.views.generic.base import RedirectView
 
 from annotator.views import *
+from annotator.services import *
 
 admin.site.site_header = 'BeaverDam'
 

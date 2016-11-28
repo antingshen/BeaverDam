@@ -23,7 +23,14 @@ HELP_URL = os.environ.get('HELP_URL', 'https://github.com/antingshen/BeaverDam/w
 URL_ROOT = os.environ.get('URL_ROOT', 'url_root')
 AWS_ID = os.environ.get('AWS_ID', 'aws_id')
 AWS_KEY = os.environ.get('AWS_KEY', 'aws_key')
+
 MTURK_SANDBOX = True
+
+MTURK_TITLE = "Video annotation"
+MTURK_DESCRIPTION = "Draw accurate boxes around every person in the video, we will pay a $0.02 bonus per accurate box drawn. Most of the payment is in the bonus"
+
+ALLOWED_HOSTS=["*"]
+
 assert MTURK_SANDBOX or not DEBUG
 
 # Application definition
@@ -121,3 +128,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
 
 STATIC_URL = '/static/'
+
+try:
+    from beaverdam.deploy_settings import *
+except ImportError as e:
+    pass

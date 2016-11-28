@@ -25,7 +25,8 @@ class Task(models.Model):
     bonus = models.DecimalField(max_digits=3, decimal_places=2, default=0)
     paid = models.BooleanField(default=False)
     sandbox = models.BooleanField(default=settings.MTURK_SANDBOX)
-
+    message = models.CharField(max_length=256, blank=True)
+    closed = models.BooleanField(default=False)
 
     class Meta:
         abstract = True
@@ -48,8 +49,35 @@ class Task(models.Model):
         self.metrics = metrics
         self.bonus = self.calculate_bonus()
         self.time_completed = datetime.now()
+        self.paid = False
         self.save()
 
+    @classmethod
+    def approve_assignment(self, bonus, message):
+        assignment_id, worker_id = mturk.get_assignments()
+        
+        if assignment_id == None:
+            raise Exception("Cannot approve task - no work has been done on Turk")
+
+        mturk.accept(assignment_id, message)
+        mturk.bonus(res.worker_id, res.assignment_id, bonus, self.verbalise_bonus())
+
+    @classmethod
+    def reject_assignment(self, message):
+        assignment_id, worker_id = mturk.get_assignments()
+        
+        if assignment_id == None:
+            raise Exception("Cannot reject task - no work has been done on Turk")
+
+        mturk.reject(assignment_id, message)
+
+    @classmethod
+    def archive_turk_hit(self):
+        res = mturk.disable(self.hit_id)
+        self.closed = True
+        self.save()
+
+    @classmethod
     def calculate_bonus(self):
         return 0
 
