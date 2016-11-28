@@ -142,9 +142,9 @@ class AcceptRejectView(View):
         
         try:
             if data['type'] == "accept":
-                accept_video(int(video_id), data['bonus'], data['message'] )
+                accept_video(request, int(video_id), data['bonus'], data['message'] )
             elif data['type'] == "reject":
-                reject_video(int(video_id), data['message'], data['reopen'], data['deleteBoxes'])
+                reject_video(request, int(video_id), data['message'], data['reopen'], data['deleteBoxes'])
             
             return HttpResponse(json.dumps({'success':True}))
         except Exception as e:

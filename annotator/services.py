@@ -36,8 +36,8 @@ def verify(request, video_id):
     video.save()
     return HttpResponse('video verification state saved')
 
-
-def accept_video(video_id, bonus, message):
+@staff_member_required
+def accept_video(request, video_id, bonus, message):
     video = Video.objects.get(pk=video_id)
     video_task = get_active_video_turk_task(video.id)
 
@@ -59,9 +59,8 @@ def accept_video(video_id, bonus, message):
     video_task.closed = True
     video_task.save()
 
-#@staff_member_required
-def reject_video(video_id, message, reopen, clear_boxes):
-    
+@staff_member_required
+def reject_video(request, video_id, message, reopen, clear_boxes):
     video = Video.objects.get(pk=video_id)
     video_task = get_active_video_turk_task(video.id)
     
@@ -73,7 +72,7 @@ def reject_video(video_id, message, reopen, clear_boxes):
 
     # clear the boxes as specified
     if clear_boxes:
-        video.annotations = ''
+        video.annotation = ''
         video.save()
 
     # update the task 
