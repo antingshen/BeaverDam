@@ -29,16 +29,21 @@
     margin: 0;
     flex-grow: 1;
     display: flex;
-    align-items: center;
+    flex-direction: column;
     justify-content: center;
     position: relative;
     text-align: center;
     flex-basis: 200px;
+    overflow-y: scroll;
 }
+
+.player-video-container {
+    display: flex;
+}
+
 .player-video {
+    position: absolute;
     top: 0;
-    max-width: 100%;
-    max-height: 100%;
 }
 
 .player-video canvas {

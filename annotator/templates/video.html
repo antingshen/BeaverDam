@@ -76,7 +76,9 @@
             {% endfor %}
           </div>
         {% else %}
-          <video class="player-video"></video>
+          <div class="player-video-container">
+            <video class="player-video"></video>
+          </div>
         {% endif %}
         <div class="player-paper"></div>
         <div class="player-loader">
@@ -104,6 +106,10 @@
             <div class="glyphicon glyphicon-trash player-control-delete-keyframe" title="Delete selected frame (shortcut - 'delete', 'd')"></div>
           </span>
           <input class="form-control player-control-time" id="frame-number" placeholder="0">
+          <div class="pull-right">
+            <input id="scale-checkbox" type="checkbox" />
+            <label for="scale-checkbox">Scale to fit</label>
+          </div>
         </div>
       </div>
 

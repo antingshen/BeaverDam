@@ -55,6 +55,8 @@ class PlayerView {
         // are we waiting for buffering
         this.loading = true;
 
+        this.scaleToFit = false;
+
         // whether or not we are using an image sequence or a video style renderer
         this.isImageSequence = isImageSequence;
 
@@ -111,18 +113,11 @@ class PlayerView {
             ).removeAttr(
                 'height'
             ).css({
-                position: 'relative',
+                position: 'absolute',
+                top: 0,
+                left: 0,
                 'width': `${viewWidth}px`,
                 'height': `${viewHeight}px`,
-            });
-            // need to link SVG with video when scaling
-            $(window).resize(() => {
-                var {viewWidth, viewHeight} = this.video;
-                $(this.$paper.canvas)
-                .css({
-                    'width': `${viewWidth}px`,
-                    'height': `${viewHeight}px`,
-                });
             });
             this.creationRect = this.makeAndAttachRect(CreationRect);
             this.rects = [];
@@ -136,6 +131,33 @@ class PlayerView {
 
             this.paperReady.resolve();
         });
+    }
+
+    sizeVideoFrame() {
+        if (!this.scaleToFit) {
+            var height = this.video.videoHeight;
+            if (this.$('video').width() < this.video.videoWidth) {
+                height = height * (this.$('video').width() / this.video.videoWidth);
+            }
+            this.$('video').css({
+                height: `${height}px`,
+            });
+        }
+
+        // need to link SVG with video when scaling
+        // if we just toggled scale to fit the video properties are not up to date yet
+        if (this.$paper) {
+            setTimeout(() => {
+                var {viewWidth, viewHeight} = this.video;
+                $(this.$paper.canvas)
+                .css({
+                    'width': `${viewWidth}px`,
+                    'height': `${viewHeight}px`,
+                });
+            }, 10);
+        }
+
+        this.video.fit();
     }
 
     initVideo() {
@@ -154,6 +176,7 @@ class PlayerView {
         this.video.onLoadedMetadata(() => {
             this.videoReady.resolve();
         });
+        $(window).resize(() => this.sizeVideoFrame());
         this.video.onAbort(() => {
             this.videoReady.reject();
         });
@@ -212,6 +235,23 @@ class PlayerView {
                 if (!this.loading)
                     this.video.nextFrame()
             });
+            $('#scale-checkbox').on('click', () => {
+                this.scaleToFit = $('#scale-checkbox')[0].checked;
+                if (this.scaleToFit) {
+                    this.$('video').css({
+                        height: `100%`,
+                        'flex-grow': 1
+                    });
+                }
+                else {
+                    this.$('video').css({
+                        'flex-grow': 0
+                    });
+                }
+                this.video.fit();
+                this.sizeVideoFrame();
+            });
+            this.sizeVideoFrame();
             this.loading = false;
         });
     }

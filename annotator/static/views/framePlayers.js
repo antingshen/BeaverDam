@@ -61,6 +61,9 @@ class AbstractFramePlayer {
     nextFrame() {}
     previousFrame() {}
 
+    fit() {}
+
+
     onTimeUpdate(callback) {
         this.onTimeUpdates.push(callback);
     }
@@ -183,7 +186,7 @@ class ImageFramePlayer extends AbstractFramePlayer {
                 this.hasInit = true;
             }
             var css = {
-                'flex-grow': 1
+                width: '100%'
             };
             $(element).css(css);
             this.imgPlayer.fitCanvas();
@@ -244,6 +247,10 @@ class ImageFramePlayer extends AbstractFramePlayer {
 
     previousFrame() {
         return this.currentTime = Math.max(0, this.currentTime - 1);
+    }
+
+    fit() {
+        this.imgPlayer.fitCanvas();
     }
 
     /**
