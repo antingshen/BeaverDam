@@ -1,26 +1,28 @@
 {% extends "base.html" %}
 
 {% block body %}
-<table class="table table-hover" style="width:1280; margin: 0 auto;">
-  <thead>
-    <tr>
-      <th>Id</th>
-      <th>Annotations</th>
-      <th>Verified</th>
-      <th>File</th>
-      <th>Link</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for video in videos %}
-    <trstyle>
-      <td>{{ video.id }}</td>
-      <td>{{ video.annotation|yesno }}</td>
-      <td>{{ video.verified|yesno }}</td>
-      <td>{{ video.filename }}</td>
-      <td><a href="{% url "video" video.id %}">view</a></td>
-    </tr>
-    {% endfor %}
-  </tbody>
-</table>
+<div style="padding: 50px;">
+  <table class="table table-hover" style="width:100%; margin: 0 auto;">
+    <thead>
+      <tr>
+        <th>Id</th>
+        <th>Annotations</th>
+        <th>Verified</th>
+        <th>File</th>
+        <th>Link</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for video in videos %}
+      <tr>
+        <td>{{ video.id }}</td>
+        <td>{{ video.annotation|yesno }}</td>
+        <td>{{ video.verified|yesno }}</td>
+        <td>{{ video.filename }}</td>
+        <td><a href="{% url "video" video.id %}">view</a></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
 {% endblock %}
