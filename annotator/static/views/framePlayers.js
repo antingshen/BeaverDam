@@ -176,9 +176,7 @@ class ImageFramePlayer extends AbstractFramePlayer {
                 this.hasInit = true;
             }
             var css = {
-                'max-height': this.imgPlayer.frames[0].height + 'px',
-                'min-width': this.imgPlayer.frames[0].width + 'px',
-                'min-height': this.imgPlayer.frames[0].height + 'px',
+                'flex-grow': 1
             };
             $(element).css(css);
             this.imgPlayer.fitCanvas();
@@ -191,6 +189,13 @@ class ImageFramePlayer extends AbstractFramePlayer {
     }
     get videoHeight() {
         return this.imgPlayer.frames[0].height;
+    }
+
+    get viewWidth() {
+        return this.imgPlayer.getDrawnWidth();
+    }
+    get viewHeight() {
+        return this.imgPlayer.getDrawnHeight();
     }
 
     get duration() {

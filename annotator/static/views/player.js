@@ -101,7 +101,7 @@ class PlayerView {
     initPaper() {
         // Depends on this.videoReady for this.video.videoWidth/Height
         this.videoReady().then(() => {
-            var {videoWidth, videoHeight} = this.video;
+            var {videoWidth, videoHeight, viewWidth, viewHeight} = this.video;
             this.$paper = Raphael(this.$('paper')[0], videoWidth, videoHeight);
 
             $(this.$paper.canvas).attr({
@@ -112,10 +112,17 @@ class PlayerView {
                 'height'
             ).css({
                 position: 'relative',
-                'max-width': `${videoWidth}px`,
-                'max-height': `${videoHeight}px`,
-                'min-width': `${videoWidth}px`,
-                'min-height': `${videoHeight}px`,
+                'width': `${viewWidth}px`,
+                'height': `${viewHeight}px`,
+            });
+            // need to link SVG with video when scaling
+            $(window).resize(() => {
+                var {viewWidth, viewHeight} = this.video;
+                $(this.$paper.canvas)
+                .css({
+                    'width': `${viewWidth}px`,
+                    'height': `${viewHeight}px`,
+                });
             });
             this.creationRect = this.makeAndAttachRect(CreationRect);
             this.rects = [];

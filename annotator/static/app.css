@@ -1,11 +1,34 @@
+.panel-body {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: 0;
+}
+
+.top-controls {
+    padding: 15px 15px 15px 20px;
+}
+
+.bottom-controls {
+    margin-bottom: 0;
+    border: 0;
+    border-radius: 0;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+}
+
 /* Player */
 
-.player-container .row {
+.player-container {
     margin: 0;
+    border-width: 0px;
+    text-align: left;
 }
 
 .player-screen {
-    margin: 1em 0 0.5em;
+    margin: 0;
+    flex-grow: 1;
+    display: flex;
     position: relative;
     text-align: center;
     flex-basis: 200px;
@@ -30,6 +53,9 @@ div.imgplay {
 }
 
 .player-paper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
     position: absolute;
     top: 0;
     bottom: 0;
@@ -147,13 +173,6 @@ div.imgplay {
 
 /* Uncategorized rules below */
 
-#fixed-panel {
-    text-align: left;
-    margin-right: 0px;
-    padding-right: 0;
-    padding-left: 0;
-}
-
 #left-container {
     padding-left: 0px;
     margin-left: 0px;
@@ -180,7 +199,7 @@ div.imgplay {
     color:#AAAAAA;
 }
 
-/* stop the control buttons from being selectable*/ 
+/* stop the control buttons from being selectable*/
 .noselect {
   -webkit-touch-callout: none; /* iOS Safari */
     -webkit-user-select: none; /* Chrome/Safari/Opera */
