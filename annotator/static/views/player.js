@@ -81,7 +81,14 @@ class PlayerView {
         this.initKeyframebar();
 
         if (helpEmbedded) {
-            $('#instructionModal').modal();
+            // check cookie
+            var hasSeen = $.cookie("has_seen_help")
+            if (hasSeen == null) {
+                $('#instructionModal').modal();
+            }
+            var date = new Date();
+            date.setTime(date.getTime() + (7 * 24 * 60 * 60 * 1000)); // 7 days
+            $.cookie('has_seen_help', 'yes', { expires: date.toGMTString(), path: '/' });
             $('#show-help').on('click', () => $('#instructionModal').modal());
         }
     }
