@@ -12,20 +12,28 @@ import urllib.request
 import markdown
 
 import mturk.utils
+from mturk.queries import get_active_video_turk_task
+
 from .models import *
 from mturk.models import Task, FullVideoTask, SingleFrameTask
+
+import logging
+
+logger = logging.getLogger()
+
 
 def home(request):
     need_annotating = Video.objects.filter(id__gt=0, verified=False)
     return render(request, 'video_list.html', context={
         'videos': need_annotating,
         'thumbnail': True,
+        'test' : settings.AWS_ID
     })
 
 def verify_list(request):
     need_verification = Video.objects.filter(id__gt=0, verified=False).exclude(annotation='')[:100]
     return render(request, 'video_list.html', context={
-        'videos': need_verification,
+        'videos': need_verification
     })
 
 def verified_list(request):
@@ -63,6 +71,18 @@ def video(request, video_id):
     start_time = float(request.GET['s']) if 's' in request.GET else None
     end_time = float(request.GET['e']) if 'e' in request.GET else None
 
+    turk_task = get_active_video_turk_task(video.id)
+
+    if turk_task != None:
+        full_video_task_data = {
+            'id': turk_task.id,
+            'metrics': '1',
+            'bonus': float(turk_task.bonus),
+            'message': turk_task.message
+        }
+    else:
+        full_video_task_data = None
+
     video_data = json.dumps({
         'id': video.id,
         'location': video.url,
@@ -70,9 +90,13 @@ def video(request, video_id):
         'is_image_sequence': True if video.image_list else False,
         'annotated': video.annotation != '',
         'verified': video.verified,
+        'rejected': video.rejected,
         'start_time': start_time,
         'end_time' : end_time,
+        'turk_task' : full_video_task_data 
     })
+
+    
 
     label_data = []
     for l in labels:
@@ -126,17 +150,3 @@ class AnnotationView(View):
         video.save()
         return HttpResponse('success')
 
-
-@staff_member_required
-def verify(request, video_id):
-    body = request.body.decode('utf-8')
-    video = Video.objects.get(id=video_id)
-    if body == 'true':
-        video.verified = True
-    elif body == 'false':
-        video.verified = False
-    else:
-        print(body)
-        return HttpResponseBadRequest()
-    video.save()
-    return HttpResponse('video verification state saved')

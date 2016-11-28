@@ -18,5 +18,7 @@ $(() => {
         videoStart: window.video.start_time,
         videoEnd: window.video.end_time,
         isImageSequence: window.video.is_image_sequence,
+        turkMetadata: window.full_video_task_data,
     });
+   console.log("task data = " + window.full_video_task_data);
 });

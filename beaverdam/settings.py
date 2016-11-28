@@ -29,10 +29,10 @@ AWS_KEY = os.environ.get('AWS_KEY', 'aws_key')
 
 MTURK_TITLE = "Video annotation"
 MTURK_DESCRIPTION = "Draw accurate boxes around every person in the video, we will pay a $0.02 bonus per accurate box drawn. Most of the payment is in the bonus"
+MTURK_SANDBOX = True
 
 ALLOWED_HOSTS=["*"]
 
-MTURK_SANDBOX = True
 assert MTURK_SANDBOX or not DEBUG
 
 # Application definition
@@ -130,3 +130,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
 
 STATIC_URL = '/static/'
+
+try:
+    from beaverdam.deploy_settings import *
+except ImportError as e:
+    pass

@@ -146,6 +146,19 @@ class Server(object):
                     pass
             print("Next page")
 
+    def get_assignments(self):
+        res = mturk.request('GetAssignmentsForHIT', {"HITId":tasks[0].hit_id})
+        if res.has_path("GetAssignmentsForHITResult/Assignment") :
+            res.store("GetAssignmentsForHITResult/Request/IsValid", "IsValid", bool)
+            res.store("GetAssignmentsForHITResult/Assignment/AssignmentId", "assignment_id")
+            res.store("GetAssignmentsForHITResult/Assignment/WorkerId", "worker_id")
+
+            return res.assignment_id, worker_id
+
+        return None
+
+        
+
     def accept(self, assignmentid, feedback = ""):
         """
         Accepts the assignment and pays the worker.
