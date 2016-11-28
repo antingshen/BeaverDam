@@ -10,6 +10,11 @@
     hitId = '{{ mturk_data.hit_id }}';
     workerId = '{{ mturk_data.worker_id }}';
     assignmentId = '{{ mturk_data.assignment_id }}';
+    {% if help_embed %}
+      helpEmbedded = true;
+    {% else %}
+      helpEmbedded = false;
+    {% endif %}
   </script>
   <script src="/static/vendor/raphael/raphael.min.js"></script>
   <script src="/static/vendor/imgplay/jquery.imgplay.min.js"></script>
@@ -37,7 +42,11 @@
             <input type="radio" name="object" id="object-radio-{{label.name}}" value="{{label.name}}" {% if forloop.first %} checked {% endif %}>
           </label>
         {% endfor %}
-        <a class="btn btn-default" href="{{help_url}}" target="_blank" style="margin-left: 25px;">Instructions &amp; Requirements</a>
+        {% if help_embed %}
+          <a class="btn btn-default" id="show-help" target="_blank" style="margin-left: 25px;">Instructions &amp; Requirements</a>
+        {% else %}
+          <a class="btn btn-default" href="{{help_url}}" target="_blank" style="margin-left: 25px;">Instructions &amp; Requirements</a>
+        {% endif %}
 
         <div id="submit-container">
         {% if mturk_data.preview == False %}
@@ -147,6 +156,21 @@
           </div>
         </div>
 
+      </div>
+    </div>
+
+    <div class="modal fade" id="instructionModal" role="dialog">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+            <h4 class="modal-title submit-result">Instructions & Requirements</h4>
+          </div>
+          <div class="modal-body">{{help_content | safe}}</div>
+          <div class="modal-footer">
+            <button id="submit-survey-btn" type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          </div>
+        </div>
       </div>
     </div>
 

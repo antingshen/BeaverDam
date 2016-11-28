@@ -79,6 +79,11 @@ class PlayerView {
         this.initPaper();
         this.initVideo();
         this.initKeyframebar();
+
+        if (helpEmbedded) {
+            $('#instructionModal').modal();
+            $('#show-help').on('click', () => $('#instructionModal').modal());
+        }
     }
 
     set loading(val) {

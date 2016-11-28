@@ -216,3 +216,15 @@ div.imgplay {
             user-select: none; /* Non-prefixed version, currently
                                   not supported by any browser */
 }
+
+#instructionModal {
+    overflow: scroll;
+}
+
+#instructionModal div.modal-dialog {
+    width: 80%;
+}
+
+#instructionModal .modal-body {
+    margin: 0 2rem;
+}

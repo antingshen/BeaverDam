@@ -2,3 +2,4 @@ Django==1.10
 sqlparse==0.2.2
 tqdm==4.8.4
 uWSGI==2.0.13.1
+markdown==2.6.7

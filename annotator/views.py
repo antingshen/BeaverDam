@@ -8,6 +8,8 @@ from django.core.exceptions import ObjectDoesNotExist
 
 import os
 import json
+import urllib.request
+import markdown
 
 import mturk.utils
 from .models import *
@@ -76,15 +78,22 @@ def video(request, video_id):
     for l in labels:
         label_data.append({'name': l.name, 'color': l.color})
 
+    help_content = ''
+    if settings.HELP_URL and settings.HELP_USE_MARKDOWN:
+        help_content = urllib.request.urlopen(settings.HELP_URL).read().decode('utf-8')
+        help_content = markdown.markdown(help_content)
+
     response = render(request, 'video.html', context={
         'label_data': label_data,
         'video_data': video_data,
         'image_list': json.loads(video.image_list) if video.image_list else 0,
         'image_list_path': video.host.replace('#', '%23'),
         'help_url': settings.HELP_URL,
+        'help_embed': settings.HELP_EMBED,
         'mturk_data': mturk_data,
         'iframe_mode': mturk_data['authenticated'],
         'survey': False,
+        'help_content': help_content
     })
     if not mturk_data['authenticated']:
         response['X-Frame-Options'] = 'SAMEORIGIN'
