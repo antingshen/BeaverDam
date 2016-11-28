@@ -118,19 +118,21 @@ class PlayerView {
             var {videoWidth, videoHeight, viewWidth, viewHeight} = this.video;
             this.$paper = Raphael(this.$('paper')[0], videoWidth, videoHeight);
 
+            var css = {
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                'width': `${viewWidth}px`,
+                'height': `${viewHeight}px`,
+            };
+
             $(this.$paper.canvas).attr({
                 viewBox: `0 0 ${videoWidth} ${videoHeight}`
             }).removeAttr(
                 'width'
             ).removeAttr(
                 'height'
-            ).css({
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                'width': `${viewWidth}px`,
-                'height': `${viewHeight}px`,
-            });
+            ).css(css);
             this.creationRect = this.makeAndAttachRect(CreationRect);
             this.rects = [];
 

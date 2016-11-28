@@ -170,7 +170,7 @@ class ImageFramePlayer extends AbstractFramePlayer {
     constructor(images, element) {
         super(images, element);
         // image list
-        $(element).imgplay({rate: 15, controls: false, pageSize: 100, onLoading: (isLoading) => {
+        $(element).imgplay({rate: 15, controls: false, pageSize: 100, center: false, onLoading: (isLoading) => {
             if (this.onBuffering)
                 this.onBuffering(isLoading);
         }});
