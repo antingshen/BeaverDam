@@ -140,9 +140,8 @@ class Player {
         // TODO doesn't respect scope
         $('#submit-btn').click(this.submitAnnotations.bind(this));
         $('#submit-survey-btn').click(this.submitSurvey.bind(this));
-
-        $(this).on('change-verification', this.updateVerifiedButton.bind(this));
-        $(this).triggerHandler('change-verification');
+        $('#accept-btn').click(this.acceptAnnotations.bind(this));
+        $('#reject-btn').click(this.rejectAnnotations.bind(this));
 
         $('#verified-btn').click(this.submitVerified.bind(this));
 
@@ -269,31 +268,46 @@ class Player {
         //TODO: Store results in datasources
     }
 
-    updateVerifiedButton() {
-        if (window.video.verified) {
-            $('#verified-btn').text('Verified').addClass('btn btn-success').removeClass('btn-danger');
-        }
-        else {
-            $('#verified-btn').text('Not Verified').addClass('btn btn-danger').removeClass('btn-success');
-        }
+    acceptAnnotations(e) {
+        e.preventDefault();
+ 
+        var bonus = $('#inputBonusAmt')[0];
+        var message = $('#inputAcceptMessage')[0];
+        DataSources.annotations.acceptAnnotation(this.videoId, parseFloat(bonus.value), message.value).then((response) => {
+            $('#acceptForm').modal('toggle');    
+        });
+
     }
 
+    rejectAnnotations(e) {
+        e.preventDefault();
+
+        var message = $('#inputRejectMessage')[0];
+        var reopen = $('#inputReopen')[0];
+        var deleteBoxes = $('#inputDeleteBoxes')[0];
+        DataSources.annotations.rejectAnnotation(this.videoId, message.value, reopen.checked, deleteBoxes.checked).then((response) => {
+            $('#acceptForm').modal('toggle');    
+        });
+    }
+
+
     submitVerified() {
-        return fetch(`/video/${this.videoId}/verify/`, {
-            headers: {
-                'X-CSRFToken': window.CSRFToken,
-                'Content-Type': 'application/json',
-            },
-            credentials: 'same-origin',
-            method: 'post',
-            body: (!window.video.verified).toString(),
-        }).then((response) => {
-            if (response.ok) {
-                window.video.verified = !window.video.verified;
-                $(this).triggerHandler('change-verification');
-            }
-            return response.text();
-        }).then((text) => console.log(text));
+        $('#acceptForm').modal()
+        // return fetch(`/video/${this.videoId}/verify/`, {
+        //     headers: {
+        //         'X-CSRFToken': window.CSRFToken,
+        //         'Content-Type': 'application/json',
+        //     },
+        //     credentials: 'same-origin',
+        //     method: 'post',
+        //     body: (!window.video.verified).toString(),
+        // }).then((response) => {
+        //     if (response.ok) {
+        //         window.video.verified = !window.video.verified;
+        //         $(this).triggerHandler('change-verification');
+        //     }
+        //     return response.text();
+        // }).then((text) => console.log(text));
     }
 
     addAnnotationAtCurrentTimeFromRect(rect) {

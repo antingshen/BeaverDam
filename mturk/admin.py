@@ -6,7 +6,7 @@ import logging
 logger = logging.getLogger()
 
 class FullVideoTaskAdmin(admin.ModelAdmin):
-    list_display =('id','hit_id','video')
+    list_display =('id','hit_id','video', 'bonus', 'closed', 'paid')
    
 
 admin.site.register(FullVideoTask, FullVideoTaskAdmin)

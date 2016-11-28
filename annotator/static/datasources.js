@@ -95,7 +95,49 @@ var DataSources = {
                     return Promise.resolve(`Error code ${response.status}`);
                 }
             });
+        },
+
+        acceptAnnotation: function(id, bonus, message) {
+            return fetch(`/accept-annotation/${id}/`, {
+                headers: {
+                    'X-CSRFToken': window.CSRFToken,
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'same-origin',
+                method: 'post',
+                body: JSON.stringify({
+                    bonus: bonus,
+                    message: message,
+                    type: 'accept'
+                }),
+            }).then((response) => {
+                response.json().then(function(data) {  
+                    return Promise.resolve(data);
+                })
+            });
+        },
+
+
+        rejectAnnotation: function(id, message, reopen, deleteBoxes) {
+            return fetch(`/reject-annotation/${id}/`, {
+                headers: {
+                    'X-CSRFToken': window.CSRFToken,
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'same-origin',
+                method: 'post',
+                body: JSON.stringify({
+                    message: message,
+                    type: 'reject',
+                    reopen: reopen,
+                    deleteBoxes: deleteBoxes
+                }),
+            }).then((response) => {
+                return Promise.resolve('State saved successfully.');
+            });
         }
+
+
     },
 };
 

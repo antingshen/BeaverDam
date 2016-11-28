@@ -28,6 +28,8 @@ MTURK_SANDBOX = True
 
 MTURK_TITLE = "Video annotation"
 MTURK_DESCRIPTION = "Draw accurate boxes around every person in the video, we will pay a $0.02 bonus per accurate box drawn. Most of the payment is in the bonus"
+MTURK_BONUS_MESSAGE = "Thanks for your work - you have been awarded a bonus of ${}"
+
 
 ALLOWED_HOSTS=["*"]
 

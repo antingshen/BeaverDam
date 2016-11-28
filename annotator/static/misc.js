@@ -169,6 +169,7 @@ var Misc = {
     },
 
     fireEventByKeyCode: function(e) {
+
         if (e === window || e === Misc) {
             throw new Error("Misc.fireEventByKeyCode: incorrectly bound");
         }

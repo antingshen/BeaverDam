@@ -8,12 +8,14 @@ from django.core.exceptions import ObjectDoesNotExist
 
 import os
 import json
+import sys
 
 import mturk.utils
 from mturk.queries import get_active_video_turk_task
 
 from .models import *
 
+from .services import *
 
 import logging
 
@@ -62,9 +64,6 @@ def video(request, video_id):
     end_time = float(request.GET['e']) if 'e' in request.GET else None
 
     turk_task = get_active_video_turk_task(video.id)
-
-    logger.error("metrics = " + turk_task.metrics)
-    logger.error("as json = " + json.loads(turk_task.metrics))
 
     if turk_task != None:
         full_video_task_data = {
@@ -136,3 +135,18 @@ class AnnotationView(View):
         video.save()
         return HttpResponse('success')
 
+
+class AcceptRejectView(View):
+    def post(self, request, video_id):
+        data = json.loads(request.body.decode('utf-8'))
+        
+        try:
+            if data['type'] == "accept":
+                accept_video(int(video_id), data['bonus'], data['message'] )
+            elif data['type'] == "reject":
+                reject_video(int(video_id), data['message'], data['reopen'], data['deleteBoxes'])
+            
+            return HttpResponse(json.dumps({'success':True}))
+        except Exception as e:
+            logger.exception(e)
+            return HttpResponse(json.dumps({'success':False, 'errorMessage':str(e)}))

@@ -1,9 +1,14 @@
 import mturk.queries
+import logging
 from django.http import HttpResponse, Http404 
 
 from django.contrib.admin.views.decorators import staff_member_required
 from mturk.models import Task, FullVideoTask
 from .models import *
+from mturk.queries import *
+from decimal import Decimal
+
+logger = logging.getLogger()
 
 @staff_member_required
 def publish_videos_to_turk(videos):
@@ -18,6 +23,7 @@ def publish_videos_to_turk(videos):
 
 @staff_member_required
 def verify(request, video_id):
+    logger.error("video id: {}".format(video_id))
     body = request.body.decode('utf-8')
     video = Video.objects.get(id=video_id)
     if body == 'true':
@@ -30,14 +36,13 @@ def verify(request, video_id):
     video.save()
     return HttpResponse('video verification state saved')
 
-@staff_member_required
-def accept_video(request, video_id, bonus, message):
-    body = request.body.decode('utf-8')
+
+def accept_video(video_id, bonus, message):
     video = Video.objects.get(pk=video_id)
     video_task = get_active_video_turk_task(video.id)
 
     if video_task == None:
-        return HttpResponse('no video task to accept')
+        raise Exception('no video task to accept')
     
     # accept on turk
     video_task.approve_assignment(bonus, message)
@@ -46,21 +51,22 @@ def accept_video(request, video_id, bonus, message):
     video_task.archive_turk_hit()
 
     # save video
-    video_task.bonus = bonus
+    decBonus = Decimal(bonus)
+
+    video_task.bonus = decBonus
     video_task.message = message
     video_task.paid = True
+    video_task.closed = True
     video_task.save()
-    
-    return HttpResponse('video sucessfully approved')
 
-@staff_member_required
-def reject_video(request, video_id, message, reopen, clear_boxes):
-    body = request.body.decode('utf-8')
+#@staff_member_required
+def reject_video(video_id, message, reopen, clear_boxes):
+    
     video = Video.objects.get(pk=video_id)
     video_task = get_active_video_turk_task(video.id)
     
     if video_task == None:
-        return HttpResponse("Error - no video task to update")
+        raise Exception("Error - no video task to update")
 
     # reject on turk
     video_task.reject_assignment(message)
@@ -74,6 +80,7 @@ def reject_video(request, video_id, message, reopen, clear_boxes):
     video_task.message = message
     video_task.rejected = True
     video_task.bonus = 0
+    video_task.closed = True
     video_task.save()
 
     # delete from Turk

@@ -9,6 +9,9 @@ from datetime import datetime
 from .mturk_api import Server
 from annotator.models import Video
 
+import logging
+
+logger = logging.getLogger()
 
 mturk = Server(settings.AWS_ID, settings.AWS_KEY, settings.URL_ROOT, settings.MTURK_SANDBOX)
 
@@ -22,7 +25,7 @@ class Task(models.Model):
     worker_id = models.CharField(max_length=64, blank=True)
     assignment_id = models.CharField(max_length=64, blank=True)
     time_completed = models.DateTimeField(null=True, blank=True)
-    bonus = models.DecimalField(max_digits=3, decimal_places=2, default=0)
+    bonus = models.DecimalField(max_digits=4, decimal_places=2, default=0)
     paid = models.BooleanField(default=False)
     sandbox = models.BooleanField(default=settings.MTURK_SANDBOX)
     message = models.CharField(max_length=256, blank=True)
@@ -52,30 +55,28 @@ class Task(models.Model):
         self.paid = False
         self.save()
 
-    @classmethod
+    
     def approve_assignment(self, bonus, message):
-        assignment_id, worker_id = mturk.get_assignments()
+        
+        assignment_id, worker_id = mturk.get_assignments(self.hit_id)
         
         if assignment_id == None:
             raise Exception("Cannot approve task - no work has been done on Turk")
 
         mturk.accept(assignment_id, message)
-        mturk.bonus(res.worker_id, res.assignment_id, bonus, self.verbalise_bonus())
+        mturk.bonus(worker_id, assignment_id, bonus, settings.MTURK_BONUS_MESSAGE.format(bonus))
 
-    @classmethod
     def reject_assignment(self, message):
-        assignment_id, worker_id = mturk.get_assignments()
+        logger.error("Hit ID = " + self.hit_id)
+        assignment_id, worker_id = mturk.get_assignments(self.hit_id)
         
         if assignment_id == None:
             raise Exception("Cannot reject task - no work has been done on Turk")
 
         mturk.reject(assignment_id, message)
 
-    @classmethod
     def archive_turk_hit(self):
         res = mturk.disable(self.hit_id)
-        self.closed = True
-        self.save()
 
     @classmethod
     def calculate_bonus(self):
