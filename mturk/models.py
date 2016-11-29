@@ -133,6 +133,7 @@ class FullVideoTask(Task):
         return self.video.filename
 
     def calculate_bonus(self):
+        boxes  = self.video.count_keyframes()
         num_cents = boxes * self.bonus_per_box
         return num_cents
 

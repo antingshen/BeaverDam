@@ -59,14 +59,19 @@
 
           {% else %}
           <div id="submit-btn-group" class="btn-group" role="group">
-            {% if request.user.is_staff == False %}
-            <button id="submit-btn" type="button" class="btn btn-primary">Submit</button>
-            {% else %}
-            <button id="submit-btn" type="button" class="btn btn-primary">Save</button>
+                {% if request.user.is_staff == False %}
+                <button id="submit-btn" type="button" class="btn btn-primary">Submit</button>
+                {% else %}
+                <button id="submit-btn" type="button" class="btn btn-primary">Save</button>
 
-            <button id="verified-btn" type="button" class="btn">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&hellip;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</button>
-            {% endif %}
-          </div>
+                  {% if mturk_data.status == "Awaiting Approval" %}
+                  <button id="btn-show-reject" type="button" class="btn btn-danger">Reject</button>
+                  <button id="btn-show-accept" type="button" class="btn btn-success ">Accept</button>
+                  {% else %}
+                  <button class="btn" disabled>{{ mturk_data.status }}</button>
+                  {% endif %}
+                {% endif %}
+              </div>
           {% endif %}
         {% else %}
           <h2>Preview Mode: Please accept HIT before working</h2>
@@ -81,21 +86,6 @@
                 <img src="{{image_list_path}}/{{image}}" />
               {% else %}
                 <img data-src="{{image_list_path}}/{{image}}" />
-
-              <div id="submit-btn-group" class="btn-group" role="group">
-                {% if request.user.is_staff == False %}
-                <button id="submit-btn" type="button" class="btn btn-primary">Submit</button>
-                {% else %}
-                <button id="submit-btn" type="button" class="btn btn-primary">Save</button>
-
-                  {% if mturk_data.status == "Awaiting Approval" %}
-                  <button id="btn-show-reject" type="button" class="btn btn-danger">Reject</button>
-                  <button id="btn-show-accept" type="button" class="btn btn-success ">Accept</button>
-                  {% else %}
-                  <button class="btn" disabled>{{ mturk_data.status }}</button>
-                  {% endif %}
-                {% endif %}
-              </div>
               {% endif %}
             {% endfor %}
           </div>
