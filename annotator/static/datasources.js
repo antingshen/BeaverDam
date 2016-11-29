@@ -97,7 +97,7 @@ var DataSources = {
             });
         },
 
-        acceptAnnotation: function(id, bonus, message) {
+        acceptAnnotation: function(id, bonus, message, updatedAnnotations) {
             return fetch(`/accept-annotation/${id}/`, {
                 headers: {
                     'X-CSRFToken': window.CSRFToken,
@@ -108,7 +108,8 @@ var DataSources = {
                 body: JSON.stringify({
                     bonus: bonus,
                     message: message,
-                    type: 'accept'
+                    type: 'accept',
+                    updatedAnnotations: updatedAnnotations,
                 }),
             }).then((response) => {
                 if (!response.ok)

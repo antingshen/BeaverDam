@@ -306,7 +306,7 @@ class Player {
         var bonus = $('#inputBonusAmt')[0];
         var message = $('#inputAcceptMessage')[0];
         $('#acceptForm').find('.btn').attr("disabled", "disabled");
-        DataSources.annotations.acceptAnnotation(this.videoId, parseFloat(bonus.value), message.value).then((response) => {
+        DataSources.annotations.acceptAnnotation(this.videoId, parseFloat(bonus.value), message.value, this.annotations).then((response) => {
             $('#acceptForm').modal('toggle');
             $('#acceptForm').find('.btn').removeAttr("disabled");
             location.reload();

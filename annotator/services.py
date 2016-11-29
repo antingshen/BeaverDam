@@ -37,7 +37,7 @@ def verify(request, video_id):
     return HttpResponse('video verification state saved')
 
 @staff_member_required
-def accept_video(request, video_id, bonus, message):
+def accept_video(request, video_id, bonus, message, updatedAnnotations):
     video = Video.objects.get(pk=video_id)
     video_task = get_active_video_turk_task(video.id)
 
