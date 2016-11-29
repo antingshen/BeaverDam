@@ -119,7 +119,7 @@ class FullVideoTask(Task):
     video = models.ForeignKey(Video)
     title = "Video Annotation"
     description = "Draw boxes around objects in a video"
-    pay = 0.00
+    pay = settings.MTURK_BASE_PAY
     bonus_per_box = settings.MTURK_BONUS_PER_BOX
 
     @property

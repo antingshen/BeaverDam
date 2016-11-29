@@ -31,6 +31,7 @@ MTURK_DESCRIPTION = "Draw accurate boxes around every person in the video, we wi
 MTURK_BONUS_MESSAGE = "Thanks for your work"
 MTURK_REJECTION_MESSAGE = "Your work has not been accepted. You must follow the instructions of the task precisely to complete this task."
 MTURK_BONUS_PER_BOX = 0.02
+MTURK_BASE_PAY = 0.04
 
 ALLOWED_HOSTS=["*"]
 
