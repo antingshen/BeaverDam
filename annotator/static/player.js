@@ -25,6 +25,7 @@ class Player {
             playerStartTimes: Date.now(),
             annotationsStartTime: null,
             annotationsEndTime: null,
+            browserAgent: navigator.userAgent
         };
 
         // Promises
