@@ -57,7 +57,7 @@ def video(request, video_id):
         'id': video.id,
         'location': video.url,
         'path': video.host,
-        'is_video': not video.image_list,
+        'is_image_sequence': True if video.image_list else False,
         'annotated': video.annotation != '',
         'verified': video.verified,
         'start_time': start_time,

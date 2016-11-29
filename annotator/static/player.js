@@ -2,7 +2,7 @@
 
 
 class Player {
-    constructor({$container, videoSrc, videoId, videoStart, videoEnd}) {
+    constructor({$container, videoSrc, videoId, videoStart, videoEnd, isImageSequence}) {
         this.$container = $container;
 
         this.videoId = videoId;
@@ -20,6 +20,8 @@ class Player {
         this.videoStart = videoStart;
 
         this.videoEnd = videoEnd;
+
+        this.isImageSequence = isImageSequence;
 
         this.metrics = {
             playerStartTimes: Date.now(),
@@ -90,7 +92,7 @@ class Player {
             annotation.updateKeyframe({
                 time: this.view.video.currentTime,
                 bounds: bounds,
-            });
+            }, this.isImageSequence);
             $(this).triggerHandler('change-onscreen-annotations');
             $(this).triggerHandler('change-keyframes');
         });
@@ -178,11 +180,13 @@ class Player {
 
             $(this.view).on('step-forward-keyframe', () => {
                 var time = this.view.video.currentTime;
+                if (!this.selectedAnnotation || !this.selectedAnnotation.keyframes)
+                    return;
                 for (let [i, kf] of this.selectedAnnotation.keyframes.entries()) {
-                    if (time == kf.time) {
+                    if (Math.abs(time - kf.time) < this.selectedAnnotation.SAME_FRAME_THRESHOLD) {
                         if (i != this.selectedAnnotation.keyframes.length - 1) {
                             var nf = this.selectedAnnotation.keyframes[i + 1];
-                            this.view.video.currentTime = nf.time;
+                            this.view.video.setCurrentTime(nf.time);
                             break;
                         }
                     }
@@ -191,11 +195,14 @@ class Player {
 
             $(this.view).on('step-backward-keyframe', () => {
                 var time = this.view.video.currentTime;
+                var selected = this.selectedAnnotation;
+                if (!this.selectedAnnotation || !this.selectedAnnotation.keyframes)
+                    return;
                 for (let [i, kf] of this.selectedAnnotation.keyframes.entries()) {
-                    if (time == kf.time) {
+                    if (Math.abs(time - kf.time) < this.selectedAnnotation.SAME_FRAME_THRESHOLD) {
                         if (i !== 0) {
                             var nf = this.selectedAnnotation.keyframes[i - 1];
-                            this.view.video.currentTime = nf.time;
+                            this.view.video.setCurrentTime(nf.time);
                             break;
                         }
                     }
@@ -229,11 +236,17 @@ class Player {
             this.metrics.annotationsStartTime = Date.now();
         }
         var time = this.view.video.currentTime;
-        var {bounds, prevIndex, nextIndex, closestIndex} = annotation.getFrameAtTime(time);
+        
+        var {bounds, prevIndex, nextIndex, closestIndex, continueInterpolation} = annotation.getFrameAtTime(time, this.isImageSequence);
 
+        // singlekeyframe determines whether we show or hide the object
+        // we want to hide if:
+        //   - the very first frame object is in the future (nextIndex == 0 && closestIndex is null)
+        //   - we're after the last frame and that last frame was marked as continueInterpolation false
         rect.appear({
-            real: closestIndex != null || (prevIndex != null && nextIndex != null),
+            real: closestIndex != null,
             selected: this.selectedAnnotation === annotation,
+            singlekeyframe: continueInterpolation && !(nextIndex == 0 && closestIndex === null)
         });
 
         // Don't mess up our drag
@@ -297,11 +310,11 @@ class Player {
     }
 
     addAnnotationAtCurrentTimeFromRect(rect) {
-        var annotation = Annotation.newFromCreationRect();
+        var annotation = Annotation.newFromCreationRect(this.isImageSequence);
         annotation.updateKeyframe({
             time: this.view.video.currentTime,
             bounds: rect.bounds
-        });
+        }, this.isImageSequence);
         this.annotations.push(annotation);
         rect.fill = annotation.fill;
         this.initBindAnnotationAndRect(annotation, rect);
@@ -328,11 +341,12 @@ class Player {
 
     deleteSelectedKeyframe() {
         if (this.selectedAnnotation == null) return false;
+        var selected = this.selectedAnnotation;
+        this.selectedAnnotation = null; 
+        selected.deleteKeyframeAtTime(this.view.video.currentTime, this.isImageSequence);
 
-        this.selectedAnnotation.deleteKeyframeAtTime(this.view.video.currentTime);
-
-        if (this.selectedAnnotation.keyframes.length === 0) {
-            this.deleteAnnotation(this.selectedAnnotation);
+        if (selected.keyframes.length === 0) {
+            this.deleteAnnotation(selected);
         }
 
         return true;
