@@ -258,7 +258,9 @@ class Player {
             return;
         }
         DataSources.annotations.save(this.videoId, this.annotations, this.metrics, window.mturk).then((response) => {
-            this.showModal("Save", "Save Successful");
+            // only show this if not running on turk
+            if (!window.hitId)
+                this.showModal("Save", "Save Successful");
         });
     }
 

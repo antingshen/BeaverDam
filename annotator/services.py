@@ -57,6 +57,7 @@ def accept_video(request, video_id, bonus, message):
     video_task.save()
 
     video.verified = True
+    video.rejected = False
     video.save()
 
 @staff_member_required
