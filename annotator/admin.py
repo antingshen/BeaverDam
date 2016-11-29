@@ -13,11 +13,11 @@ def publish(modeladmin, request, videos):
     for video in videos:
         video_task = get_active_video_turk_task(video.id)
 
-    if video_task != None:
-        raise Exception('video {} already has an active FullVideoTask'.format(id))
+        if video_task != None:
+            raise Exception('video {} already has an active FullVideoTask'.format(id))
 
-    video_task = FullVideoTask(video = video)
-    video_task.publish()
+        video_task = FullVideoTask(video = video)
+        video_task.publish()
 
 class PublishedFilter(SimpleListFilter):
     title = 'Published' # or use _('country') for translated title
@@ -60,7 +60,7 @@ class PublishedFilter(SimpleListFilter):
 class VideoAdmin(admin.ModelAdmin):
     list_display =('id','filename','verified', 'is_published')
     list_filter=[PublishedFilter, 'verified']
-    search_fields=['filename']
+    search_fields=['filename', 'id']
     actions=[publish]
 
     def is_published(self, obj):
