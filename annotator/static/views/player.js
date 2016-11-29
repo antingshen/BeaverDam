@@ -88,7 +88,7 @@ class PlayerView {
             }
             var date = new Date();
             date.setTime(date.getTime() + (7 * 24 * 60 * 60 * 1000)); // 7 days
-            document.cookie = 'has_seen_help=yes; expires=' + date.toGMTString() + '; path:/';
+            document.cookie = 'has_seen_help=yes; expires=' + date.toGMTString() + '; path=/';
             $('#show-help').on('click', () => $('#instructionModal').modal());
         }
     }
