@@ -85,10 +85,10 @@ def video(request, video_id):
         'rejected': video.rejected,
         'start_time': start_time,
         'end_time' : end_time,
-        'turk_task' : full_video_task_data 
+        'turk_task' : full_video_task_data
     })
 
-    
+
 
     label_data = []
     for l in labels:
@@ -139,14 +139,15 @@ class AnnotationView(View):
 class AcceptRejectView(View):
     def post(self, request, video_id):
         data = json.loads(request.body.decode('utf-8'))
-        
+
         try:
             if data['type'] == "accept":
                 accept_video(request, int(video_id), data['bonus'], data['message'] )
             elif data['type'] == "reject":
                 reject_video(request, int(video_id), data['message'], data['reopen'], data['deleteBoxes'])
-            
-            return HttpResponse(json.dumps({'success':True}))
+            return HttpResponse(status=200)
         except Exception as e:
             logger.exception(e)
-            return HttpResponse(json.dumps({'success':False, 'errorMessage':str(e)}))
+            response = HttpResponse(status=500)
+            response['error-message'] = str(e)
+            return response

@@ -111,12 +111,11 @@ var DataSources = {
                     type: 'accept'
                 }),
             }).then((response) => {
-                return response.json().then(function(data) {
-                    return Promise.resolve(data);
-                })
+                if (!response.ok)
+                    return Promise.reject(response.headers.get('error-message'));
+                return null;
             });
         },
-
 
         rejectAnnotation: function(id, message, reopen, deleteBoxes) {
             return fetch(`/reject-annotation/${id}/`, {
@@ -133,13 +132,12 @@ var DataSources = {
                     deleteBoxes: deleteBoxes
                 }),
             }).then((response) => {
-                return response.json().then(function(data) {
-                    return Promise.resolve(data);
-                })
+                if (!response.ok) {
+                    return Promise.reject(response.headers.get('error-message'));
+                }
+                return null;
             });
         }
-
-
     },
 };
 
