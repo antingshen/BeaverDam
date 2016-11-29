@@ -27,19 +27,22 @@ def home(request):
     return render(request, 'video_list.html', context={
         'videos': need_annotating,
         'thumbnail': True,
-        'test' : settings.AWS_ID
+        'test': settings.AWS_ID,
+        'title': 'Videos'
     })
 
 def verify_list(request):
     need_verification = Video.objects.filter(id__gt=0, verified=False, rejected=False).exclude(annotation='')[:100]
     return render(request, 'video_list.html', context={
-        'videos': need_verification
+        'videos': need_verification,
+        'title': 'Videos to Verify'
     })
 
 def verified_list(request):
     verified = Video.objects.filter(id__gt=0, verified=True).exclude(annotation='')[:100]
     return render(request, 'video_list.html', context={
         'videos': verified,
+        'title': 'Verified Videos'
     })
 
 def ready_to_pay(request):
@@ -55,7 +58,7 @@ def next_unannotated(request, video_id):
     return redirect('video', id)
 
 # status of Not Published, Published, Awaiting Approval, Verified
-# this is a bit convoluted as there's status stored on 
+# this is a bit convoluted as there's status stored on
 # video (approved) as well as FullVideoTask (closed, paid, etc.)
 def get_mturk_status(video, full_video_task):
     if video.verified:
@@ -103,7 +106,7 @@ def video(request, video_id):
     else:
         full_video_task_data = None
 
-    mturk_data['status'] = get_mturk_status(video, turk_task)    
+    mturk_data['status'] = get_mturk_status(video, turk_task)
 
     logger.error("full task = {}".format(full_video_task_data))
 
@@ -154,7 +157,7 @@ class AnnotationView(View):
 
     def post(self, request, video_id):
         data = json.loads(request.body.decode('utf-8'))
-        
+
         video = Video.objects.get(id=video_id)
         video.annotation = json.dumps(data['annotation'])
         video.save()
