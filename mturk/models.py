@@ -122,7 +122,7 @@ class FullVideoTask(Task):
     video = models.ForeignKey(Video)
     title = settings.MTURK_TITLE
     description = settings.MTURK_DESCRIPTION
-    pay = 0.04
+    pay = settings.MTURK_BASE_PAY
     bonus_per_box = settings.MTURK_BONUS_PER_BOX
 
     @property
