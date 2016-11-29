@@ -204,6 +204,8 @@ class PlayerView {
             // key => better key events
             $(document).keydown(Misc.fireEventByKeyCode.bind(this));
             $(document).keyup(Misc.fireEventByKeyCode.bind(this));
+            $('input').keydown(function(e) {   e.stopPropagation(); });
+            $('textarea').keydown(function(e) {   e.stopPropagation(); });
 
             // control-time <=> video
             this.$on('control-time', 'change', () => this.video.currentTime = this.controlTime);

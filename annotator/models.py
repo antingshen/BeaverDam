@@ -34,7 +34,6 @@ class Video(models.Model):
         else:
             raise Exception('Video {0} does not have a filename, host or image_list. Possible fixes: \n1) Place {0}.mp4 into static/videos to serve locally. \n2) Update the filename & host fields of the Video with id={0}'.format(self.id)) + self.filename
 
-    @classmethod
     def count_keyframes(self, at_time=None):
         if at_time is None:
             return self.annotation.count('"frame"')

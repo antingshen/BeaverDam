@@ -2,7 +2,7 @@
 
 
 class Player {
-    constructor({$container, videoSrc, videoId, videoStart, videoEnd, isImageSequence}) {
+    constructor({$container, videoSrc, videoId, videoStart, videoEnd, isImageSequence, turkMetadata}) {
         this.$container = $container;
 
         this.videoId = videoId;
@@ -23,10 +23,13 @@ class Player {
 
         this.isImageSequence = isImageSequence;
 
+        this.turkMetadata = turkMetadata;
+
         this.metrics = {
             playerStartTimes: Date.now(),
             annotationsStartTime: null,
             annotationsEndTime: null,
+            browserAgent: navigator.userAgent
         };
 
         // Promises
@@ -139,16 +142,16 @@ class Player {
 
 
         // Submitting
-        // TODO doesn't respect scope
         $('#submit-btn').click(this.submitAnnotations.bind(this));
         $('#submit-survey-btn').click(this.submitSurvey.bind(this));
 
-        $(this).on('change-verification', this.updateVerifiedButton.bind(this));
-        $(this).triggerHandler('change-verification');
+        $('#btn-show-accept').click(this.showAcceptDialog.bind(this));
+        $('#btn-show-reject').click(this.showRejectDialog.bind(this));
 
-        $('#verified-btn').click(this.submitVerified.bind(this));
+        $('#accept-btn').click(this.acceptAnnotations.bind(this));
+        $('#reject-btn').click(this.rejectAnnotations.bind(this));
 
-
+       
         // On drawing changed
         this.viewReady().then(() => {
             $(this.view.creationRect).on('drag-start', () => {
@@ -268,9 +271,14 @@ class Player {
             return;
         }
         DataSources.annotations.save(this.videoId, this.annotations, this.metrics, window.mturk).then((response) => {
-            $('.submit-result').html(response + (numberOfSurveyQuestions ? "<br />Optional feedback on your experience: " : ''));
+            this.showModal("Save", "Save Successful");
         });
-        $('#myModal').modal();
+    }
+
+    showModal(title, message) {
+        $('#genericModalTitle')[0].innerText = title;
+        $('#genericModalMessage')[0].innerText = message;
+        $('#genericModal').modal();
     }
 
     submitSurvey() {
@@ -282,32 +290,58 @@ class Player {
         //TODO: Store results in datasources
     }
 
-    updateVerifiedButton() {
-        if (window.video.verified) {
-            $('#verified-btn').text('Verified').addClass('btn btn-success').removeClass('btn-danger');
-        }
-        else {
-            $('#verified-btn').text('Not Verified').addClass('btn btn-danger').removeClass('btn-success');
-        }
+    showAcceptDialog(e) {
+        $('#workerTime')[0].innerText = this.verbaliseTimeTaken(this.turkMetadata.storedMetrics);
+        $('#inputBonusAmt')[0].value = this.turkMetadata.bonus
+        $('#inputAcceptMessage')[0].value = this.turkMetadata.bonusMessage
+         $('#acceptForm').modal('toggle'); 
+    }
+    showRejectDialog(e) {
+        $('#workerTimeRejection')[0].innerText = this.verbaliseTimeTaken(this.turkMetadata.storedMetrics);
+        $('#readonlyBonusAmt')[0].innerText = this.turkMetadata.bonus
+        $('#inputRejectMessage')[0].value = this.turkMetadata.rejectionMessage
+        $('#rejectForm').modal('toggle');
     }
 
-    submitVerified() {
-        return fetch(`/video/${this.videoId}/verify/`, {
-            headers: {
-                'X-CSRFToken': window.CSRFToken,
-                'Content-Type': 'application/json',
-            },
-            credentials: 'same-origin',
-            method: 'post',
-            body: (!window.video.verified).toString(),
-        }).then((response) => {
-            if (response.ok) {
-                window.video.verified = !window.video.verified;
-                $(this).triggerHandler('change-verification');
-            }
-            return response.text();
-        }).then((text) => console.log(text));
+    verbaliseTimeTaken(metricsObj) {
+        var timeInMillis = metricsObj.annotationsEndTime - metricsObj.annotationsStartTime;
+
+        return Math.round(timeInMillis / 60 / 100) / 10 + " minutes";
     }
+
+    acceptAnnotations(e) {
+        e.preventDefault();
+
+        var bonus = $('#inputBonusAmt')[0];
+        var message = $('#inputAcceptMessage')[0];
+        $('#acceptForm').find('.btn').attr("disabled", "disabled");
+        DataSources.annotations.acceptAnnotation(this.videoId, parseFloat(bonus.value), message.value).then((response) => {
+            $('#acceptForm').modal('toggle');
+            $('#acceptForm').find('.btn').removeAttr("disabled");
+            location.reload();
+        }, (err) => {
+            alert("There was an error processing your request.");
+            $('#acceptForm').find('.btn').removeAttr("disabled");
+        });
+    }
+
+    rejectAnnotations(e) {
+        e.preventDefault();
+
+        var message = $('#inputRejectMessage')[0];
+        var reopen = $('#inputReopen')[0];
+        var deleteBoxes = $('#inputDeleteBoxes')[0];
+        $('#rejectForm').find('.btn').attr("disabled", "disabled");
+        DataSources.annotations.rejectAnnotation(this.videoId, message.value, reopen.checked, deleteBoxes.checked).then((response) => {
+            $('#rejectForm').modal('toggle');
+            $('#rejectForm').find('.btn').removeAttr("disabled");
+            location.reload();
+        }, (err) => {
+            alert("There was an error processing your request:\n" + err);
+            $('#rejectForm').find('.btn').removeAttr("disabled");
+        });
+    }
+
 
     addAnnotationAtCurrentTimeFromRect(rect) {
         var annotation = Annotation.newFromCreationRect(this.isImageSequence);

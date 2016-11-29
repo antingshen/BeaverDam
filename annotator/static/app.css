@@ -225,3 +225,8 @@ div.imgplay {
 #instructionModal .modal-body {
     margin: 0 2rem;
 }
+
+.row {
+    padding-top:4px;
+    padding-bottom: 4px;
+}

@@ -146,16 +146,16 @@ class Server(object):
                     pass
             print("Next page")
 
-    def get_assignments(self):
-        res = mturk.request('GetAssignmentsForHIT', {"HITId":tasks[0].hit_id})
+    def get_assignments(self, hit_id):
+        res = self.request('GetAssignmentsForHIT', {"HITId":hit_id})
         if res.has_path("GetAssignmentsForHITResult/Assignment") :
             res.store("GetAssignmentsForHITResult/Request/IsValid", "IsValid", bool)
             res.store("GetAssignmentsForHITResult/Assignment/AssignmentId", "assignment_id")
             res.store("GetAssignmentsForHITResult/Assignment/WorkerId", "worker_id")
 
-            return res.assignment_id, worker_id
+            return (res.assignment_id, res.worker_id)
 
-        return None
+        return (None, None)
 
         
 
@@ -292,6 +292,7 @@ class Response(object):
         self.operation = operation
         self.httpresponse = httpresponse
         self.data = httpresponse.read()
+        logger.error(self.data)
         self.tree = ElementTree.fromstring(self.data)
         self.values = {}
         #print("------------------------------------------------------")
@@ -319,6 +320,11 @@ class Response(object):
                 raise CommunicationError(errormessage.text.strip(), self)
             else:
                 raise CommunicationError("Response not valid", self)
+    def has_path(self, path):
+        res = self.tree.find(path)
+        if res is None:
+            return False
+        return True
 
     def has_path(self, path):
         result = self.tree.find(path)
