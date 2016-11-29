@@ -66,7 +66,8 @@ class Task(models.Model):
         if self.assignment_id == None:
             raise Exception("Cannot approve task - no work has been done on Turk")
 
-        mturk.bonus(self.worker_id, self.assignment_id, bonus, message)
+        if bonus > 0:
+            mturk.bonus(self.worker_id, self.assignment_id, bonus, message)
 
         mturk.accept(self.assignment_id, message)
         

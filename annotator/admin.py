@@ -9,7 +9,7 @@ import logging
 
 logger = logging.getLogger() 
 
-def publish(modeladmin, request, videos):
+def publish_to_turk(modeladmin, request, videos):
     for video in videos:
         video_task = get_active_video_turk_task(video.id)
 
@@ -20,24 +20,23 @@ def publish(modeladmin, request, videos):
         video_task.publish()
 
 class PublishedFilter(SimpleListFilter):
-    title = 'Published' # or use _('country') for translated title
+    title = 'Currently Published' # or use _('country') for translated title
     parameter_name = 'Published'
     default_value = 2
 
     def lookups(self, request, model_admin):
         return (
-        (2, 'All'),
-        (1, 'Yes'),
-        (0, 'No'),
+        ("1", 'Yes'),
+        ("0", 'No'),
     )
  
     def queryset(self, request, queryset):
         if self.value() is None:
             return queryset
         else:
-            self.used_parameters[self.parameter_name] = int(self.value())
+            self.used_parameters[self.parameter_name] = self.value()
 
-        if self.value() == 0:
+        if self.value() == "0":
             return queryset.annotate(num_video_tasks=
                 Sum(
                     Case(
@@ -46,7 +45,7 @@ class PublishedFilter(SimpleListFilter):
                         output_field=IntegerField())
                     )).filter(num_video_tasks = 0)
 
-        elif self.value() == 1:
+        elif self.value() == "1":
             return queryset.annotate(num_video_tasks=
                 Sum(
                     Case(
@@ -61,7 +60,7 @@ class VideoAdmin(admin.ModelAdmin):
     list_display =('id','filename','verified', 'is_published')
     list_filter=[PublishedFilter, 'verified']
     search_fields=['filename', 'id']
-    actions=[publish]
+    actions=[publish_to_turk]
 
     def is_published(self, obj):
         task = get_active_video_turk_task(obj.id)
@@ -71,7 +70,8 @@ class VideoAdmin(admin.ModelAdmin):
             return False
         return True
 
-    is_published.short_description = "Published"
+    is_published.short_description = "Currently Published"
+    is_published.boolean = True
         
     
 admin.site.register(Video, VideoAdmin)
