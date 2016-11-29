@@ -109,7 +109,7 @@ var DataSources = {
                     bonus: bonus,
                     message: message,
                     type: 'accept',
-                    updatedAnnotations: updatedAnnotations,
+                    updatedAnnotations: DataSources.annotations.toJson(updatedAnnotations),
                 }),
             }).then((response) => {
                 if (!response.ok)

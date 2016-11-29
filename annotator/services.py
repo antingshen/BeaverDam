@@ -56,6 +56,7 @@ def accept_video(request, video_id, bonus, message, updatedAnnotations):
     video_task.closed = True
     video_task.save()
 
+    video.annotation = updatedAnnotations
     video.verified = True
     video.rejected = False
     video.save()
