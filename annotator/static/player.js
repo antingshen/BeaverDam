@@ -237,6 +237,8 @@ class Player {
     drawAnnotationOnRect(annotation, rect) {
         if (this.metrics.annotationsStartTime == null) {
             this.metrics.annotationsStartTime = Date.now();
+            // force the keyboard shortcuts to work within an iframe
+            window.focus();
         }
         var time = this.view.video.currentTime;
 
