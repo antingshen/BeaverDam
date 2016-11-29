@@ -43,21 +43,21 @@ def accept_video(request, video_id, bonus, message):
 
     if video_task == None:
         raise Exception('no video task to accept')
-    
+
     # accept on turk
     video_task.approve_assignment(bonus, message)
 
     # delete from Turk
     video_task.archive_turk_hit()
 
-    # save video
-    decBonus = Decimal(bonus)
-
-    video_task.bonus = decBonus
+    video_task.bonus = Decimal(bonus)
     video_task.message = message
     video_task.paid = True
     video_task.closed = True
     video_task.save()
+
+    video.verified = True
+    video.save()
 
 @staff_member_required
 def reject_video(request, video_id, message, reopen, clear_boxes):
@@ -89,3 +89,7 @@ def reject_video(request, video_id, message, reopen, clear_boxes):
     if reopen:
         new_task = FullVideoTask(video = video)
         new_task.publish()
+
+    video.verified = False
+    video.rejected = True
+    video.save()

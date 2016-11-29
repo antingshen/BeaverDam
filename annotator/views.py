@@ -18,6 +18,7 @@ from .models import *
 from .services import *
 
 import logging
+import ast
 
 logger = logging.getLogger()
 
@@ -46,6 +47,19 @@ def next_unannotated(request, video_id):
     id = Video.objects.filter(id__gt=video_id, annotation='')[0].id
     return redirect('video', id)
 
+# status of Not Published, Published, Awaiting Approval, Verified
+# this is a bit convoluted as there's status stored on 
+# video (approved) as well as FullVideoTask (closed, paid, etc.)
+def get_mturk_status(video, full_video_task):
+    if video.verified:
+        return "Verified"
+    if full_video_task == None:
+        return "Not Published"
+    if full_video_task.worker_id == '':
+        return "Published"
+    if full_video_task.worker_id != '':
+        return "Awaiting Approval"
+
 @xframe_options_exempt
 def video(request, video_id):
     try:
@@ -66,14 +80,25 @@ def video(request, video_id):
     turk_task = get_active_video_turk_task(video.id)
 
     if turk_task != None:
+        if turk_task.metrics != '':
+            metricsDictr = ast.literal_eval(turk_task.metrics)
+        else:
+            metricsDictr = {}
+
         full_video_task_data = {
             'id': turk_task.id,
-            'metrics': '1',
+            'storedMetrics': metricsDictr,
             'bonus': float(turk_task.bonus),
-            'message': turk_task.message
+            'bonusMessage': turk_task.message,
+            'rejectionMessage': settings.MTURK_REJECTION_MESSAGE,
+            'isComplete': turk_task.worker_id != ''
         }
     else:
         full_video_task_data = None
+
+    mturk_data['status'] = get_mturk_status(video, turk_task)    
+
+    logger.error("full task = {}".format(full_video_task_data))
 
     video_data = json.dumps({
         'id': video.id,
@@ -87,8 +112,6 @@ def video(request, video_id):
         'end_time' : end_time,
         'turk_task' : full_video_task_data
     })
-
-
 
     label_data = []
     for l in labels:
@@ -117,8 +140,13 @@ class AnnotationView(View):
 
     def post(self, request, video_id):
         data = json.loads(request.body.decode('utf-8'))
+        
+        video = Video.objects.get(id=video_id)
+        video.annotation = json.dumps(data['annotation'])
+        video.save()
+
         hit_id = data.get('hitId', None)
-        if not (request.user.is_authenticated()):
+        if hit_id != None:
             if not Task.valid_hit_id(hit_id):
                 return HttpResponseForbidden('Not authenticated')
             else:
@@ -130,9 +158,6 @@ class AnnotationView(View):
                 except ObjectDoesNotExist:
                     if not settings.DEBUG:
                         raise
-        video = Video.objects.get(id=video_id)
-        video.annotation = json.dumps(data['annotation'])
-        video.save()
         return HttpResponse('success')
 
 

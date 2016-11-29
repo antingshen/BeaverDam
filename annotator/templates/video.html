@@ -58,8 +58,12 @@
                 {% else %}
                 <button id="submit-btn" type="button" class="btn btn-primary">Save</button>
 
-                <button type="button" class="btn btn-danger" onclick="$('#rejectForm').modal('toggle')">Reject</button>
-                <button type="button" class="btn btn-success" onclick="$('#acceptForm').modal('toggle')" >Accept</button>
+                  {% if mturk_data.status == "Awaiting Approval" %}
+                  <button id="btn-show-reject" type="button" class="btn btn-danger">Reject</button>
+                  <button id="btn-show-accept" type="button" class="btn btn-success ">Accept</button>
+                  {% else %}
+                  <button class="btn" disabled>{{ mturk_data.status }}</button>
+                  {% endif %}
                 {% endif %}
               </div>
               {% endif %}
@@ -117,6 +121,26 @@
 
     </div>
 
+    <div class="modal fade" id="genericModal" role="dialog">
+      <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+            <h4 id="genericModalTitle" class="modal-title submit-result">aaa</h4>
+          </div>
+
+          <div class="modal-body">
+            <span id="genericModalMessage">aaa</span>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn" data-dismiss="modal">OK</button>
+          </div>
+        </div>
+      </div>
+    </div>
 
     {% if mturk_data.authenticated == False %}
     <div class="modal fade" id="acceptForm" role="dialog">
@@ -129,11 +153,11 @@
             <h4 class="modal-title submit-result">Accept Work</h4>
           </div>
 
-          <div>
+          <div class="modal-body">
             <div class="form-group row">
               <label for="workerTime" class="col-sm-2 col-form-label">Worker Time</label>
               <div class="col-sm-10">
-                <span id="workerTime" class="form-control" style="text-align:left;">23.1 mins</span>
+                <span id="workerTime" class="form-control" style="text-align:left;"></span>
               </div>
             </div>
             <div class="form-group row">
@@ -168,18 +192,17 @@
             <h4 class="modal-title submit-result">Reject Work</h4>
           </div>
 
-          <form class="form horizontal">
-          <div >
+          <div class="modal-body">
             <div class="form-group row">
-              <label for="workerTime" class="col-md-2 col-form-label">Time</label>
+              <label for="workerTime" class="col-md-2 col-form-label">Worker Time</label>
               <div class="col-sm-10">
-                <span id="workerTime" class="form-control" style="text-align:left;">23.1 mins</span>
+                <span id="workerTimeRejection" class="form-control" style="text-align:left;"></span>
               </div>
             </div>
             <div class="form-group row">
-              <label for="inputBonusAmt" class="col-md-2 col-form-label">Bonus</label>
+              <label for="inputBonusAmt" class="col-md-2 col-form-label">Unpaid Bonus</label>
               <div class="col-sm-10">
-                <input type="number" class="form-control" id="inputBonusAmt" placeholder="0.00" step="0.01" min="0">
+                <span  class="form-control" id="readonlyBonusAmt"></span>
               </div>
             </div>
             <div class="form-group row">
@@ -203,7 +226,6 @@
               </div>
             </div>
           </div>
-          </form>
 
           <div class="modal-footer">
 

@@ -8,6 +8,7 @@ from datetime import datetime
 
 from .mturk_api import Server
 from annotator.models import Video
+import time
 
 import logging
 
@@ -47,33 +48,30 @@ class Task(models.Model):
         self.save()
 
     def complete(self, worker_id, assignment_id, metrics):
+
         self.worker_id = worker_id
         self.assignment_id = assignment_id
         self.metrics = metrics
         self.bonus = self.calculate_bonus()
+        self.message = settings.MTURK_BONUS_MESSAGE
         self.time_completed = datetime.now()
         self.paid = False
         self.save()
 
     
     def approve_assignment(self, bonus, message):
-        
-        assignment_id, worker_id = mturk.get_assignments(self.hit_id)
-        
-        if assignment_id == None:
+        if self.assignment_id == None:
             raise Exception("Cannot approve task - no work has been done on Turk")
 
-        mturk.accept(assignment_id, message)
-        mturk.bonus(worker_id, assignment_id, bonus, settings.MTURK_BONUS_MESSAGE.format(bonus))
+        mturk.bonus(self.worker_id, self.assignment_id, bonus, message)
 
-    def reject_assignment(self, message):
-        logger.error("Hit ID = " + self.hit_id)
-        assignment_id, worker_id = mturk.get_assignments(self.hit_id)
+        mturk.accept(self.assignment_id, message)
         
-        if assignment_id == None:
+    def reject_assignment(self, message):
+        if self.assignment_id == None:
             raise Exception("Cannot reject task - no work has been done on Turk")
 
-        mturk.reject(assignment_id, message)
+        mturk.reject(self.assignment_id, message)
 
     def archive_turk_hit(self):
         res = mturk.disable(self.hit_id)
@@ -122,6 +120,7 @@ class FullVideoTask(Task):
     title = "Video Annotation"
     description = "Draw boxes around objects in a video"
     pay = 0.00
+    bonus_per_box = settings.MTURK_BONUS_PER_BOX
 
     @property
     def url(self):
@@ -130,6 +129,10 @@ class FullVideoTask(Task):
     def __str__(self):
         return self.video.filename
 
+    def calculate_bonus(self):
+        boxes = self.video.count_keyframes()
+        num_cents = boxes * self.bonus_per_box
+        return num_cents
 
 class SingleFrameTask(Task):
     video = models.ForeignKey(Video)
@@ -141,7 +144,7 @@ class SingleFrameTask(Task):
 
     def calculate_bonus(self):
         boxes = self.video.count_keyframes(at_time=self.time)
-        num_cents = ((boxes - 1) * bonus_per_box + pay) * 100
+        num_cents = ((boxes - 1) * self.bonus_per_box + pay) * 100
         return math.ceil(num_cents) / 100
 
     @property
