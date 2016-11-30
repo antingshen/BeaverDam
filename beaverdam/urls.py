@@ -17,8 +17,9 @@ urlpatterns = [
     url(r'^video/(\d+)/next/$', next_unannotated),
     url(r'^video/(\d+)/verify/$', verify),
     url(r'^annotation/(\d+)/$', AnnotationView.as_view()),
-    url(r'^accept\-annotation/(\d+)/$', AcceptRejectView.as_view()),
-    url(r'^reject\-annotation/(\d+)/$', AcceptRejectView.as_view()),
+    url(r'^accept\-annotation/(\d+)/$', ReceiveCommand.as_view()),
+    url(r'^reject\-annotation/(\d+)/$', ReceiveCommand.as_view()),
+    url(r'^email-worker/(\d+)/$', ReceiveCommand.as_view()),
 
     url(r'^login/$', login,
         {'template_name': 'admin/login.html',

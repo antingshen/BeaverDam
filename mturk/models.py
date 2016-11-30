@@ -11,6 +11,7 @@ from annotator.models import Video
 import time
 
 import logging
+import os
 
 logger = logging.getLogger()
 
@@ -27,10 +28,12 @@ class Task(models.Model):
     assignment_id = models.CharField(max_length=64, blank=True)
     time_completed = models.DateTimeField(null=True, blank=True)
     bonus = models.DecimalField(max_digits=4, decimal_places=2, default=0)
-    paid = models.BooleanField(default=False)
     sandbox = models.BooleanField(default=settings.MTURK_SANDBOX)
     message = models.CharField(max_length=256, blank=True)
+    email_trail = models.TextField(blank=True)
+    last_email_sent_date = models.DateTimeField(null=True, blank=True)
     closed = models.BooleanField(default=False)
+    paid = models.BooleanField(default=False)
 
     class Meta:
         abstract = True
@@ -48,7 +51,6 @@ class Task(models.Model):
         self.save()
 
     def complete(self, worker_id, assignment_id, metrics):
-
         self.worker_id = worker_id
         self.assignment_id = assignment_id
         self.metrics = metrics
@@ -58,7 +60,21 @@ class Task(models.Model):
         self.paid = False
         self.save()
 
-    
+    def send_email(self, subject, message):
+        if (self.worker_id == ''):
+            raise Exception("No worked id to send email to for FullVideoTask({})".format(id))
+
+        mturk.email(self.worker_id, subject, message)
+        self.last_email_sent_date = datetime.now()
+        self.email_trail += "{}================================================{}".format(os.linesep, os.linesep)
+        self.email_trail += "Date: {}{}".format(self.last_email_sent_date.strftime("%c"), os.linesep)
+        self.email_trail += "Subject: {}{}".format(subject, os.linesep)
+        self.email_trail += "--------------------------------------------------{}".format(os.linesep)
+        self.email_trail += message
+        self.email_trail += os.linesep
+         
+        self.save()
+
     def approve_assignment(self, bonus, message):
         if self.assignment_id == None:
             raise Exception("Cannot approve task - no work has been done on Turk")

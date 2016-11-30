@@ -118,7 +118,7 @@ var DataSources = {
             });
         },
 
-        rejectAnnotation: function(id, message, reopen, deleteBoxes) {
+        rejectAnnotation: function(id, message, reopen, deleteBoxes, updatedAnnotations) {
             return fetch(`/reject-annotation/${id}/`, {
                 headers: {
                     'X-CSRFToken': window.CSRFToken,
@@ -130,7 +130,29 @@ var DataSources = {
                     message: message,
                     type: 'reject',
                     reopen: reopen,
-                    deleteBoxes: deleteBoxes
+                    deleteBoxes: deleteBoxes,
+                    updatedAnnotations: DataSources.annotations.toJson(updatedAnnotations)
+                }),
+            }).then((response) => {
+                if (!response.ok) {
+                    return Promise.reject(response.headers.get('error-message'));
+                }
+                return null;
+            });
+        },
+
+        emailWorker: function(id, subject, message) {
+            return fetch(`/email-worker/${id}/`, {
+                headers: {
+                    'X-CSRFToken': window.CSRFToken,
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'same-origin',
+                method: 'post',
+                body: JSON.stringify({
+                    message: message,
+                    subject: subject,
+                    type: "email"
                 }),
             }).then((response) => {
                 if (!response.ok) {

@@ -5,18 +5,14 @@ from django.views.generic import View
 from django.views.decorators.clickjacking import xframe_options_exempt
 from django.contrib.admin.views.decorators import staff_member_required
 from django.core.exceptions import ObjectDoesNotExist
-
+from datetime import datetime, timezone
 import os
 import json
 import sys
-
 import mturk.utils
 from mturk.queries import get_active_video_turk_task
-
 from .models import *
-
 from .services import *
-
 import logging
 import ast
 
@@ -54,7 +50,12 @@ def get_mturk_status(video, full_video_task):
     if video.verified:
         return "Verified"
     if full_video_task == None:
-        return "Not Published"
+        if video.rejected == True:
+            return "Rejected"
+        elif video.annotation == '':
+            return "Not Published"
+        else:
+            return "Awaiting Approval"
     if full_video_task.worker_id == '':
         return "Published"
     if full_video_task.worker_id != '':
@@ -85,18 +86,26 @@ def video(request, video_id):
         else:
             metricsDictr = {}
 
+        # Data for Javascript
         full_video_task_data = {
             'id': turk_task.id,
             'storedMetrics': metricsDictr,
             'bonus': float(turk_task.bonus),
             'bonusMessage': turk_task.message,
             'rejectionMessage': settings.MTURK_REJECTION_MESSAGE,
+            'emailSubject': settings.MTURK_EMAIL_SUBJECT,
+            'emailMessage': settings.MTURK_EMAIL_MESSAGE,
             'isComplete': turk_task.worker_id != ''
         }
+
+        # Data for python templating
+        if turk_task.last_email_sent_date != None:
+            mturk_data['last_email_sent_date'] = turk_task.last_email_sent_date.strftime("%Y-%m-%d %H:%M")
     else:
         full_video_task_data = None
 
-    mturk_data['status'] = get_mturk_status(video, turk_task)    
+    mturk_data['status'] = get_mturk_status(video, turk_task)
+    mturk_data['has_current_full_video_task'] = full_video_task_data != None
 
     logger.error("full task = {}".format(full_video_task_data))
 
@@ -161,15 +170,21 @@ class AnnotationView(View):
         return HttpResponse('success')
 
 
-class AcceptRejectView(View):
+class ReceiveCommand(View):
+
     def post(self, request, video_id):
         data = json.loads(request.body.decode('utf-8'))
 
         try:
-            if data['type'] == "accept":
-                accept_video(request, int(video_id), data['bonus'], data['message'], json.dumps(data['updatedAnnotations']))
-            elif data['type'] == "reject":
-                reject_video(request, int(video_id), data['message'], data['reopen'], data['deleteBoxes'])
+            vid_id = int(video_id)
+            command_type = data['type'] 
+            if command_type == "accept":
+                accept_video(request, vid_id, data['bonus'], data['message'], json.dumps(data['updatedAnnotations']))
+            elif command_type == "reject":
+                reject_video(request, vid_id, data['message'], data['reopen'], data['deleteBoxes'], json.dumps(data['updatedAnnotations']))
+            elif command_type == "email":
+                email_worker(request, vid_id, data['subject'], data['message'])
+
             return HttpResponse(status=200)
         except Exception as e:
             logger.exception(e)
