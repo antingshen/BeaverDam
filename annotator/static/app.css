@@ -231,7 +231,15 @@ div.imgplay {
     padding-bottom: 4px;
 }
 
-.modal-content
-{
+.modal-content {
     min-width: 760px;
+}
+
+.video-list {
+    padding: 0 50px 25px 50px;
+}
+
+.video-list h3 {
+    font-weight: 300;
+    font-size: 18px;
 }

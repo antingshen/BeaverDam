@@ -1,8 +1,14 @@
 {% extends "base.html" %}
 
+{% block head %}
+  <link rel="stylesheet" type="text/css" href="/static/app.css"/>
+{% endblock %}
+
 {% block body %}
 
-<div style="padding: 50px;">
+<div class="video-list">
+  <h1>{{title}}</h1>
+  <h3>{{videos|length}} videos</h3>
   <table class="table table-hover" style="width:100%; margin: 0 auto;">
     <thead>
       <tr>
