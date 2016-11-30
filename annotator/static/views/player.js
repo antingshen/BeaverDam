@@ -12,7 +12,7 @@ var PlayerViewConstants = {
 
 
 class PlayerView {
-    constructor({$container, videoSrc, videoStart, videoEnd}) {
+    constructor({$container, videoSrc, videoStart, videoEnd, isImageSequence}) {
         // This container of the player
         this.$container = $container;
 
@@ -54,6 +54,9 @@ class PlayerView {
 
         // are we waiting for buffering
         this.loading = true;
+
+        // whether or not we are using an image sequence or a video style renderer
+        this.isImageSequence = isImageSequence;
 
         // Promises
         this.keyframebarReady = Misc.CustomPromise();
@@ -189,7 +192,7 @@ class PlayerView {
             $(this).on('keydn-period    keydn-e', () => this.play());
             $(this).on('keyup-period    keyup-e', () => this.pause());
             // Delete keyframe
-            $(this).on('                keydn-d', () => this.deleteKeyframe());
+            $(this).on('keyup-delete    keyup-d', () => this.deleteKeyframe());
             // Keyframe stepping
             $(this).on('keydn-g                ', () => this.stepforward());
             $(this).on('keydn-f                ', () => this.stepbackward());

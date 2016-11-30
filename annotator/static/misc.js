@@ -229,6 +229,7 @@ var Misc = {
          38: "arrowup",
          39: "arrowright",
          40: "arrowdown",
+         46: "delete",
          48: "0",
          49: "1",
          50: "2",
