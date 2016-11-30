@@ -3,6 +3,7 @@
 
 class Player {
     constructor({$container, videoSrc, videoId, videoStart, videoEnd, isImageSequence, turkMetadata}) {
+
         this.$container = $container;
 
         this.videoId = videoId;
@@ -24,6 +25,8 @@ class Player {
         this.isImageSequence = isImageSequence;
 
         this.turkMetadata = turkMetadata;
+
+        this.isImageSequence = isImageSequence;
 
         this.metrics = {
             playerStartTimes: Date.now(),
@@ -143,13 +146,14 @@ class Player {
 
         // Submitting
         $('#submit-btn').click(this.submitAnnotations.bind(this));
-        $('#submit-survey-btn').click(this.submitSurvey.bind(this));
 
         $('#btn-show-accept').click(this.showAcceptDialog.bind(this));
         $('#btn-show-reject').click(this.showRejectDialog.bind(this));
+        $('#btn-show-email').click(this.showEmailDialog.bind(this));
 
         $('#accept-btn').click(this.acceptAnnotations.bind(this));
         $('#reject-btn').click(this.rejectAnnotations.bind(this));
+        $('#email-btn').click(this.emailWorker.bind(this));
 
        
         // On drawing changed
@@ -285,26 +289,37 @@ class Player {
         $('#genericModal').modal();
     }
 
-    submitSurvey() {
-        var results = [];
-        for (let i = 1; i <= numberOfSurveyQuestions; i++) {
-            results.push($(`input[name='survey-q${i}']:checked`).val());
-        }
-        console.log(results);
-        //TODO: Store results in datasources
-    }
-
     showAcceptDialog(e) {
-        $('#workerTime')[0].innerText = this.verbaliseTimeTaken(this.turkMetadata.storedMetrics);
-        $('#inputBonusAmt')[0].value = this.turkMetadata.bonus
-        $('#inputAcceptMessage')[0].value = this.turkMetadata.bonusMessage
-         $('#acceptForm').modal('toggle'); 
+        this.setDialogDefaults();
+        if (this.turkMetadata) {
+            $('#inputBonusAmt')[0].value = this.turkMetadata.bonus
+            $('#inputAcceptMessage')[0].value = this.turkMetadata.bonusMessage
+        }
+        $('#acceptForm').modal('toggle'); 
     }
     showRejectDialog(e) {
-        $('#workerTimeRejection')[0].innerText = this.verbaliseTimeTaken(this.turkMetadata.storedMetrics);
-        $('#readonlyBonusAmt')[0].innerText = this.turkMetadata.bonus
-        $('#inputRejectMessage')[0].value = this.turkMetadata.rejectionMessage
+        this.setDialogDefaults();
+        if (this.turkMetadata) {
+            $('#inputRejectMessage')[0].value = this.turkMetadata.rejectionMessage;
+        }
         $('#rejectForm').modal('toggle');
+    }
+    showEmailDialog(e) {
+        this.setDialogDefaults();
+      
+        $('#inputEmailMessage')[0].value = this.turkMetadata.emailMessage;
+        $('#inputEmailSubject')[0].value = this.turkMetadata.emailSubject;
+        $('#emailForm').modal('toggle');
+    }
+    setDialogDefaults(){
+        if (this.turkMetadata) {
+            $('.workerTime').text(this.verbaliseTimeTaken(this.turkMetadata.storedMetrics));
+            $('.readonlyBonusAmt').text(this.turkMetadata.bonus);
+            $('.readonlyBrowser').text(this.turkMetadata.storedMetrics.browserAgent);
+        }
+        else {
+            $('.turkSpecific').css({display:'none'});
+        }
     }
 
     verbaliseTimeTaken(metricsObj) {
@@ -336,7 +351,7 @@ class Player {
         var reopen = $('#inputReopen')[0];
         var deleteBoxes = $('#inputDeleteBoxes')[0];
         $('#rejectForm').find('.btn').attr("disabled", "disabled");
-        DataSources.annotations.rejectAnnotation(this.videoId, message.value, reopen.checked, deleteBoxes.checked).then((response) => {
+        DataSources.annotations.rejectAnnotation(this.videoId, message.value, reopen.checked, deleteBoxes.checked, this.annotations).then((response) => {
             $('#rejectForm').modal('toggle');
             $('#rejectForm').find('.btn').removeAttr("disabled");
             location.reload();
@@ -346,6 +361,21 @@ class Player {
         });
     }
 
+    emailWorker(e) {
+        e.preventDefault();
+        var subject = $('#inputEmailSubject')[0];
+        var message = $('#inputEmailMessage')[0];
+        
+        $('#emailForm').find('.btn').attr("disabled", "disabled");
+        DataSources.annotations.emailWorker(this.videoId, subject.value, message.value).then((response) => {
+            $('#emailForm').modal('toggle');
+            $('#emailForm').find('.btn').removeAttr("disabled");
+            location.reload();
+        }, (err) => {
+            alert("There was an error processing your request:\n" + err);
+            $('#emailForm').find('.btn').removeAttr("disabled");
+        });
+    }
 
     addAnnotationAtCurrentTimeFromRect(rect) {
         var annotation = Annotation.newFromCreationRect(this.isImageSequence);

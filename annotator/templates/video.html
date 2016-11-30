@@ -58,18 +58,23 @@
           </form>
 
           {% else %}
-          <div id="submit-btn-group" class="btn-group" role="group">
+              {% if mturk_data.last_email_sent_date != None %}
+                <i>E-mail sent on {{  mturk_data.last_email_sent_date }}</i>
+              {% endif %}
+              <div id="submit-btn-group" class="btn-group" role="group">
                 {% if request.user.is_staff == False %}
                 <button id="submit-btn" type="button" class="btn btn-primary">Submit</button>
                 {% else %}
                 <button id="submit-btn" type="button" class="btn btn-primary">Save</button>
 
-                  {% if mturk_data.status == "Awaiting Approval" %}
-                  <button id="btn-show-reject" type="button" class="btn btn-danger">Reject</button>
-                  <button id="btn-show-accept" type="button" class="btn btn-success ">Accept</button>
-                  {% else %}
-                  <button class="btn" disabled>{{ mturk_data.status }}</button>
+                  {% if mturk_data.status == "Awaiting Approval" or mturk_data.status == "Rejected" %}
+                    <button id="btn-show-reject" type="button" class="btn btn-danger">Reject</button>
+                    <button id="btn-show-accept" type="button" class="btn btn-success ">Accept</button>
+                    {% if mturk_data.has_current_full_video_task %}
+                      <button id="btn-show-email" type="button" class="btn">E-mail Worker</button>
+                    {% endif %}
                   {% endif %}
+                  <button class="btn" disabled>{{ mturk_data.status }}</button>
                 {% endif %}
               </div>
           {% endif %}
@@ -129,10 +134,9 @@
 
     </div>
 
+    <!-- ============================Generic Form=============================== -->
     <div class="modal fade" id="genericModal" role="dialog">
       <div class="modal-dialog">
-
-        <!-- Modal content-->
         <div class="modal-content">
           <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal">&times;</button>
@@ -166,10 +170,9 @@
     </div>
 
     {% if mturk_data.authenticated == False %}
+    <!-- ============================ACCEPT FORM=============================== -->
     <div class="modal fade" id="acceptForm" role="dialog">
       <div class="modal-dialog">
-
-        <!-- Modal content-->
         <div class="modal-content">
           <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal">&times;</button>
@@ -177,19 +180,25 @@
           </div>
 
           <div class="modal-body">
-            <div class="form-group row">
+            <div class="form-group row turkSpecific">
               <label for="workerTime" class="col-sm-2 col-form-label">Worker Time</label>
               <div class="col-sm-10">
-                <span id="workerTime" class="form-control" style="text-align:left;"></span>
+                <span class="form-control workerTime" style="text-align:left;"></span>
               </div>
             </div>
-            <div class="form-group row">
+            <div class="form-group row turkSpecific">
               <label for="inputBonusAmt" class="col-sm-2 col-form-label">Bonus</label>
               <div class="col-sm-10">
                 <input type="number" class="form-control" id="inputBonusAmt" placeholder="0.00" step="0.01" min="0">
               </div>
             </div>
-            <div class="form-group row">
+            <div class="form-group row turkSpecific">
+              <label for="inputBonusAmt" class="col-md-2 col-form-label">Worker Browser</label>
+              <div class="col-sm-10">
+                <span type="text" class="form-control readonlyBrowser" ><span>
+              </div>
+            </div>
+            <div class="form-group row turkSpecific">
               <label for="inputMessage" class="col-sm-2 col-form-label">Message</label>
               <div class="col-sm-10">
                 <textarea class="form-control vresize" id="inputAcceptMessage" placeholder="Thanks for your work"></textarea>
@@ -205,10 +214,9 @@
       </div>
     </div>
 
+    <!-- ============================REJECT FORM=============================== -->
     <div class="modal fade" id="rejectForm" role="dialog">
       <div class="modal-dialog">
-
-        <!-- Modal content-->
         <div class="modal-content">
           <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal">&times;</button>
@@ -216,25 +224,31 @@
           </div>
 
           <div class="modal-body">
-            <div class="form-group row">
+            <div class="form-group row turkSpecific">
               <label for="workerTime" class="col-md-2 col-form-label">Worker Time</label>
               <div class="col-sm-10">
-                <span id="workerTimeRejection" class="form-control" style="text-align:left;"></span>
+                <span class="form-control workerTime" style="text-align:left;"></span>
               </div>
             </div>
-            <div class="form-group row">
+            <div class="form-group row turkSpecific">
               <label for="inputBonusAmt" class="col-md-2 col-form-label">Unpaid Bonus</label>
               <div class="col-sm-10">
-                <span  class="form-control" id="readonlyBonusAmt"></span>
+                <span  class="form-control readonlyBonusAmt"></span>
               </div>
             </div>
-            <div class="form-group row">
+            <div class="form-group row turkSpecific">
+              <label for="readonlybrowser" class="col-md-2 col-form-label">Worker Browser</label>
+              <div class="col-sm-10">
+                <div id="readonlybrowser" class="form-control readonlyBrowser"></div>
+              </div>
+            </div>      
+            <div class="form-group row turkSpecific">
               <label for="inputRejectMessage" class="col-md-2 col-form-label">Message</label>
               <div class="col-sm-10">
                 <textarea class="form-control vresize" id="inputRejectMessage" placeholder="Thanks for your work"></textarea>
               </div>
             </div>
-            <div class="form-group row">
+            <div class="form-group row turkSpecific">
               <div class="col-sm-offset-2 col-md-10">
                 <div class="checkbox"  style="margin-top:0px; margin-bottom:0px">
                   <label><input type="checkbox" checked="true" id="inputReopen">Reopen on Turk</label>
@@ -254,6 +268,56 @@
 
             <button id="cancel-btn" type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
             <button id="reject-btn" type="button" class="btn btn-danger">Reject</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================EMAIL FORM=============================== -->
+    <div class="modal fade" id="emailForm" role="dialog">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+            <h4 class="modal-title submit-result">Send Worker Email</h4>
+          </div>
+
+          <div class="modal-body">
+            <div class="form-group row">
+              <label for="workerTime" class="col-sm-2 col-form-label">Worker Time</label>
+              <div class="col-sm-10">
+                <span class="form-control workerTime" style="text-align:left;"></span>
+              </div>
+            </div>
+            <div class="form-group row">
+              <label for="inputBonusAmt" class="col-sm-2 col-form-label">Bonus</label>
+              <div class="col-sm-10">
+                <span  class="form-control readonlyBonusAmt"></span>
+              </div>
+            </div>
+            <div class="form-group row">
+              <label for="inputBonusAmt" class="col-md-2 col-form-label">Worker Browser</label>
+              <div class="col-sm-10">
+                <span type="text" class="form-control readonlyBrowser" ><span>
+              </div>
+            </div>
+            <div class="form-group row">
+              <label for="inputMessage" class="col-sm-2 col-form-label">Subject</label>
+              <div class="col-sm-10">
+                <input class="form-control" id="inputEmailSubject"/>
+              </div>
+            </div>
+            <div class="form-group row">
+              <label for="inputMessage" class="col-sm-2 col-form-label" >Message</label>
+              <div class="col-sm-10">
+                <textarea class="form-control vresize" id="inputEmailMessage" style="height:21em;" placeholder="Thanks for your work"></textarea>
+              </div>
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button id="cancel-btn" type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+            <button id="email-btn" type="button" class="btn btn-primary">Send</button>
           </div>
         </div>
       </div>

@@ -34,7 +34,19 @@ MTURK_BONUS_MESSAGE = "Thanks for your work"
 MTURK_REJECTION_MESSAGE = "Your work has not been accepted. You must follow the instructions of the task precisely to complete this task."
 MTURK_BONUS_PER_BOX = 0.02
 MTURK_BASE_PAY = 0.04
+MTURK_EMAIL_SUBJECT = "Question about your work"
+MTURK_EMAIL_MESSAGE = """Thanks for your submission.
 
+Unfortunately, we're not able to accept this work as it does not meet the standards required.
+
+If you'd like to have another go at it, can you please carefully read the instructions and make sure you enter information for the entire video.
+
+Otherwise, we will reject the task in 24 hours.
+
+Please let us know if you've encountered any problems.
+
+Regards
+"""
 
 ALLOWED_HOSTS=["*"]
 
