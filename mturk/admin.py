@@ -16,6 +16,8 @@ def recalculate_bonus(modeladmin, request, videos):
 
 class FullVideoTaskAdmin(admin.ModelAdmin):
     list_display =('id','hit_id','video', 'bonus', 'closed', 'paid')
+    search_fields=['id', 'worker_id', 'hit_id', 'assignment_id']
+    list_filter=['paid', 'closed', 'worker_id']
     actions=[recalculate_bonus]
    
 
