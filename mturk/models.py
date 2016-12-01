@@ -8,7 +8,12 @@ from datetime import datetime
 
 from .mturk_api import Server
 from annotator.models import Video
+import time
 
+import logging
+import os
+
+logger = logging.getLogger()
 
 mturk = Server(settings.AWS_ID, settings.AWS_KEY, settings.URL_ROOT, settings.MTURK_SANDBOX)
 
@@ -22,10 +27,13 @@ class Task(models.Model):
     worker_id = models.CharField(max_length=64, blank=True)
     assignment_id = models.CharField(max_length=64, blank=True)
     time_completed = models.DateTimeField(null=True, blank=True)
-    bonus = models.DecimalField(max_digits=3, decimal_places=2, default=0)
-    paid = models.BooleanField(default=False)
+    bonus = models.DecimalField(max_digits=4, decimal_places=2, default=0)
     sandbox = models.BooleanField(default=settings.MTURK_SANDBOX)
-
+    message = models.CharField(max_length=256, blank=True)
+    email_trail = models.TextField(blank=True)
+    last_email_sent_date = models.DateTimeField(null=True, blank=True)
+    closed = models.BooleanField(default=False)
+    paid = models.BooleanField(default=False)
 
     class Meta:
         abstract = True
@@ -47,9 +55,51 @@ class Task(models.Model):
         self.assignment_id = assignment_id
         self.metrics = metrics
         self.bonus = self.calculate_bonus()
+        self.message = settings.MTURK_BONUS_MESSAGE
         self.time_completed = datetime.now()
+        self.paid = False
         self.save()
 
+    def send_email(self, subject, message):
+        if (self.worker_id == ''):
+            raise Exception("No worked id to send email to for FullVideoTask({})".format(id))
+
+        mturk.email(self.worker_id, subject, message)
+        self.last_email_sent_date = datetime.now()
+        self.email_trail += "{}================================================{}".format(os.linesep, os.linesep)
+        self.email_trail += "Date: {}{}".format(self.last_email_sent_date.strftime("%c"), os.linesep)
+        self.email_trail += "Subject: {}{}".format(subject, os.linesep)
+        self.email_trail += "--------------------------------------------------{}".format(os.linesep)
+        self.email_trail += message
+        self.email_trail += os.linesep
+         
+        self.save()
+
+    def approve_assignment(self, bonus, message):
+        if self.assignment_id == None:
+            raise Exception("Cannot approve task - no work has been done on Turk")
+
+        if bonus > 0:
+            mturk.bonus(self.worker_id, self.assignment_id, bonus, message)
+
+        mturk.accept(self.assignment_id, message)
+        
+    def reject_assignment(self, message):
+        if self.assignment_id == None:
+            raise Exception("Cannot reject task - no work has been done on Turk")
+
+        mturk.reject(self.assignment_id, message)
+
+    def blockWorker(self):
+        if self.worker_id == None:
+            raise Exception("Cannot reject task - no work has been done on Turk")
+
+        mturk.block(self.worker_id, settings.MTURK_BLOCK_MESSAGE)
+
+    def archive_turk_hit(self):
+        res = mturk.disable(self.hit_id)
+
+    @classmethod
     def calculate_bonus(self):
         return 0
 
@@ -92,7 +142,8 @@ class FullVideoTask(Task):
     video = models.ForeignKey(Video)
     title = "Video Annotation"
     description = "Draw boxes around objects in a video"
-    pay = 0.00
+    pay = settings.MTURK_BASE_PAY
+    bonus_per_box = settings.MTURK_BONUS_PER_BOX
 
     @property
     def url(self):
@@ -101,6 +152,10 @@ class FullVideoTask(Task):
     def __str__(self):
         return self.video.filename
 
+    def calculate_bonus(self):
+        boxes = self.video.count_keyframes()
+        num_cents = boxes * self.bonus_per_box
+        return num_cents
 
 class SingleFrameTask(Task):
     video = models.ForeignKey(Video)
@@ -112,7 +167,7 @@ class SingleFrameTask(Task):
 
     def calculate_bonus(self):
         boxes = self.video.count_keyframes(at_time=self.time)
-        num_cents = ((boxes - 1) * bonus_per_box + pay) * 100
+        num_cents = ((boxes - 1) * self.bonus_per_box + pay) * 100
         return math.ceil(num_cents) / 100
 
     @property

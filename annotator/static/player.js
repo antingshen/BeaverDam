@@ -2,7 +2,9 @@
 
 
 class Player {
-    constructor({$container, videoSrc, videoId, videoStart, videoEnd, isImageSequence}) {
+
+    constructor({$container, videoSrc, videoId, videoStart, videoEnd, turkMetadata, isImageSequence}) {
+
         this.$container = $container;
 
         this.videoId = videoId;
@@ -21,12 +23,15 @@ class Player {
 
         this.videoEnd = videoEnd;
 
+        this.turkMetadata = turkMetadata;
+
         this.isImageSequence = isImageSequence;
 
         this.metrics = {
             playerStartTimes: Date.now(),
             annotationsStartTime: null,
             annotationsEndTime: null,
+            browserAgent: navigator.userAgent
         };
 
         // Promises
@@ -139,16 +144,17 @@ class Player {
 
 
         // Submitting
-        // TODO doesn't respect scope
         $('#submit-btn').click(this.submitAnnotations.bind(this));
-        $('#submit-survey-btn').click(this.submitSurvey.bind(this));
 
-        $(this).on('change-verification', this.updateVerifiedButton.bind(this));
-        $(this).triggerHandler('change-verification');
+        $('#btn-show-accept').click(this.showAcceptDialog.bind(this));
+        $('#btn-show-reject').click(this.showRejectDialog.bind(this));
+        $('#btn-show-email').click(this.showEmailDialog.bind(this));
 
-        $('#verified-btn').click(this.submitVerified.bind(this));
+        $('#accept-reject-btn').click(this.acceptRejectAnnotations.bind(this));
 
+        $('#email-btn').click(this.emailWorker.bind(this));
 
+       
         // On drawing changed
         this.viewReady().then(() => {
             $(this.view.creationRect).on('drag-start', () => {
@@ -234,6 +240,8 @@ class Player {
     drawAnnotationOnRect(annotation, rect) {
         if (this.metrics.annotationsStartTime == null) {
             this.metrics.annotationsStartTime = Date.now();
+            // force the keyboard shortcuts to work within an iframe
+            window.focus();
         }
         var time = this.view.video.currentTime;
         
@@ -268,45 +276,117 @@ class Player {
             return;
         }
         DataSources.annotations.save(this.videoId, this.annotations, this.metrics, window.mturk).then((response) => {
-            $('.submit-result').html(response + (numberOfSurveyQuestions ? "<br />Optional feedback on your experience: " : ''));
+            // only show this if not running on turk
+            if (!window.hitId)
+                this.showModal("Save", "Save Successful");
         });
-        $('#myModal').modal();
     }
 
-    submitSurvey() {
-        var results = [];
-        for (let i = 1; i <= numberOfSurveyQuestions; i++) {
-            results.push($(`input[name='survey-q${i}']:checked`).val());
+    showModal(title, message) {
+        $('#genericModalTitle')[0].innerText = title;
+        $('#genericModalMessage')[0].innerText = message;
+        $('#genericModal').modal();
+    }
+
+    showAcceptDialog(e) {
+        this.setDialogDefaults();
+        if (this.turkMetadata) {
+            $('#inputAcceptRejectMessage')[0].value = this.turkMetadata.bonusMessage
         }
-        console.log(results);
-        //TODO: Store results in datasources
+        $('#acceptRejectType')[0].value = 'accept';
+        $('#labelForBonus').text("Bonus")
+        $('#inputBonusAmt').prop('readonly', false);
+        $('#inputReopen')[0].checked = false;
+        $('#inputDeleteBoxes')[0].checked = false;
+        $('#inputBlockWorker')[0].checked = false;
+        $('#accept-reject-btn').removeClass('btn-danger').addClass('btn-success')
+        $('#accept-reject-btn').text('Accept');
+        $('#acceptRejectForm').find('.modal-title').text("Accept Work");
+        $('#acceptRejectForm').modal('toggle'); 
     }
-
-    updateVerifiedButton() {
-        if (window.video.verified) {
-            $('#verified-btn').text('Verified').addClass('btn btn-success').removeClass('btn-danger');
+    showRejectDialog(e) {
+        this.setDialogDefaults();
+        if (this.turkMetadata) {
+            $('#inputAcceptRejectMessage')[0].value = this.turkMetadata.rejectionMessage;
+        }
+        $('#acceptRejectType')[0].value = 'reject';
+        $('#labelForBonus').text("Lost Bonus")
+        $('#inputBonusAmt').prop('readonly', true);
+        $('#inputReopen')[0].checked = true;
+        $('#inputDeleteBoxes')[0].checked = true;
+        $('#inputBlockWorker')[0].checked = false;
+        $('#accept-reject-btn').removeClass('btn-success').addClass('btn-danger')
+        $('#accept-reject-btn').text('Reject');
+        $('#acceptRejectForm').find('.modal-title').text("Reject Work");
+        $('#acceptRejectForm').modal('toggle');
+    }
+    setDialogDefaults(){
+        if (this.turkMetadata) {
+            $('#inputBonusAmt')[0].value = this.turkMetadata.bonus
+            $('.workerTime').text(this.verbaliseTimeTaken(this.turkMetadata.storedMetrics));
+            $('.readonlyBrowser').text(this.turkMetadata.storedMetrics.browserAgent);
         }
         else {
-            $('#verified-btn').text('Not Verified').addClass('btn btn-danger').removeClass('btn-success');
+            $('.turkSpecific').css({display:'none'});
         }
     }
 
-    submitVerified() {
-        return fetch(`/video/${this.videoId}/verify/`, {
-            headers: {
-                'X-CSRFToken': window.CSRFToken,
-                'Content-Type': 'application/json',
-            },
-            credentials: 'same-origin',
-            method: 'post',
-            body: (!window.video.verified).toString(),
-        }).then((response) => {
-            if (response.ok) {
-                window.video.verified = !window.video.verified;
-                $(this).triggerHandler('change-verification');
-            }
-            return response.text();
-        }).then((text) => console.log(text));
+    showEmailDialog(e) {
+        this.setDialogDefaults();
+      
+        $('#inputEmailMessage')[0].value = this.turkMetadata.emailMessage;
+        $('#inputEmailSubject')[0].value = this.turkMetadata.emailSubject;
+        $('#emailForm').modal('toggle');
+    }
+
+    verbaliseTimeTaken(metricsObj) {
+        var timeInMillis = metricsObj.annotationsEndTime - metricsObj.annotationsStartTime;
+
+        return Math.round(timeInMillis / 60 / 100) / 10 + " minutes";
+    }
+
+    acceptRejectAnnotations(e) {
+        e.preventDefault();
+        var bonus = $('#inputBonusAmt')[0];
+        var message = $('#inputAcceptRejectMessage')[0];
+        var reopen = $('#inputReopen')[0];
+        var deleteBoxes = $('#inputDeleteBoxes')[0];
+        var blockWorker = $('#inputBlockWorker')[0]
+        var type = $('#acceptRejectType')[0].value;
+
+        $('#acceptRejectForm').find('.btn').attr("disabled", "disabled");
+
+        var promise;
+        if (type == 'accept')
+            promise = DataSources.annotations.acceptAnnotation(this.videoId, parseFloat(bonus.value), message.value, 
+                                                               reopen.checked, deleteBoxes.checked, blockWorker.checked, this.annotations);
+        else
+            promise = DataSources.annotations.rejectAnnotation(this.videoId, message.value, reopen.checked, deleteBoxes.checked, blockWorker.checked, this.annotations);
+            
+        promise.then((response) => {
+            $('#acceptForm').modal('toggle');
+            $('#acceptForm').find('.btn').removeAttr("disabled");
+            location.reload();
+        }, (err) => {
+            alert("There was an error processing your request.");
+            $('#acceptForm').find('.btn').removeAttr("disabled");
+        });
+    }
+
+    emailWorker(e) {
+        e.preventDefault();
+        var subject = $('#inputEmailSubject')[0];
+        var message = $('#inputEmailMessage')[0];
+        
+        $('#emailForm').find('.btn').attr("disabled", "disabled");
+        DataSources.annotations.emailWorker(this.videoId, subject.value, message.value).then((response) => {
+            $('#emailForm').modal('toggle');
+            $('#emailForm').find('.btn').removeAttr("disabled");
+            location.reload();
+        }, (err) => {
+            alert("There was an error processing your request:\n" + err);
+            $('#emailForm').find('.btn').removeAttr("disabled");
+        });
     }
 
     addAnnotationAtCurrentTimeFromRect(rect) {

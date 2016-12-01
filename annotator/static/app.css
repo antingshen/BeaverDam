@@ -179,3 +179,13 @@ div.imgplay {
 .glyphicon:hover {
     color:#AAAAAA;
 }
+
+.row {
+    padding-top:4px;
+    padding-bottom: 4px;
+}
+
+.modal-content
+{
+    min-width: 760px;
+}

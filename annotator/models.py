@@ -1,7 +1,6 @@
 from django.db import models
 from django.contrib.staticfiles import finders
 
-
 class Video(models.Model):
     annotation = models.TextField(blank=True)
     source = models.CharField(max_length=1048, blank=True)
@@ -9,6 +8,7 @@ class Video(models.Model):
     image_list = models.TextField(blank=True)
     host = models.CharField(max_length=1048, blank=True)
     verified = models.BooleanField(default=False)
+    rejected = models.BooleanField(default=False)
 
     @classmethod
     def from_list(cls, path_to_list, *, source, host, filename_prefix=''):

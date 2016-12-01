@@ -4,6 +4,7 @@ from django.contrib.auth.views import login, logout
 from django.views.generic.base import RedirectView
 
 from annotator.views import *
+from annotator.services import *
 
 admin.site.site_header = 'BeaverDam'
 
@@ -16,6 +17,9 @@ urlpatterns = [
     url(r'^video/(\d+)/next/$', next_unannotated),
     url(r'^video/(\d+)/verify/$', verify),
     url(r'^annotation/(\d+)/$', AnnotationView.as_view()),
+    url(r'^accept\-annotation/(\d+)/$', ReceiveCommand.as_view()),
+    url(r'^reject\-annotation/(\d+)/$', ReceiveCommand.as_view()),
+    url(r'^email-worker/(\d+)/$', ReceiveCommand.as_view()),
 
     url(r'^login/$', login,
         {'template_name': 'admin/login.html',

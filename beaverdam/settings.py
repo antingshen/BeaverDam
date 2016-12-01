@@ -23,7 +23,33 @@ HELP_URL = os.environ.get('HELP_URL', 'https://github.com/antingshen/BeaverDam/w
 URL_ROOT = os.environ.get('URL_ROOT', 'url_root')
 AWS_ID = os.environ.get('AWS_ID', 'aws_id')
 AWS_KEY = os.environ.get('AWS_KEY', 'aws_key')
+
 MTURK_SANDBOX = True
+
+MTURK_TITLE = "Video annotation"
+MTURK_DESCRIPTION = "Draw accurate boxes around every person in the video, we will pay a $0.02 bonus per accurate box drawn. Most of the payment is in the bonus"
+MTURK_BONUS_MESSAGE = "Thanks for your work"
+MTURK_REJECTION_MESSAGE = "Your work has not been accepted. You must follow the instructions of the task precisely to complete this task."
+MTURK_BLOCK_MESSAGE = "I'm sorry but we have blocked you from working on our HITs. We have limited time and unfortunately your work accuracy was not up to the standards required."
+MTURK_BONUS_PER_BOX = 0.02
+MTURK_BASE_PAY = 0.04
+
+MTURK_EMAIL_SUBJECT = "Question about your work"
+MTURK_EMAIL_MESSAGE = """Thanks for your submission.
+
+Unfortunately, we're not able to accept this work as it does not meet the standards required.
+
+If you'd like to have another go at it, can you please carefully read the instructions and make sure you enter information for the entire video.
+
+Otherwise, we will reject the task in 24 hours.
+
+Please let us know if you've encountered any problems.
+
+Regards
+"""
+
+ALLOWED_HOSTS=["*"]
+
 assert MTURK_SANDBOX or not DEBUG
 
 # Application definition
@@ -121,3 +147,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
 
 STATIC_URL = '/static/'
+
+try:
+    from beaverdam.deploy_settings import *
+except ImportError as e:
+    pass

@@ -97,6 +97,75 @@ var DataSources = {
                     return Promise.resolve(`Error code ${response.status}`);
                 }
             });
+        },
+
+        acceptAnnotation: function(id, bonus, message,  reopen, deleteBoxes, blockWorker, updatedAnnotations) {
+            return fetch(`/accept-annotation/${id}/`, {
+                headers: {
+                    'X-CSRFToken': window.CSRFToken,
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'same-origin',
+                method: 'post',
+                body: JSON.stringify({
+                    bonus: bonus,
+                    message: message,
+                    type: 'accept',
+                    reopen: reopen,
+                    deleteBoxes: deleteBoxes,
+                    blockWorker: blockWorker,
+                    updatedAnnotations: DataSources.annotations.toJson(updatedAnnotations),
+                }),
+            }).then((response) => {
+                if (!response.ok)
+                    return Promise.reject(response.headers.get('error-message'));
+                return null;
+            });
+        },
+
+        rejectAnnotation: function(id, message, reopen, deleteBoxes, blockWorker, updatedAnnotations) {
+            return fetch(`/reject-annotation/${id}/`, {
+                headers: {
+                    'X-CSRFToken': window.CSRFToken,
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'same-origin',
+                method: 'post',
+                body: JSON.stringify({
+                    message: message,
+                    type: 'reject',
+                    reopen: reopen,
+                    deleteBoxes: deleteBoxes,
+                    blockWorker: blockWorker,
+                    updatedAnnotations: DataSources.annotations.toJson(updatedAnnotations)
+                }),
+            }).then((response) => {
+                if (!response.ok) {
+                    return Promise.reject(response.headers.get('error-message'));
+                }
+                return null;
+            });
+        },
+
+        emailWorker: function(id, subject, message) {
+            return fetch(`/email-worker/${id}/`, {
+                headers: {
+                    'X-CSRFToken': window.CSRFToken,
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'same-origin',
+                method: 'post',
+                body: JSON.stringify({
+                    message: message,
+                    subject: subject,
+                    type: "email"
+                }),
+            }).then((response) => {
+                if (!response.ok) {
+                    return Promise.reject(response.headers.get('error-message'));
+                }
+                return null;
+            });
         }
     },
 };
