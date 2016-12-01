@@ -99,7 +99,7 @@ var DataSources = {
             });
         },
 
-        acceptAnnotation: function(id, bonus, message, updatedAnnotations) {
+        acceptAnnotation: function(id, bonus, message,  reopen, deleteBoxes, blockWorker, updatedAnnotations) {
             return fetch(`/accept-annotation/${id}/`, {
                 headers: {
                     'X-CSRFToken': window.CSRFToken,
@@ -111,6 +111,9 @@ var DataSources = {
                     bonus: bonus,
                     message: message,
                     type: 'accept',
+                    reopen: reopen,
+                    deleteBoxes: deleteBoxes,
+                    blockWorker: blockWorker,
                     updatedAnnotations: DataSources.annotations.toJson(updatedAnnotations),
                 }),
             }).then((response) => {
@@ -120,7 +123,7 @@ var DataSources = {
             });
         },
 
-        rejectAnnotation: function(id, message, reopen, deleteBoxes, updatedAnnotations) {
+        rejectAnnotation: function(id, message, reopen, deleteBoxes, blockWorker, updatedAnnotations) {
             return fetch(`/reject-annotation/${id}/`, {
                 headers: {
                     'X-CSRFToken': window.CSRFToken,
@@ -133,6 +136,7 @@ var DataSources = {
                     type: 'reject',
                     reopen: reopen,
                     deleteBoxes: deleteBoxes,
+                    blockWorker: blockWorker,
                     updatedAnnotations: DataSources.annotations.toJson(updatedAnnotations)
                 }),
             }).then((response) => {

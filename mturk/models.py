@@ -93,6 +93,12 @@ class Task(models.Model):
 
         mturk.reject(self.assignment_id, message)
 
+    def blockWorker(self):
+        if self.worker_id == None:
+            raise Exception("Cannot reject task - no work has been done on Turk")
+
+        mturk.block(self.worker_id, settings.MTURK_BLOCK_MESSAGE)
+
     def archive_turk_hit(self):
         res = mturk.disable(self.hit_id)
 
