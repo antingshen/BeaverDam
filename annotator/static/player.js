@@ -150,8 +150,8 @@ class Player {
         $('#btn-show-reject').click(this.showRejectDialog.bind(this));
         $('#btn-show-email').click(this.showEmailDialog.bind(this));
 
-        $('#accept-btn').click(this.acceptAnnotations.bind(this));
-        $('#reject-btn').click(this.rejectAnnotations.bind(this));
+        $('#accept-reject-btn').click(this.acceptRejectAnnotations.bind(this));
+
         $('#email-btn').click(this.emailWorker.bind(this));
 
        
@@ -291,34 +291,52 @@ class Player {
     showAcceptDialog(e) {
         this.setDialogDefaults();
         if (this.turkMetadata) {
-            $('#inputBonusAmt')[0].value = this.turkMetadata.bonus
-            $('#inputAcceptMessage')[0].value = this.turkMetadata.bonusMessage
+            $('#inputAcceptRejectMessage')[0].value = this.turkMetadata.bonusMessage
         }
-        $('#acceptForm').modal('toggle'); 
+        $('#acceptRejectType')[0].value = 'accept';
+        $('#labelForBonus').text("Bonus")
+        $('#inputBonusAmt').prop('readonly', false);
+        $('#inputReopen')[0].checked = false;
+        $('#inputDeleteBoxes')[0].checked = false;
+        $('#inputBlockWorker')[0].checked = false;
+        $('#accept-reject-btn').removeClass('btn-danger').addClass('btn-success')
+        $('#accept-reject-btn').text('Accept');
+        $('#acceptRejectForm').find('.modal-title').text("Accept Work");
+        $('#acceptRejectForm').modal('toggle'); 
     }
     showRejectDialog(e) {
         this.setDialogDefaults();
         if (this.turkMetadata) {
-            $('#inputRejectMessage')[0].value = this.turkMetadata.rejectionMessage;
+            $('#inputAcceptRejectMessage')[0].value = this.turkMetadata.rejectionMessage;
         }
-        $('#rejectForm').modal('toggle');
+        $('#acceptRejectType')[0].value = 'reject';
+        $('#labelForBonus').text("Lost Bonus")
+        $('#inputBonusAmt').prop('readonly', true);
+        $('#inputReopen')[0].checked = true;
+        $('#inputDeleteBoxes')[0].checked = true;
+        $('#inputBlockWorker')[0].checked = false;
+        $('#accept-reject-btn').removeClass('btn-success').addClass('btn-danger')
+        $('#accept-reject-btn').text('Reject');
+        $('#acceptRejectForm').find('.modal-title').text("Reject Work");
+        $('#acceptRejectForm').modal('toggle');
     }
+    setDialogDefaults(){
+        if (this.turkMetadata) {
+            $('#inputBonusAmt')[0].value = this.turkMetadata.bonus
+            $('.workerTime').text(this.verbaliseTimeTaken(this.turkMetadata.storedMetrics));
+            $('.readonlyBrowser').text(this.turkMetadata.storedMetrics.browserAgent);
+        }
+        else {
+            $('.turkSpecific').css({display:'none'});
+        }
+    }
+
     showEmailDialog(e) {
         this.setDialogDefaults();
       
         $('#inputEmailMessage')[0].value = this.turkMetadata.emailMessage;
         $('#inputEmailSubject')[0].value = this.turkMetadata.emailSubject;
         $('#emailForm').modal('toggle');
-    }
-    setDialogDefaults(){
-        if (this.turkMetadata) {
-            $('.workerTime').text(this.verbaliseTimeTaken(this.turkMetadata.storedMetrics));
-            $('.readonlyBonusAmt').text(this.turkMetadata.bonus);
-            $('.readonlyBrowser').text(this.turkMetadata.storedMetrics.browserAgent);
-        }
-        else {
-            $('.turkSpecific').css({display:'none'});
-        }
     }
 
     verbaliseTimeTaken(metricsObj) {
@@ -327,36 +345,31 @@ class Player {
         return Math.round(timeInMillis / 60 / 100) / 10 + " minutes";
     }
 
-    acceptAnnotations(e) {
+    acceptRejectAnnotations(e) {
         e.preventDefault();
-
         var bonus = $('#inputBonusAmt')[0];
-        var message = $('#inputAcceptMessage')[0];
-        $('#acceptForm').find('.btn').attr("disabled", "disabled");
-        DataSources.annotations.acceptAnnotation(this.videoId, parseFloat(bonus.value), message.value, this.annotations).then((response) => {
+        var message = $('#inputAcceptRejectMessage')[0];
+        var reopen = $('#inputReopen')[0];
+        var deleteBoxes = $('#inputDeleteBoxes')[0];
+        var blockWorker = $('#inputBlockWorker')[0]
+        var type = $('#acceptRejectType')[0].value;
+
+        $('#acceptRejectForm').find('.btn').attr("disabled", "disabled");
+
+        var promise;
+        if (type == 'accept')
+            promise = DataSources.annotations.acceptAnnotation(this.videoId, parseFloat(bonus.value), message.value, 
+                                                               reopen.checked, deleteBoxes.checked, blockWorker.checked, this.annotations);
+        else
+            promise = DataSources.annotations.rejectAnnotation(this.videoId, message.value, reopen.checked, deleteBoxes.checked, blockWorker.checked, this.annotations);
+            
+        promise.then((response) => {
             $('#acceptForm').modal('toggle');
             $('#acceptForm').find('.btn').removeAttr("disabled");
             location.reload();
         }, (err) => {
             alert("There was an error processing your request.");
             $('#acceptForm').find('.btn').removeAttr("disabled");
-        });
-    }
-
-    rejectAnnotations(e) {
-        e.preventDefault();
-
-        var message = $('#inputRejectMessage')[0];
-        var reopen = $('#inputReopen')[0];
-        var deleteBoxes = $('#inputDeleteBoxes')[0];
-        $('#rejectForm').find('.btn').attr("disabled", "disabled");
-        DataSources.annotations.rejectAnnotation(this.videoId, message.value, reopen.checked, deleteBoxes.checked, this.annotations).then((response) => {
-            $('#rejectForm').modal('toggle');
-            $('#rejectForm').find('.btn').removeAttr("disabled");
-            location.reload();
-        }, (err) => {
-            alert("There was an error processing your request:\n" + err);
-            $('#rejectForm').find('.btn').removeAttr("disabled");
         });
     }
 

@@ -107,8 +107,6 @@ def video(request, video_id):
     mturk_data['status'] = get_mturk_status(video, turk_task)
     mturk_data['has_current_full_video_task'] = full_video_task_data != None
 
-    logger.error("full task = {}".format(full_video_task_data))
-
     video_data = json.dumps({
         'id': video.id,
         'location': video.url,
@@ -178,12 +176,21 @@ class ReceiveCommand(View):
         try:
             vid_id = int(video_id)
             command_type = data['type'] 
+
+            if 'bonus' in data:
+                bonus = data['bonus']
+            message = data['message']
+            reopen = data['reopen']
+            delete_boxes = data['deleteBoxes']
+            block_worker = data['blockWorker']
+            updated_annotations = json.dumps(data['updatedAnnotations'])
+
             if command_type == "accept":
-                accept_video(request, vid_id, data['bonus'], data['message'], json.dumps(data['updatedAnnotations']))
+                accept_video(request, vid_id, bonus, message, reopen, delete_boxes, block_worker, updated_annotations)
             elif command_type == "reject":
-                reject_video(request, vid_id, data['message'], data['reopen'], data['deleteBoxes'], json.dumps(data['updatedAnnotations']))
+                reject_video(request, vid_id, message, reopen, delete_boxes, block_worker, updated_annotations)
             elif command_type == "email":
-                email_worker(request, vid_id, data['subject'], data['message'])
+                email_worker(request, vid_id, data['subject'], message)
 
             return HttpResponse(status=200)
         except Exception as e:

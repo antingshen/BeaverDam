@@ -15,10 +15,15 @@ def recalculate_bonus(modeladmin, request, videos):
         video_task.save()
 
 class FullVideoTaskAdmin(admin.ModelAdmin):
-    list_display =('id','hit_id','video', 'bonus', 'closed', 'paid')
+    list_display =('id','hit_id','video_url', 'bonus', 'closed', 'paid')
     search_fields=['id', 'worker_id', 'hit_id', 'assignment_id']
     list_filter=['paid', 'closed', 'worker_id']
     actions=[recalculate_bonus]
+
+    def video_url(self, obj):
+        return '<a target="_" href="/video/{}/">/video/{}/</a>'.format(obj.video.id, obj.video.id)
+    video_url.allow_tags = True
+    video_url.short_description = 'Video'
    
 
 admin.site.register(FullVideoTask, FullVideoTaskAdmin)

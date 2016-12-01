@@ -199,6 +199,8 @@ class Server(object):
         """
         Blocks the worker from working on any of our HITs.
         """
+        logger.error("Blocking worker: {}".format(workerid))
+
         r = self.request("BlockWorker", {"WorkerId": workerid,
                                          "Reason": reason})
         r.validate("BlockWorkerResult/Request/IsValid",

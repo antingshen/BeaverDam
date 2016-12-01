@@ -30,6 +30,7 @@ MTURK_TITLE = "Video annotation"
 MTURK_DESCRIPTION = "Draw accurate boxes around every person in the video, we will pay a $0.02 bonus per accurate box drawn. Most of the payment is in the bonus"
 MTURK_BONUS_MESSAGE = "Thanks for your work"
 MTURK_REJECTION_MESSAGE = "Your work has not been accepted. You must follow the instructions of the task precisely to complete this task."
+MTURK_BLOCK_MESSAGE = "I'm sorry but we have blocked you from working on our HITs. We have limited time and unfortunately your work accuracy was not up to the standards required."
 MTURK_BONUS_PER_BOX = 0.02
 MTURK_BASE_PAY = 0.04
 
