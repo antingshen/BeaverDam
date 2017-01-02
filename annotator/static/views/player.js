@@ -55,6 +55,8 @@ class PlayerView {
         // are we waiting for buffering
         this.loading = true;
 
+        this.scaleToFit = false;
+
         // whether or not we are using an image sequence or a video style renderer
         this.isImageSequence = isImageSequence;
 
@@ -77,6 +79,18 @@ class PlayerView {
         this.initPaper();
         this.initVideo();
         this.initKeyframebar();
+
+        if (helpEmbedded) {
+            // check cookie
+            var hasSeen = document.cookie && document.cookie.indexOf('has_seen_help=') > -1
+            if (!hasSeen) {
+                $('#instructionModal').modal();
+            }
+            var date = new Date();
+            date.setTime(date.getTime() + (7 * 24 * 60 * 60 * 1000)); // 7 days
+            document.cookie = 'has_seen_help=yes; expires=' + date.toGMTString() + '; path=/';
+            $('#show-help').on('click', () => $('#instructionModal').modal());
+        }
     }
 
     set loading(val) {
@@ -101,8 +115,16 @@ class PlayerView {
     initPaper() {
         // Depends on this.videoReady for this.video.videoWidth/Height
         this.videoReady().then(() => {
-            var {videoWidth, videoHeight} = this.video;
+            var {videoWidth, videoHeight, viewWidth, viewHeight} = this.video;
             this.$paper = Raphael(this.$('paper')[0], videoWidth, videoHeight);
+
+            var css = {
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                'width': `${viewWidth}px`,
+                'height': `${viewHeight}px`,
+            };
 
             $(this.$paper.canvas).attr({
                 viewBox: `0 0 ${videoWidth} ${videoHeight}`
@@ -110,13 +132,7 @@ class PlayerView {
                 'width'
             ).removeAttr(
                 'height'
-            ).css({
-                position: 'relative',
-                'max-width': `${videoWidth}px`,
-                'max-height': `${videoHeight}px`,
-                'min-width': `${videoWidth}px`,
-                'min-height': `${videoHeight}px`,
-            });
+            ).css(css);
             this.creationRect = this.makeAndAttachRect(CreationRect);
             this.rects = [];
 
@@ -129,6 +145,33 @@ class PlayerView {
 
             this.paperReady.resolve();
         });
+    }
+
+    sizeVideoFrame() {
+        if (!this.scaleToFit) {
+            var height = this.video.videoHeight;
+            if (this.$('video').width() < this.video.videoWidth) {
+                height = height * (this.$('video').width() / this.video.videoWidth);
+            }
+            this.$('video').css({
+                height: `${height}px`,
+            });
+        }
+
+        // need to link SVG with video when scaling
+        // if we just toggled scale to fit the video properties are not up to date yet
+        if (this.$paper) {
+            setTimeout(() => {
+                var {viewWidth, viewHeight} = this.video;
+                $(this.$paper.canvas)
+                .css({
+                    'width': `${viewWidth}px`,
+                    'height': `${viewHeight}px`,
+                });
+            }, 10);
+        }
+
+        this.video.fit();
     }
 
     initVideo() {
@@ -147,6 +190,7 @@ class PlayerView {
         this.video.onLoadedMetadata(() => {
             this.videoReady.resolve();
         });
+        $(window).resize(() => this.sizeVideoFrame());
         this.video.onAbort(() => {
             this.videoReady.reject();
         });
@@ -178,6 +222,8 @@ class PlayerView {
 
             // controls => video
             this.$on('control-play-pause', 'click', (event) => {this.playPause()});
+            this.$on('control-step-backward', 'click', (event) => {this.video.previousFrame()});
+            this.$on('control-step-forward', 'click', (event) => {this.video.nextFrame()});
             this.$on('control-goto-start', 'click', () => this.jumpToTimeAndPause(0));
             this.$on('control-goto-end', 'click', () => this.jumpToTimeAndPause(this.video.duration));
             this.$on('control-delete-keyframe', 'click', () => this.deleteKeyframe());
@@ -205,6 +251,23 @@ class PlayerView {
                 if (!this.loading)
                     this.video.nextFrame()
             });
+            $('#scale-checkbox').on('click', () => {
+                this.scaleToFit = $('#scale-checkbox')[0].checked;
+                if (this.scaleToFit) {
+                    this.$('video').css({
+                        height: `100%`,
+                        'flex-grow': 1
+                    });
+                }
+                else {
+                    this.$('video').css({
+                        'flex-grow': 0
+                    });
+                }
+                this.video.fit();
+                this.sizeVideoFrame();
+            });
+            this.sizeVideoFrame();
             this.loading = false;
         });
     }

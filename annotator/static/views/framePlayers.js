@@ -61,6 +61,9 @@ class AbstractFramePlayer {
     nextFrame() {}
     previousFrame() {}
 
+    fit() {}
+
+
     onTimeUpdate(callback) {
         this.onTimeUpdates.push(callback);
     }
@@ -88,6 +91,13 @@ class VideoFramePlayer extends AbstractFramePlayer {
     get videoHeight() {
         return this.videoElement.videoHeight;
     }
+    get viewWidth() {
+        return $(this.videoElement).width();
+    }
+    get viewHeight() {
+        return $(this.videoElement).height();
+    }
+
     get duration() {
         return this.videoElement.duration;
     }
@@ -160,7 +170,7 @@ class ImageFramePlayer extends AbstractFramePlayer {
     constructor(images, element) {
         super(images, element);
         // image list
-        $(element).imgplay({rate: 15, controls: false, pageSize: 100, onLoading: (isLoading) => {
+        $(element).imgplay({rate: 15, controls: false, pageSize: 100, center: false, onLoading: (isLoading) => {
             if (this.onBuffering)
                 this.onBuffering(isLoading);
         }});
@@ -176,9 +186,7 @@ class ImageFramePlayer extends AbstractFramePlayer {
                 this.hasInit = true;
             }
             var css = {
-                'max-height': this.imgPlayer.frames[0].height + 'px',
-                'min-width': this.imgPlayer.frames[0].width + 'px',
-                'min-height': this.imgPlayer.frames[0].height + 'px',
+                width: '100%'
             };
             $(element).css(css);
             this.imgPlayer.fitCanvas();
@@ -191,6 +199,13 @@ class ImageFramePlayer extends AbstractFramePlayer {
     }
     get videoHeight() {
         return this.imgPlayer.frames[0].height;
+    }
+
+    get viewWidth() {
+        return this.imgPlayer.getDrawnWidth();
+    }
+    get viewHeight() {
+        return this.imgPlayer.getDrawnHeight();
     }
 
     get duration() {
@@ -232,6 +247,10 @@ class ImageFramePlayer extends AbstractFramePlayer {
 
     previousFrame() {
         return this.currentTime = Math.max(0, this.currentTime - 1);
+    }
+
+    fit() {
+        this.imgPlayer.fitCanvas();
     }
 
     /**

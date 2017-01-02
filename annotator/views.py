@@ -5,14 +5,22 @@ from django.views.generic import View
 from django.views.decorators.clickjacking import xframe_options_exempt
 from django.contrib.admin.views.decorators import staff_member_required
 from django.core.exceptions import ObjectDoesNotExist
+from mturk.queries import get_active_video_turk_task
+from .models import *
+from mturk.models import Task, FullVideoTask, SingleFrameTask
+from .services import *
 from datetime import datetime, timezone
+
 import os
 import json
+import urllib.request
+import markdown
 import sys
 import mturk.utils
 from mturk.queries import get_active_video_turk_task
 from .models import *
 from .services import *
+
 import logging
 import ast
 
@@ -20,23 +28,34 @@ logger = logging.getLogger()
 
 
 def home(request):
-    need_annotating = Video.objects.filter(id__gt=0, verified=False)[:25]
+    need_annotating = Video.objects.filter(id__gt=0, verified=False)
     return render(request, 'video_list.html', context={
         'videos': need_annotating,
         'thumbnail': True,
-        'test' : settings.AWS_ID
+        'test': settings.AWS_ID,
+        'title': 'Videos'
     })
 
 def verify_list(request):
     need_verification = Video.objects.filter(id__gt=0, verified=False).exclude(annotation='')[:250]
     return render(request, 'video_list.html', context={
-        'videos': need_verification
+        'videos': need_verification,
+        'title': 'Videos to Verify'
     })
 
 def verified_list(request):
     verified = Video.objects.filter(id__gt=0, verified=True).exclude(annotation='')[:100]
     return render(request, 'video_list.html', context={
         'videos': verified,
+        'title': 'Verified Videos'
+    })
+
+def ready_to_pay(request):
+    #tasks = FullVideoTask.objects.filter(paid = False, video__verified = True).exclude(hit_id = '')
+    tasks = FullVideoTask.objects.all()#filter(paid = False, video__verified = True).exclude(hit_id = '')
+    print("there are {} tasks".format(len(tasks)))
+    return render(request, 'turk_ready_to_pay.html', context={
+        'tasks': tasks,
     })
 
 def next_unannotated(request, video_id):
@@ -44,7 +63,7 @@ def next_unannotated(request, video_id):
     return redirect('video', id)
 
 # status of Not Published, Published, Awaiting Approval, Verified
-# this is a bit convoluted as there's status stored on 
+# this is a bit convoluted as there's status stored on
 # video (approved) as well as FullVideoTask (closed, paid, etc.)
 def get_mturk_status(video, full_video_task):
     if video.verified:
@@ -124,15 +143,22 @@ def video(request, video_id):
     for l in labels:
         label_data.append({'name': l.name, 'color': l.color})
 
+    help_content = ''
+    if settings.HELP_URL and settings.HELP_USE_MARKDOWN:
+        help_content = urllib.request.urlopen(settings.HELP_URL).read().decode('utf-8')
+        help_content = markdown.markdown(help_content)
+
     response = render(request, 'video.html', context={
         'label_data': label_data,
         'video_data': video_data,
         'image_list': json.loads(video.image_list) if video.image_list else 0,
-        'image_list_path': video.host,
+        'image_list_path': video.host.replace('#', '%23'),
         'help_url': settings.HELP_URL,
+        'help_embed': settings.HELP_EMBED,
         'mturk_data': mturk_data,
         'iframe_mode': mturk_data['authenticated'],
         'survey': False,
+        'help_content': help_content
     })
     if not mturk_data['authenticated']:
         response['X-Frame-Options'] = 'SAMEORIGIN'
@@ -147,7 +173,7 @@ class AnnotationView(View):
 
     def post(self, request, video_id):
         data = json.loads(request.body.decode('utf-8'))
-        
+
         video = Video.objects.get(id=video_id)
         video.annotation = json.dumps(data['annotation'])
         video.save()

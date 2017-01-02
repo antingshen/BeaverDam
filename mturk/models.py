@@ -9,11 +9,13 @@ from datetime import datetime
 from .mturk_api import Server
 from annotator.models import Video
 import time
+import math
 
 import logging
 import os
 
 logger = logging.getLogger()
+
 
 mturk = Server(settings.AWS_ID, settings.AWS_KEY, settings.URL_ROOT, settings.MTURK_SANDBOX)
 
@@ -22,7 +24,7 @@ class Task(models.Model):
     hit_id = models.CharField(max_length=64, blank=True)
     hit_group = models.CharField(max_length=64, blank=True)
     metrics = models.TextField(blank=True)
-    duration = 7200 # 2 hours
+    duration = 10800 # 3 hours
     lifetime = 2592000 # 30 days
     worker_id = models.CharField(max_length=64, blank=True)
     assignment_id = models.CharField(max_length=64, blank=True)
@@ -57,6 +59,7 @@ class Task(models.Model):
         self.bonus = self.calculate_bonus()
         self.message = settings.MTURK_BONUS_MESSAGE
         self.time_completed = datetime.now()
+
         self.paid = False
         self.save()
 
@@ -140,8 +143,8 @@ class Task(models.Model):
 
 class FullVideoTask(Task):
     video = models.ForeignKey(Video)
-    title = "Video Annotation"
-    description = "Draw boxes around objects in a video"
+    title = settings.MTURK_TITLE
+    description = settings.MTURK_DESCRIPTION
     pay = settings.MTURK_BASE_PAY
     bonus_per_box = settings.MTURK_BONUS_PER_BOX
 
@@ -153,9 +156,10 @@ class FullVideoTask(Task):
         return self.video.filename
 
     def calculate_bonus(self):
-        boxes = self.video.count_keyframes()
+        boxes  = self.video.count_keyframes()
         num_cents = boxes * self.bonus_per_box
         return num_cents
+
 
 class SingleFrameTask(Task):
     video = models.ForeignKey(Video)

@@ -2,8 +2,7 @@
 
 
 class Player {
-
-    constructor({$container, videoSrc, videoId, videoStart, videoEnd, turkMetadata, isImageSequence}) {
+    constructor({$container, videoSrc, videoId, videoStart, videoEnd, isImageSequence, turkMetadata}) {
 
         this.$container = $container;
 
@@ -22,6 +21,8 @@ class Player {
         this.videoStart = videoStart;
 
         this.videoEnd = videoEnd;
+
+        this.isImageSequence = isImageSequence;
 
         this.turkMetadata = turkMetadata;
 
@@ -192,7 +193,7 @@ class Player {
                     if (Math.abs(time - kf.time) < this.selectedAnnotation.SAME_FRAME_THRESHOLD) {
                         if (i != this.selectedAnnotation.keyframes.length - 1) {
                             var nf = this.selectedAnnotation.keyframes[i + 1];
-                            this.view.video.setCurrentTime(nf.time);
+                            this.view.video.currentTime = nf.time;
                             break;
                         }
                     }
@@ -208,7 +209,7 @@ class Player {
                     if (Math.abs(time - kf.time) < this.selectedAnnotation.SAME_FRAME_THRESHOLD) {
                         if (i !== 0) {
                             var nf = this.selectedAnnotation.keyframes[i - 1];
-                            this.view.video.setCurrentTime(nf.time);
+                            this.view.video.currentTime = nf.time;
                             break;
                         }
                     }
@@ -244,7 +245,7 @@ class Player {
             window.focus();
         }
         var time = this.view.video.currentTime;
-        
+
         var {bounds, prevIndex, nextIndex, closestIndex, continueInterpolation} = annotation.getFrameAtTime(time, this.isImageSequence);
 
         // singlekeyframe determines whether we show or hide the object
@@ -422,7 +423,7 @@ class Player {
     deleteSelectedKeyframe() {
         if (this.selectedAnnotation == null) return false;
         var selected = this.selectedAnnotation;
-        this.selectedAnnotation = null; 
+        this.selectedAnnotation = null;
         selected.deleteKeyframeAtTime(this.view.video.currentTime, this.isImageSequence);
 
         if (selected.keyframes.length === 0) {

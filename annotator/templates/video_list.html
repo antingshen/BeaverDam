@@ -1,30 +1,41 @@
 {% extends "base.html" %}
 
+{% block head %}
+  <link rel="stylesheet" type="text/css" href="/static/app.css"/>
+{% endblock %}
+
 {% block body %}
-<table class="table table-hover" style="width:1280; margin: 0 auto;">
-  <thead>
-    <tr>
-      <th>Id</th>
-      <th>Annotations</th>
-      <th>Verified</th>
-      <th>Source</th>
-      {% if thumbnail %}
-        <th>Video</th>
-      {% endif %}
-    </tr>
-  </thead>
-  <tbody>
-    {% for video in videos %}
-    <tr onclick="window.document.location='{% url "video" video.id %}';" style="cursor: pointer;">
-      <td>{{ video.id }}</td>
-      <td>{{ video.annotation|yesno }}</td>
-      <td>{{ video.verified|yesno }}</td>
-      <td>{{ video.source }}</td>
-      {% if thumbnail %}
-        <td><video height="100"><source src="{{ video.url }}" type="video/mp4"></video>
-      {% endif %}
-    </tr>
-    {% endfor %}
-  </tbody>
-</table>
+
+<div class="video-list">
+  <h1>{{title}}</h1>
+  <h3>{{videos|length}} videos</h3>
+  <table class="table table-hover" style="width:100%; margin: 0 auto;">
+    <thead>
+      <tr>
+        <th>Id</th>
+        <th>Annotations</th>
+        <th>Verified</th>
+        <th>File</th>
+        <th>Type</th>
+        <th>Link</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for video in videos %}
+      <tr>
+        <td>{{ video.id }}</td>
+        <td>{{ video.annotation|yesno }}</td>
+        <td>{{ video.verified|yesno }}</td>
+        <td>{{ video.filename }}</td>
+        {% if video.image_list %}
+          <td>Sequence</td>
+        {% else %}
+          <td>Video</td>
+        {% endif %}
+        <td><a href="{% url "video" video.id %}">view</a></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
 {% endblock %}

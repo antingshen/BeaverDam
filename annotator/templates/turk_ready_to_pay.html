@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block body %}
+<table class="table table-hover" style="width:1280; margin: 0 auto;">
+  <thead>
+    <tr>
+      <th>Video Id</th>
+      <th>Hit Id</th>
+      <th>Calculated Bonus</th>
+      <th>File</th>
+      <th>Link</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for video_task in tasks %}
+    <trstyle>
+      <td>{{ video_task.video.id }}</td>
+      <td>{{ video_task.hit_id }}</td>
+      <td>{{ video_task.bonus }}</td>
+      <td>{{ video_task.filename }}</td>
+      <td><a href="{% url "video" video_task.video.id %}">View Video</a> | <a href="/admin/mturk/fullvideotask/{{video_task.id}}">View Task</a></td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

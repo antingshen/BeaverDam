@@ -1,19 +1,49 @@
+.panel-body {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: 0;
+}
+
+.top-controls {
+    padding: 15px 15px 15px 20px;
+}
+
+.bottom-controls {
+    margin-bottom: 0;
+    border: 0;
+    border-radius: 0;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+}
+
 /* Player */
 
-.player-container .row {
+.player-container {
     margin: 0;
+    border-width: 0px;
+    text-align: left;
 }
 
 .player-screen {
-    margin: 1em 0 0.5em;
+    margin: 0;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
     position: relative;
     text-align: center;
     flex-basis: 200px;
+    overflow-y: scroll;
 }
+
+.player-video-container {
+    display: flex;
+}
+
 .player-video {
+    position: absolute;
     top: 0;
-    max-width: 100%;
-    max-height: 100%;
 }
 
 .player-video canvas {
@@ -147,13 +177,6 @@ div.imgplay {
 
 /* Uncategorized rules below */
 
-#fixed-panel {
-    text-align: left;
-    margin-right: 0px;
-    padding-right: 0;
-    padding-left: 0;
-}
-
 #left-container {
     padding-left: 0px;
     margin-left: 0px;
@@ -180,12 +203,43 @@ div.imgplay {
     color:#AAAAAA;
 }
 
+/* stop the control buttons from being selectable*/
+.noselect {
+  -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Chrome/Safari/Opera */
+     -khtml-user-select: none; /* Konqueror */
+       -moz-user-select: none; /* Firefox */
+        -ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none; /* Non-prefixed version, currently
+                                  not supported by any browser */
+}
+
+#instructionModal {
+    overflow: scroll;
+}
+
+#instructionModal div.modal-dialog {
+    width: 80%;
+}
+
+#instructionModal .modal-body {
+    margin: 0 2rem;
+}
+
 .row {
     padding-top:4px;
     padding-bottom: 4px;
 }
 
-.modal-content
-{
+.modal-content {
     min-width: 760px;
+}
+
+.video-list {
+    padding: 0 50px 25px 50px;
+}
+
+.video-list h3 {
+    font-weight: 300;
+    font-size: 18px;
 }

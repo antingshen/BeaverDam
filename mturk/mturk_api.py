@@ -297,6 +297,9 @@ class Response(object):
         logger.error(self.data)
         self.tree = ElementTree.fromstring(self.data)
         self.values = {}
+        #print("------------------------------------------------------")
+        logger.error('HTTP Response = ' + str(self.data))
+        #print("------------------------------------------------------")
 
     def validate(self, valid, errormessage = None):
         """
@@ -322,6 +325,12 @@ class Response(object):
     def has_path(self, path):
         res = self.tree.find(path)
         if res is None:
+            return False
+        return True
+
+    def has_path(self, path):
+        result = self.tree.find(path)
+        if result is None:
             return False
         return True
 

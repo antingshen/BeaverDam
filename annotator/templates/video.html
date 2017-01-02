@@ -10,6 +10,11 @@
     hitId = '{{ mturk_data.hit_id }}';
     workerId = '{{ mturk_data.worker_id }}';
     assignmentId = '{{ mturk_data.assignment_id }}';
+    {% if help_embed %}
+      helpEmbedded = true;
+    {% else %}
+      helpEmbedded = false;
+    {% endif %}
   </script>
   <script src="/static/vendor/raphael/raphael.min.js"></script>
   <script src="/static/vendor/imgplay/jquery.imgplay.min.js"></script>
@@ -27,32 +32,32 @@
 {% endblock %}
 
 {% block body %}
-  <div class=" {{ iframe_mode|yesno:'empty, panel panel-default panel-space'}}   player-container" id="player">
-    <div class="row">
+  <div class=" {{ iframe_mode|yesno:'empty, panel panel-default panel-space'}} player-container" id="player">
+    <div class="panel-body">
 
-      <div id="fixed-panel" class="col-lg-12">
-        <div class="panel-body">
+      <div class="top-controls">
+        {% for label in label_data %}
+          <label for="object-radio-{{label.name}}" class="label" style="background-color: #{{label.color}}">
+            {{label.name}}
+            <input type="radio" name="object" id="object-radio-{{label.name}}" value="{{label.name}}" {% if forloop.first %} checked {% endif %}>
+          </label>
+        {% endfor %}
+        {% if help_embed %}
+          <a class="btn btn-default" id="show-help" target="_blank" style="margin-left: 25px;">Instructions &amp; Requirements</a>
+        {% else %}
+          <a class="btn btn-default" href="{{help_url}}" target="_blank" style="margin-left: 25px;">Instructions &amp; Requirements</a>
+        {% endif %}
 
-          <div>
-            {% for label in label_data %}
-              <label for="object-radio-{{label.name}}" class="label" style="background-color: #{{label.color}}">
-                {{label.name}}
-                <input type="radio" name="object" id="object-radio-{{label.name}}" value="{{label.name}}" {% if forloop.first %} checked {% endif %}>
-              </label>
-            {% endfor %}
-            <a class="btn btn-default" href="{{help_url}}" target="_blank" style="margin-left: 25px;">Instructions &amp; Requirements</a>
+        <div id="submit-container">
+        {% if mturk_data.preview == False %}
+          {% if mturk_data.authenticated %}
+          <form method="post" id="turk-form" action="https://{{ mturk_data.sandbox|yesno:'workersandbox,www'}}.mturk.com/mturk/externalSubmit">
+            <input type="hidden" value="{{ mturk_data.assignment_id }}" name="assignmentId">
+            <input type="hidden" value="{{ video_data.id }}" name="video-id">
+            <button id="submit-btn" type="submit"  class="btn btn-primary">Submit</button>
+          </form>
 
-            <div id="submit-container">
-            {% if mturk_data.preview == False %}
-              {% if mturk_data.authenticated %}
-              <form method="post" id="turk-form" action="https://{{ mturk_data.sandbox|yesno:'workersandbox,www'}}.mturk.com/mturk/externalSubmit">
-                <input type="hidden" value="{{ mturk_data.assignment_id }}" name="assignmentId">
-                <input type="hidden" value="{{ video_data.id }}" name="video-id">
-                <button id="submit-btn" type="submit"  class="btn btn-primary">Submit</button>
-              </form>
-
-              {% else %}
-
+          {% else %}
               {% if mturk_data.last_email_sent_date != None %}
                 <i>E-mail sent on {{  mturk_data.last_email_sent_date }}</i>
               {% endif %}
@@ -72,57 +77,59 @@
                   <button class="btn" disabled>{{ mturk_data.status }}</button>
                 {% endif %}
               </div>
+          {% endif %}
+        {% else %}
+          <h2>Preview Mode: Please accept HIT before working</h2>
+        {% endif %}
+        </div>
+      </div>
+      <div class="player-screen">
+        {% if image_list %}
+          <div class="player-video">
+            {% for image in image_list %}
+              {% if forloop.counter0 < 25 %}
+                <img src="{{image_list_path}}/{{image}}" />
+              {% else %}
+                <img data-src="{{image_list_path}}/{{image}}" />
               {% endif %}
-            {% else %}
-              <h2>Preview Mode: Please accept HIT before working</h2>
-            {% endif %}
-            </div>
+            {% endfor %}
           </div>
-          <div class="player-screen">
-            {% if image_list %}
-              <div class="player-video">
-                {% for image in image_list %}
-                  {% if forloop.counter0 < 25 %}
-                    <img src="{{image_list_path}}/{{image}}" />
-                  {% else %}
-                    <img data-src="{{image_list_path}}/{{image}}" />
-                  {% endif %}
-                {% endfor %}
-              </div>
-            {% else %}
-              <video class="player-video"></video>
-            {% endif %}
-            <div class="player-paper"></div>
-            <div class="player-loader">
-              <div class="bounce1"></div>
-              <div class="bounce2"></div>
-              <div class="bounce3"></div>
-            </div>
+        {% else %}
+          <div class="player-video-container">
+            <video class="player-video"></video>
           </div>
-
-          <div class="panel panel-primary">
-            <div class="panel-heading">
-              <input class="player-control-scrubber" type="range" min="0" max="10000" value="0" step="1"/>
-              <div class="panel panel-success">
-                <!-- <div class="panel-heading style="background-color: #3A7734"> -->
-                  <div class="player-keyframebar"></div>
-                <!-- </div> -->
-              </div>
-
-              <div class="glyphicon glyphicon-step-backward player-control-goto-start" title="Go to start"></div>
-              <div class="glyphicon glyphicon-play player-control-play-pause" title="Play / Pause (space)"></div>
-              <div class="glyphicon glyphicon-step-forward player-control-goto-end"></div>
-              <div class="glyphicon glyphicon-trash player-control-delete-keyframe"></div>
-              <input class="form-control player-control-time" id="frame-number" placeholder="0">
-            </div>
-          </div>
-
+        {% endif %}
+        <div class="player-paper"></div>
+        <div class="player-loader">
+          <div class="bounce1"></div>
+          <div class="bounce2"></div>
+          <div class="bounce3"></div>
         </div>
       </div>
 
-      <div class="col-xs-6 col-md-4">
-        <ul id="shape-list" class="list-group row">
-        </ul>
+      <div class="panel panel-primary bottom-controls">
+        <div class="panel-heading">
+          <input class="player-control-scrubber" type="range" min="0" max="10000" value="0" step="1"/>
+          <div class="panel panel-success">
+            <!-- <div class="panel-heading style="background-color: #3A7734"> -->
+              <div class="player-keyframebar"></div>
+            <!-- </div> -->
+          </div>
+
+          <span class="noselect">
+            <div class="glyphicon glyphicon-fast-backward player-control-goto-start" title="Go to start"></div>
+            <div class="glyphicon glyphicon-step-backward player-control-step-backward" title="One Frame Backward (shortcut - 'a')"></div>
+            <div class="glyphicon glyphicon-play player-control-play-pause" title="Play / Pause (shortcut - 'space'')"></div>
+            <div class="glyphicon glyphicon-step-forward player-control-step-forward" title="One Frame Forward (shortcut - 's')"></div>
+            <div class="glyphicon glyphicon-fast-forward player-control-goto-end"></div>
+            <div class="glyphicon glyphicon-trash player-control-delete-keyframe" title="Delete selected frame (shortcut - 'delete', 'd')"></div>
+          </span>
+          <input class="form-control player-control-time" id="frame-number" placeholder="0">
+          <div class="pull-right">
+            <input id="scale-checkbox" type="checkbox" />
+            <label for="scale-checkbox">Scale to fit</label>
+          </div>
+        </div>
       </div>
 
     </div>
@@ -142,6 +149,21 @@
 
           <div class="modal-footer">
             <button type="button" class="btn" data-dismiss="modal">OK</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  <div class="modal fade" id="instructionModal" role="dialog">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+            <h4 class="modal-title submit-result">Instructions &amp; Requirements</h4>
+          </div>
+          <div class="modal-body">{{help_content | safe}}</div>
+          <div class="modal-footer">
+            <button id="submit-survey-btn" type="button" class="btn btn-default" data-dismiss="modal">Close</button>
           </div>
         </div>
       </div>
@@ -269,3 +291,5 @@
     {% endif %}
 
 {% endblock %}
+
+
