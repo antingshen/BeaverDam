@@ -1,0 +1,98 @@
+---
+- hosts: webservers
+
+  vars:
+    path: /home/anting/BeaverDam/
+    repo: https://github.com/antingshen/BeaverDam.git
+    branch: master
+    server_domain: SERVER_DOMAIN
+    python3: "{{path}}venv/bin/python"
+    db_filename: prod.db.sqlite3
+    aws_id: AWS_ID
+    aws_key: AWS_KEY
+
+  tasks:
+  - name: Install package list
+    apt: pkg={{item}} state=installed update_cache=yes
+    become: true
+    with_items:
+      - git
+      - python3-pip
+      - supervisor
+      - nginx
+      - s3cmd
+    notify: Start supervisor
+
+  - name: Install virtualenv
+    pip:
+      name: virtualenv
+      executable: pip3
+    become: true
+
+  - name: Fetch code
+    git: repo={{repo}} dest={{path}} version={{branch}} accept_hostkey=yes
+    notify:
+      - Install python packages
+      - Collect static & migrate db
+      - Restart django
+    tags: pull
+
+  - name: Copy configurations
+    template: src={{item.src}} dest={{item.dest}}
+    with_items:
+      - {src: 'supervisor.conf', dest: '/etc/supervisor/conf.d/supervisor.conf'}
+      - {src: 'nginx.conf', dest: '/etc/nginx/conf.d/BeaverDam.conf'}
+      - {src: 'deploy_settings.py', dest: '{{path}}beaverdam/deploy_settings.py'}
+    notify:
+      - Restart supervisor
+      - Restart nginx
+      - Restart django
+    become: true
+    tags: config
+
+  - name: Create log
+    copy:
+      content: ""
+      dest: '{{path}}/logs/uwsgi.log'
+      force: no
+      mode: 0666
+
+  - name: Run handlers
+    debug: msg="running handlers"
+    changed_when: true
+    notify:
+      # - Start supervisor
+      - Install python packages
+      - Restart supervisor
+      - Restart nginx
+      - Collect static & migrate db
+      - Restart django
+
+
+  handlers:
+  - name: Start supervisor
+    command: supervisord -c /etc/supervisor/conf.d/supervisor.conf
+    become: true
+
+  - name: Install python packages
+    pip: virtualenv={{path}}venv
+         requirements={{path}}requirements.txt
+         virtualenv_python=python3.5
+
+  - name: Restart supervisor
+    command: supervisorctl reload
+    notify: Restart django
+    become: true
+
+  - name: Restart nginx
+    service: name=nginx state=restarted
+    become: true
+
+  - name: Collect static & migrate db
+    command: "{{python3}} {{path}}manage.py {{item}} --settings beaverdam.deploy_settings --noinput"
+    with_items:
+      - collectstatic
+      - migrate
+
+  - name: Restart django
+    supervisorctl: name=django state=restarted

@@ -3,6 +3,16 @@ BeaverDam
 
 Video annotation tool for deep learning training labels
 
+## About
+
+This tool is for drawing object bounding boxes in videos. It also includes support for Amazon Mechanical Turk. See the [paper](https://www2.eecs.berkeley.edu/Pubs/TechRpts/2016/EECS-2016-193.html).
+
+With small amount of changes, you can also:
+- Draw bounding boxes in images
+- Add additional attributes in bounding boxes
+- Use a custom keyframe scheduler instead of user-scheduled keyframes
+
+This tool currently does not support semantic segmentation.
 
 ## Installation
 
@@ -18,6 +28,8 @@ Video annotation tool for deep learning training labels
     `scripts/seed -f`
 
 When running any `./manage.py` commands, use `source venv/bin/activate` to enter venv first.
+
+See `/deployment` for tips on using BeaverDam for production.
 
 ### If using mturk
 
@@ -62,3 +74,7 @@ Inside venv, run `./manage.py test`
 ## Contributing
 
 See [annotator/static/README.md](annotator/static) for more info.
+
+## Support
+
+For help setting up BeaverDam for your application/company, please contact me or leave an issue.
