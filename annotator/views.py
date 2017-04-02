@@ -14,6 +14,7 @@ from datetime import datetime, timezone
 import os
 import json
 import urllib.request
+import urllib.parse
 import markdown
 import sys
 import mturk.utils
@@ -152,7 +153,7 @@ def video(request, video_id):
         'label_data': label_data,
         'video_data': video_data,
         'image_list': json.loads(video.image_list) if video.image_list else 0,
-        'image_list_path': video.host.replace('#', '%23'),
+        'image_list_path': urllib.parse.quote(video.host),
         'help_url': settings.HELP_URL,
         'help_embed': settings.HELP_EMBED,
         'mturk_data': mturk_data,
@@ -201,7 +202,7 @@ class ReceiveCommand(View):
 
         try:
             vid_id = int(video_id)
-            command_type = data['type'] 
+            command_type = data['type']
 
             if 'bonus' in data:
                 bonus = data['bonus']

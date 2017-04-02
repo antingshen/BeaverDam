@@ -1,0 +1,64 @@
+<div class="modal fade" id="acceptRejectForm" role="dialog">
+  <input type="hidden" id="acceptRejectType"/>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title submit-result">Accept Work</h4>
+      </div>
+
+      <div class="modal-body">
+        <div class="form-group row turkSpecific">
+          <label for="workerTime" class="col-sm-2 col-form-label">Worker Time</label>
+          <div class="col-sm-10">
+            <span class="form-control workerTime" style="text-align:left;"></span>
+          </div>
+        </div>
+        <div class="form-group row turkSpecific">
+          <label id="labelForBonus" for="inputBonusAmt" class="col-sm-2 col-form-label"></label>
+          <div class="col-sm-10">
+            <input type="number" class="form-control" id="inputBonusAmt" placeholder="0.00" step="0.01" min="0">
+          </div>
+        </div>
+        <div class="form-group row turkSpecific">
+          <label for="inputBonusAmt" class="col-md-2 col-form-label">Worker Browser</label>
+          <div class="col-sm-10">
+            <span type="text" class="form-control readonlyBrowser" ><span>
+          </div>
+        </div>
+        <div class="form-group row turkSpecific">
+          <label for="inputMessage" class="col-sm-2 col-form-label">Message</label>
+          <div class="col-sm-10">
+            <textarea class="form-control vresize" id="inputAcceptRejectMessage" placeholder="Thanks for your work"></textarea>
+          </div>
+        </div>
+        <div class="form-group row turkSpecific">
+          <div class="col-sm-offset-2 col-md-10">
+            <div class="checkbox"  style="margin-top:0px; margin-bottom:0px">
+              <label><input type="checkbox" checked="true" id="inputReopen">Reopen on Turk</label>
+            </div>
+          </div>
+        </div>
+        <div class="form-group row">
+          <div class="col-sm-offset-2 col-md-10">
+            <div class="checkbox" style="margin-top:0px; margin-bottom:0px">
+              <label><input type="checkbox" checked="true" id="inputDeleteBoxes">Delete Boxes</label>
+            </div>
+          </div>
+        </div>
+        <div class="form-group row turkSpecific">
+          <div class="col-sm-offset-2 col-md-10">
+            <div class="checkbox" style="margin-top:0px; margin-bottom:0px">
+              <label><input type="checkbox" checked="false" id="inputBlockWorker">Block Worker</label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button id="cancel-btn" type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+        <button id="accept-reject-btn" type="button" class="btn btn-success">Accept</button>
+      </div>
+    </div>
+  </div>
+</div>
