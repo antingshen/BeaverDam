@@ -2,11 +2,14 @@ from django.db import models
 from django.contrib.staticfiles import finders
 
 class Video(models.Model):
-    annotation = models.TextField(blank=True)
-    source = models.CharField(max_length=1048, blank=True)
+    annotation = models.TextField(blank=True,
+        help_text="A JSON blob containing all user annotation sent from client.")
+    source = models.CharField(max_length=1048, blank=True,
+        help_text="Name of video source or type, for easier grouping/searching of videos.")
     filename = models.CharField(max_length=100, blank=True, unique=True)
     image_list = models.TextField(blank=True)
-    host = models.CharField(max_length=1048, blank=True)
+    host = models.CharField(max_length=1048, blank=True,
+        help_text="Path to prepend to filenames to form the url for this video or the images in `image_list`.")
     verified = models.BooleanField(default=False)
     rejected = models.BooleanField(default=False)
 
