@@ -60,6 +60,14 @@ Need to run on a custom port? `env PORT=1234 scripts/serve`
 To make a superuser account for testing, or for production, run inside venv `./manage.py createsuperuser`
 If you are using sample data, login with username `test` and password `password`
 
+### Adding videos and tasks
+
+To add videos via web UI, navigate to `/admin` and create Video objects. 
+Alternatively, use `./manage.py shell`, and create `annotator.Video` objects and call `video.save()`.
+Helper methods exist to create large number of video objects at once, see `annotator/models.py`.
+
+Tasks are created in the same way. They can be published to mturk by calling `task.publish()`.
+
 ### Simulating mturk view in debug
 
 To see what video pages look like on mturk preview mode, set url param `preview=true`.
