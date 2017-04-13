@@ -19,7 +19,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '8pje5%pxibt2c=&j_c+ly5v@x)$r77%h-x3%jluq-@)4^75)ak'
 DEBUG = True
 
-HELP_URL = os.environ.get('HELP_URL', 'https://raw.githubusercontent.com/xysense/BeaverDam/master/default-instructions.md')
+HELP_URL = os.environ.get('HELP_URL', 'https://raw.githubusercontent.com/antingshen/BeaverDam/master/default-instructions.md')
 # this will show in a popup instead of the external HELP_URL
 HELP_USE_MARKDOWN = True
 HELP_EMBED = True
