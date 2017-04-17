@@ -21,13 +21,19 @@ mturk = Server(settings.AWS_ID, settings.AWS_KEY, settings.URL_ROOT, settings.MT
 
 
 class Task(models.Model):
-    hit_id = models.CharField(max_length=64, blank=True)
-    hit_group = models.CharField(max_length=64, blank=True)
+    hit_id = models.CharField(max_length=64, blank=True,
+        help_text="ID on MTurk. Auto-populated when publishing")
+    hit_group = models.CharField(max_length=64, blank=True,
+        help_text=("Group ID on Mturk. "
+            "HITs with same title/description usually are placed in the same group by MTurk. "
+            "Auto-populated when publishing."))
     metrics = models.TextField(blank=True)
     duration = 10800 # 3 hours
     lifetime = 2592000 # 30 days
-    worker_id = models.CharField(max_length=64, blank=True)
-    assignment_id = models.CharField(max_length=64, blank=True)
+    worker_id = models.CharField(max_length=64, blank=True,
+        help_text="ID of worker who submitted this HIT")
+    assignment_id = models.CharField(max_length=64, blank=True,
+        help_text="ID of matching between this task and a worker. Used for authentication")
     time_completed = models.DateTimeField(null=True, blank=True)
     bonus = models.DecimalField(max_digits=4, decimal_places=2, default=0)
     sandbox = models.BooleanField(default=settings.MTURK_SANDBOX)
@@ -46,7 +52,7 @@ class Task(models.Model):
         if self.video.verified:
             self.video.verified = False
             self.video.save()
-        response = mturk.create_hit(self.title, self.description, self.url, 
+        response = mturk.create_hit(self.title, self.description, self.url,
             self.pay, self.duration, self.lifetime)
         self.hit_id = response.values['hitid']
         self.hit_group = response.values['hittypeid']
@@ -75,7 +81,7 @@ class Task(models.Model):
         self.email_trail += "--------------------------------------------------{}".format(os.linesep)
         self.email_trail += message
         self.email_trail += os.linesep
-         
+
         self.save()
 
     def approve_assignment(self, bonus, message):
@@ -86,7 +92,7 @@ class Task(models.Model):
             mturk.bonus(self.worker_id, self.assignment_id, bonus, message)
 
         mturk.accept(self.assignment_id, message)
-        
+
     def reject_assignment(self, message):
         if self.assignment_id == None:
             raise Exception("Cannot reject task - no work has been done on Turk")
@@ -153,7 +159,7 @@ class FullVideoTask(Task):
         return reverse('video', args=[self.video.id])
 
     def __str__(self):
-        return self.video.filename
+        return self.video.filename or str(self.video)
 
     def calculate_bonus(self):
         boxes  = self.video.count_keyframes()
