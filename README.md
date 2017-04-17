@@ -55,18 +55,32 @@ Then navigate to [localhost:5000](http://localhost:5000/) in your browser.
 
 Need to run on a custom port? `env PORT=1234 scripts/serve`
 
+For actual production deployment, we recommend using standard Django deployment procedures. Sample scripts using uWSGI & nginx are provided in `/deployment`. Remember to set `DEBUG=False` in `settings.py`. 
+
 ### Making accounts
 
-To make a superuser account for testing, or for production, run inside venv `./manage.py createsuperuser`
-If you are using sample data, login with username `test` and password `password`
+Login is required to authenticate any changes. Turkers do not require accounts and are authenticated by BeaverDam via Mechanical Turk. 
 
-### Adding videos and tasks
+To make a superuser account, run inside venv `./manage.py createsuperuser`
+If you are using sample data, login with username `test` and password `password`.
+Additional non-turker worker accounts can be created via `/admin`. 
+
+### Videos
 
 To add videos via web UI, navigate to `/admin` and create Video objects. 
 Alternatively, use `./manage.py shell`, and create `annotator.Video` objects and call `video.save()`.
 Helper methods exist to create large number of video objects at once, see `annotator/models.py`.
 
-Tasks are created in the same way. They can be published to mturk by calling `task.publish()`.
+Video objects can either be H.264 encoded video (See `scripts/convert-to-h264`), or a list of frames provided in the attribute `image_list`.
+By using single-frame videos, BeaverDam can be used for image annotation.
+
+Video annotations can be accessed via admin, `/annotation/video_id`, or through the Video objects' annotation attribute through the shell.
+
+### Tasks
+
+Tasks are created in the same way as Videos. 
+Only the `video` attribute needs to be filled out at creation time.
+They can be published to mturk by calling `task.publish()`. 
 
 ### Simulating mturk view in debug
 
@@ -81,7 +95,8 @@ Inside venv, run `./manage.py test`
 
 ## Contributing
 
-See [annotator/static/README.md](annotator/static) for more info.
+Pull requests and contributions are welcome. 
+See [annotator/static/README.md](annotator/static) for more info on frontend architecture.
 
 ## Support
 
