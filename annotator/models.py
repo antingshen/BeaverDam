@@ -7,7 +7,7 @@ class Video(models.Model):
     source = models.CharField(max_length=1048, blank=True,
         help_text=("Name of video source or type, for easier grouping/searching of videos."
             "This field is not used by BeaverDam and only facilitates querying on videos by type."))
-    filename = models.CharField(max_length=100, blank=True, unique=True,
+    filename = models.CharField(max_length=100, blank=True,
         help_text=("Name of the video file."
             "The video should be publically accessible by at <host><filename>."))
     image_list = models.TextField(blank=True,
