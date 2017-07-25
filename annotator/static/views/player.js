@@ -388,6 +388,17 @@ class PlayerView {
             this.$('paper').css({cursor});
         });
 
+        $(rect).on('clear-lines', () => {
+            if (this.creationRect.xline) {
+                this.creationRect.xline.remove();
+                this.creationRect.xline = null;
+            }
+            if (this.creationRect.yline) {
+                this.creationRect.yline.remove();
+                this.creationRect.yline = null;
+            }
+        });
+
         // .. but don't change it if there's we're in the middle of a drag
         $(rect).on('drag-start', () => {
             this.dragInProgress = true;
