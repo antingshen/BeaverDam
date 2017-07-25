@@ -77,6 +77,10 @@ class Rect {
         // Raphel paper that this element is attached to
         this.$paper = null;
 
+        // Lines
+        this.xline = null;
+        this.yline = null;
+
         this.getPlayerMetrics = null;
 
         // Prevent adding new properties
@@ -409,11 +413,13 @@ class Rect {
     }
 
     onMouseover(e, absMouseX, absMouseY) {
+
         // Don't change cursor during a drag operation
         if (this.isBeingDragged()) return;
 
         // X,Y Coordinates relative to shape's orgin
         var mouse = this.getCanvasRelativePoint(absMouseX, absMouseY);
+
         var relative = {
             xMin: mouse.x - this.bounds.xMin,
             yMin: mouse.y - this.bounds.yMin,
@@ -546,7 +552,28 @@ class CreationRect extends Rect {
         $(this).triggerHandler('drag-end');
     }
 
-    onMouseover() {
+    onMouseover(e, absMouseX, absMouseY) {
+        let mouse = this.getCanvasRelativePoint(absMouseX, absMouseY);
+
+        // draw x line
+        if (this.xline) {
+            this.xline.attr("path", "M 0 " + mouse.y.toString() + " H " + this.$paper.width);
+        } else {
+            this.xline = this.$paper.path("M 0 " + mouse.y.toString() + " H " + this.$paper.width).attr({stroke:'blue'});
+        }
+
+        // draw y line
+        if (this.yline) {
+            this.yline.attr("path", "M " + mouse.x.toString() + " 0" + " V " + this.$paper.height);
+        } else {
+            this.yline = this.$paper.path("M " + mouse.x.toString() + " 0" + " V " + this.$paper.height).attr({stroke: 'blue'});
+        }
+
+        // dont focus on the lines
+        this.xline.toBack();
+        this.yline.toBack();
+
+
         this.dragIntent = 'create';
     }
 
