@@ -1,6 +1,17 @@
 from django.db import models
 from django.contrib.staticfiles import finders
 
+class Label(models.Model):
+    """The classes available for workers to choose from for each object."""
+    id = models.AutoField(primary_key=True)
+    name = models.CharField(blank=True, max_length=100, unique=True,
+        help_text="Name of class label option.")
+    color = models.CharField(blank=True, max_length=6,
+        help_text="6 digit hex.")
+
+    def __str__(self):
+        return self.name
+
 class Video(models.Model):
     annotation = models.TextField(blank=True,
         help_text="A JSON blob containing all user annotation sent from client.")
@@ -17,6 +28,7 @@ class Video(models.Model):
         help_text="Path to prepend to filenames to form the url for this video or the images in `image_list`.")
     verified = models.BooleanField(default=False, help_text="Verified as correct by expert.")
     rejected = models.BooleanField(default=False, help_text="Rejected by expert.")
+    labels = models.ManyToManyField(Label)
 
     @classmethod
     def from_list(cls, path_to_list, *, source, host, filename_prefix=''):
@@ -47,14 +59,3 @@ class Video(models.Model):
             return self.annotation.count('"frame"')
         else:
             return self.annotation.count('"frame": {}'.format(at_time))
-
-class Label(models.Model):
-    """The classes available for workers to choose from for each object."""
-    id = models.AutoField(primary_key=True)
-    name = models.CharField(blank=True, max_length=100, unique=True,
-        help_text="Name of class label option.")
-    color = models.CharField(blank=True, max_length=6,
-        help_text="6 digit hex.")
-
-    def __str__(self):
-        return self.name
