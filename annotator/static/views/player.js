@@ -210,11 +210,12 @@ class PlayerView {
             // control-time <=> video
             this.$on('control-time', 'change', () => this.video.currentTime = this.controlTime);
             this.video.onTimeUpdate(() => this.controlTimeUnfocused = this.video.currentTime);
-            this.video.onPlaying(() => this.togglePlayPauseIcon())
-            this.video.onPause(() => this.togglePlayPauseIcon())
+            this.video.onPlaying(() => this.togglePlayPauseIcon());
+            this.video.onPause(() => this.togglePlayPauseIcon());
 
             // control-scrubber <=> video
             this.$on('control-scrubber', 'input', () => this.jumpToTimeAndPause(this.controlScrubber));
+            this.$('control-scrubber').on('focus', () => this.$('control-scrubber').blur());
             this.video.onTimeUpdate(() => this.controlScrubberInactive = this.video.currentTime);
 
             // keyframebar => video
