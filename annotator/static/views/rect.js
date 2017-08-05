@@ -413,6 +413,7 @@ class Rect {
     }
 
     onMouseover(e, absMouseX, absMouseY) {
+        // Clear lines
         $(this).triggerHandler('clear-lines');
         // Don't change cursor during a drag operation
         if (this.isBeingDragged()) return;

@@ -381,14 +381,7 @@ class PlayerView {
         var rect = new KindOfRect({classBaseName});
         rect.attach(this.$paper, this.metrics.bind(this));
 
-        // In case drag exceeds bounds of object, set it as the cursor of the
-        // entire paper
-        $(rect).on('change-cursor', (e, cursor) => {
-            if (this.dragInProgress) return;
-            this.$('paper').css({cursor});
-        });
-
-        $(rect).on('clear-lines', () => {
+        var removeLines = () => {
             if (this.creationRect.xline) {
                 this.creationRect.xline.remove();
                 this.creationRect.xline = null;
@@ -397,8 +390,19 @@ class PlayerView {
                 this.creationRect.yline.remove();
                 this.creationRect.yline = null;
             }
-        });
+        };
+        // Clear lines trigger handler
+        $(rect).on('clear-lines', () => { removeLines(); });
 
+        // In case drag exceeds bounds of object, set it as the cursor of the
+        // entire paper
+        $(rect).on('change-cursor', (e, cursor) => {
+            if (this.dragInProgress) {
+                removeLines();
+                return;
+            }
+            this.$('paper').css({cursor});
+        });
         // .. but don't change it if there's we're in the middle of a drag
         $(rect).on('drag-start', () => {
             this.dragInProgress = true;
