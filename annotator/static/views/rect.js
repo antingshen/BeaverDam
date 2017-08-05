@@ -25,7 +25,7 @@ var RectConstants = {
         'e-resize': 'ew-resize',
         'w-resize': 'ew-resize',
         'move': 'move',
-        'create': 'crosshair',
+        'create': 'none',
     },
 };
 
