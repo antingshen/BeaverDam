@@ -296,6 +296,20 @@ class Player {
         if (this.annotations.length === 0 && !confirm('Confirm that there are no objects in the video?')) {
             return;
         }
+
+        // account for offset of 5% set in initPaper()
+        for (let annotation of this.annotations) {
+            for (let keyframe of annotation.keyframes) {
+                let video = $(".player-video");
+                let offset_width = video.outerWidth() * 0.05;
+                let offset_height = video.outerHeight() * 0.05;
+                keyframe.bounds.xMin -= offset_width;
+                keyframe.bounds.xMax -= offset_width;
+                keyframe.bounds.yMin -= offset_height;
+                keyframe.bounds.yMax -= offset_height;
+            }
+        }
+
         DataSources.annotations.save(this.videoId, this.annotations, this.metrics, window.mturk).then((response) => {
             // only show this if not running on turk
             if (!window.hitId)
