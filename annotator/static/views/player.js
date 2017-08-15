@@ -64,6 +64,7 @@ class PlayerView {
         this.keyframebarReady = Misc.CustomPromise();
         this.paperReady = Misc.CustomPromise();
         this.videoReady = Misc.CustomPromise();
+        this.localVideoReady = Misc.CustomPromise();
 
         // We're ready when all the components are ready.
         this.ready = Misc.CustomPromiseAll(
@@ -76,6 +77,7 @@ class PlayerView {
         Misc.preventExtensions(this, PlayerView);
 
         this.initHandlers();
+        this.initLocalVideo();
         this.initPaper();
         this.initVideo();
         this.initKeyframebar();
@@ -174,29 +176,47 @@ class PlayerView {
         this.video.fit();
     }
 
-    initVideo() {
-        this.video = AbstractFramePlayer.newFramePlayer(this.$('video')[0], { images: imageList, videoSrc: this.videoSrc });
+    initLocalVideo() {
+        let fullBuff = function(scope) {
+            let req = new XMLHttpRequest();
+            req.open('GET', scope.videoSrc, true);
+            req.responseType = 'blob';
+            req.onload = function () {
+                if (this.status == 200) {
+                    scope.videoSrc = URL.createObjectURL(this.response);
+                    scope.localVideoReady.resolve();
+                }
+            };
+            req.send();
+        };
+        fullBuff(this);
+    }
 
-        // need to set the current time by default -  if (this.videoStart != null) { this.video.currentTime = this.videoStart; }
-        this.video.onPlaying(() => {
-            clearInterval(this.manualTimeupdateTimerId);
-            this.manualTimeupdateTimerId = setInterval(() => {
-                this.video.triggerTimerUpdateHandler();
-            }, this.TIME_UPDATE_DELAY);
+    initVideo() {
+        this.localVideoReady().then(() => {
+            this.video = AbstractFramePlayer.newFramePlayer(this.$('video')[0], { images: imageList, videoSrc: this.videoSrc });
+
+            // need to set the current time by default -  if (this.videoStart != null) { this.video.currentTime = this.videoStart; }
+            this.video.onPlaying(() => {
+                clearInterval(this.manualTimeupdateTimerId);
+                this.manualTimeupdateTimerId = setInterval(() => {
+                    this.video.triggerTimerUpdateHandler();
+                }, this.TIME_UPDATE_DELAY);
+            });
+            this.video.onPause(() => {
+                clearInterval(this.manualTimeupdateTimerId);
+            });
+            this.video.onLoadedMetadata(() => {
+                this.videoReady.resolve();
+            });
+            $(window).resize(() => this.sizeVideoFrame());
+            this.video.onAbort(() => {
+                this.videoReady.reject();
+            });
+            this.video.onBuffering((isBuffering) => {
+                this.loading = isBuffering;
+            });
         });
-        this.video.onPause(() => {
-            clearInterval(this.manualTimeupdateTimerId);
-        });
-        this.video.onLoadedMetadata(() => {
-            this.videoReady.resolve();
-        });
-        $(window).resize(() => this.sizeVideoFrame());
-        this.video.onAbort(() => {
-            this.videoReady.reject();
-        });
-        this.video.onBuffering((isBuffering) => {
-            this.loading = isBuffering;
-        })
     }
 
     initHandlers() {
