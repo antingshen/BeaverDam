@@ -28,7 +28,7 @@ class Video(models.Model):
         help_text="Path to prepend to filenames to form the url for this video or the images in `image_list`.")
     verified = models.BooleanField(default=False, help_text="Verified as correct by expert.")
     rejected = models.BooleanField(default=False, help_text="Rejected by expert.")
-    labels = models.ManyToManyField(Label)
+    labels = models.ManyToManyField(Label, blank=True)
 
     @classmethod
     def from_list(cls, path_to_list, *, source, host, filename_prefix=''):
