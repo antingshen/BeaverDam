@@ -267,6 +267,14 @@ class PlayerView {
                 this.video.fit();
                 this.sizeVideoFrame();
             });
+            $('#guidelines-checkbox').on('click', () => {
+                if (this.creationRect) {
+                    this.creationRect.guideLinesEnabled = !this.creationRect.guideLinesEnabled;
+                    if (!this.creationRect.guideLinesEnabled) {
+                        $(this.creationRect).triggerHandler('clear-lines');
+                    }
+                }
+            });
             this.sizeVideoFrame();
             this.loading = false;
         });
