@@ -25,7 +25,7 @@ var RectConstants = {
         'e-resize': 'ew-resize',
         'w-resize': 'ew-resize',
         'move': 'move',
-        'create': 'none',
+        'create': 'crosshair',
     },
 };
 
@@ -555,25 +555,23 @@ class CreationRect extends Rect {
 
     onMouseover(e, absMouseX, absMouseY) {
         let mouse = this.getCanvasRelativePoint(absMouseX, absMouseY);
-
         // draw x line
         if (this.xline) {
-            this.xline.attr("path", "M 0 " + mouse.y.toString() + " H " + this.$paper.width);
+            this.xline.attr("path", "M 0 " + mouse.y + " H " + this.$paper.width);
         } else {
-            this.xline = this.$paper.path("M 0 " + mouse.y.toString() + " H " + this.$paper.width).attr({stroke:'blue'});
+            this.xline = this.$paper.path("M 0 " + mouse.y + " H " + this.$paper.width).attr({stroke:'blue'});
         }
 
         // draw y line
         if (this.yline) {
-            this.yline.attr("path", "M " + mouse.x.toString() + " 0" + " V " + this.$paper.height);
+            this.yline.attr("path", "M " + mouse.x + " 0" + " V " + this.$paper.height);
         } else {
-            this.yline = this.$paper.path("M " + mouse.x.toString() + " 0" + " V " + this.$paper.height).attr({stroke: 'blue'});
+            this.yline = this.$paper.path("M " + mouse.x + " 0" + " V " + this.$paper.height).attr({stroke: 'blue'});
         }
 
         // dont focus on the lines
         this.xline.toBack();
         this.yline.toBack();
-
 
         this.dragIntent = 'create';
     }
