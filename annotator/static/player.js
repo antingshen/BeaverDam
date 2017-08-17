@@ -141,6 +141,9 @@ class Player {
 
         $(this).on('change-keyframes', () => {
             this.drawKeyframes();
+            if (this.selectedAnnotation) {
+                $('#label-name').val(this.selectedAnnotation.type);
+            }
         });
 
 
@@ -234,6 +237,14 @@ class Player {
                 this.selectedAnnotation.updateKeyframe({time:time, bounds:previousKeyFrame.bounds}, this.isImageSequence);
                 $(this).triggerHandler('change-onscreen-annotations');
                 $(this).triggerHandler('change-keyframes');
+            });
+
+            $(this.view).on('change-annotation-type', () => {
+                console.log("called");
+                if (this.selectedAnnotation) {
+                    this.selectedAnnotation.type = $('#label-name').val();
+                    console.log("changed annotation type");
+                }
             });
 
         });

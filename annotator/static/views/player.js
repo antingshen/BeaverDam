@@ -270,6 +270,13 @@ class PlayerView {
                 this.video.fit();
                 this.sizeVideoFrame();
             });
+            // Custom label listener
+            $('#label-name').on('change', () => {
+                console.log("changed123");
+                console.log(this);
+                $(this).triggerHandler('change-annotation-type');
+            });
+
             this.sizeVideoFrame();
             this.loading = false;
         });
