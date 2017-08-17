@@ -142,7 +142,7 @@ class Player {
         $(this).on('change-keyframes', () => {
             this.drawKeyframes();
             if (this.selectedAnnotation) {
-                $('#label-name').val(this.selectedAnnotation.type);
+                $('#annotation-type').val(this.selectedAnnotation.type);
             }
         });
 
@@ -240,10 +240,10 @@ class Player {
             });
 
             $(this.view).on('change-annotation-type', () => {
-                console.log("called");
                 if (this.selectedAnnotation) {
-                    this.selectedAnnotation.type = $('#label-name').val();
-                    console.log("changed annotation type");
+                    let annotationType = $('#annotation-type');
+                    this.selectedAnnotation.type = annotationType.val();
+                    annotationType.blur();
                 }
             });
 

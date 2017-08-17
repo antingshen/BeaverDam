@@ -271,9 +271,7 @@ class PlayerView {
                 this.sizeVideoFrame();
             });
             // Custom label listener
-            $('#label-name').on('change', () => {
-                console.log("changed123");
-                console.log(this);
+            $('#annotation-type').on('change', () => {
                 $(this).triggerHandler('change-annotation-type');
             });
 
