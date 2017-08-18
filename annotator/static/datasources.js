@@ -10,6 +10,7 @@ var DataSources = {
                     width: json.w,
                     height: json.h,
                 }),
+                attributes: json.attributes,
                 time: json.frame,
                 continueInterpolation: json.continueInterpolation === false ? false : true,
             };
@@ -24,6 +25,7 @@ var DataSources = {
                 h: attr.height,
                 continueInterpolation: frame.continueInterpolation, 
                 frame: frame.time,
+                attributes: frame.attributes,
             };
         },
     },

@@ -137,6 +137,15 @@ class Player {
         // Drawing annotations
         $(this).on('change-onscreen-annotations', () => {
             this.drawOnscreenAnnotations();
+            if (this.selectedAnnotation) {
+                let index = this.selectedAnnotation.getFrameAtTime(this.view.video.currentTime).closestIndex;
+                let frame = this.selectedAnnotation.keyframes[index];
+                if (frame && frame.attributes) {
+                    $('#frame-attributes').val(frame.attributes);
+                } else {
+                    $('#frame-attributes').val("");
+                }
+            }
         });
 
         $(this).on('change-keyframes', () => {
@@ -234,6 +243,16 @@ class Player {
                 this.selectedAnnotation.updateKeyframe({time:time, bounds:previousKeyFrame.bounds}, this.isImageSequence);
                 $(this).triggerHandler('change-onscreen-annotations');
                 $(this).triggerHandler('change-keyframes');
+            });
+
+            $(this.view).on('change-frame-attributes', () => {
+                if (this.selectedAnnotation) {
+                    let frameAttributes = $('#frame-attributes');
+                    let newFrame = this.selectedAnnotation.getFrameAtTime(this.view.video.currentTime)
+                    newFrame.attributes = frameAttributes.val();
+                    this.selectedAnnotation.updateKeyframe(newFrame);
+                    frameAttributes.blur();
+                }
             });
 
         });
