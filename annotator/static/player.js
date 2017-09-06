@@ -155,7 +155,7 @@ class Player {
 
         $('#email-btn').click(this.emailWorker.bind(this));
 
-       
+
         // On drawing changed
         this.viewReady().then(() => {
             $(this.view.creationRect).on('drag-start', () => {
@@ -299,7 +299,7 @@ class Player {
         DataSources.annotations.save(this.videoId, this.annotations, this.metrics, window.mturk).then((response) => {
             // only show this if not running on turk
             if (!window.hitId)
-                this.showModal("Save", "Save Successful");
+                this.showModal("Save", response);
         });
     }
 
@@ -323,7 +323,7 @@ class Player {
         $('#accept-reject-btn').removeClass('btn-danger').addClass('btn-success')
         $('#accept-reject-btn').text('Accept');
         $('#acceptRejectForm').find('.modal-title').text("Accept Work");
-        $('#acceptRejectForm').modal('toggle'); 
+        $('#acceptRejectForm').modal('toggle');
     }
     showRejectDialog(e) {
         this.setDialogDefaults();
@@ -354,7 +354,7 @@ class Player {
 
     showEmailDialog(e) {
         this.setDialogDefaults();
-      
+
         $('#inputEmailMessage')[0].value = this.turkMetadata.emailMessage;
         $('#inputEmailSubject')[0].value = this.turkMetadata.emailSubject;
         $('#emailForm').modal('toggle');
@@ -379,11 +379,11 @@ class Player {
 
         var promise;
         if (type == 'accept')
-            promise = DataSources.annotations.acceptAnnotation(this.videoId, parseFloat(bonus.value), message.value, 
+            promise = DataSources.annotations.acceptAnnotation(this.videoId, parseFloat(bonus.value), message.value,
                                                                reopen.checked, deleteBoxes.checked, blockWorker.checked, this.annotations);
         else
             promise = DataSources.annotations.rejectAnnotation(this.videoId, message.value, reopen.checked, deleteBoxes.checked, blockWorker.checked, this.annotations);
-            
+
         promise.then((response) => {
             $('#acceptForm').modal('toggle');
             $('#acceptForm').find('.btn').removeAttr("disabled");
@@ -398,7 +398,7 @@ class Player {
         e.preventDefault();
         var subject = $('#inputEmailSubject')[0];
         var message = $('#inputEmailMessage')[0];
-        
+
         $('#emailForm').find('.btn').attr("disabled", "disabled");
         DataSources.annotations.emailWorker(this.videoId, subject.value, message.value).then((response) => {
             $('#emailForm').modal('toggle');

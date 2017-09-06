@@ -22,7 +22,7 @@ var DataSources = {
                 y: attr.y,
                 w: attr.width,
                 h: attr.height,
-                continueInterpolation: frame.continueInterpolation, 
+                continueInterpolation: frame.continueInterpolation,
                 frame: frame.time,
             };
         },
@@ -94,6 +94,7 @@ var DataSources = {
                     }
                     return Promise.resolve('State saved successfully.');
                 } else {
+                    response.text().then(t => console.log(t));
                     return Promise.resolve(`Error code ${response.status}`);
                 }
             });
