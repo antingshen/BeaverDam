@@ -216,6 +216,26 @@ class Player {
                 }
             });
 
+            $(this.view).on('duplicate-keyframe', () => {
+                var time = this.view.video.currentTime;
+
+                if (!this.selectedAnnotation || !this.selectedAnnotation.keyframes) {
+                    return;
+                }
+                var previousKeyFrame;
+                for (let [i, kf] of this.selectedAnnotation.keyframes.entries()) {
+                    if (Math.abs(kf.time - time) < this.selectedAnnotation.SAME_FRAME_THRESHOLD) {
+                        return;
+                    } else if (kf.time > time) {
+                        break;
+                    }
+                    previousKeyFrame = kf;
+                }
+                this.selectedAnnotation.updateKeyframe({time:time, bounds:previousKeyFrame.bounds}, this.isImageSequence);
+                $(this).triggerHandler('change-onscreen-annotations');
+                $(this).triggerHandler('change-keyframes');
+            });
+
         });
     }
 

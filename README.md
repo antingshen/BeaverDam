@@ -67,11 +67,13 @@ Additional non-turker worker accounts can be created via `/admin`.
 
 ### Videos
 
-To add videos via web UI, navigate to `/admin` and create Video objects. 
+To add videos, one must upload the video to a CDN (or use `/annotator/static/videos` to serve on the same server), then create a Django video object that contains the url (`host` + `filename`) to the video file.
+
+To add video objects via web UI, navigate to `/admin` and create Video objects. 
 Alternatively, use `./manage.py shell`, and create `annotator.Video` objects and call `video.save()`.
 Helper methods exist to create large number of video objects at once, see `annotator/models.py`.
 
-Video objects can either be H.264 encoded video (See `scripts/convert-to-h264`), or a list of frames provided in the attribute `image_list`.
+Video objects can either use H.264 encoded video (See `scripts/convert-to-h264`), or a list of frames provided in the attribute `image_list`.
 By using single-frame videos, BeaverDam can be used for image annotation.
 
 Video annotations can be accessed via admin, `/annotation/video_id`, or through the Video objects' annotation attribute through the shell.

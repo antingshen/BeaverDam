@@ -210,11 +210,12 @@ class PlayerView {
             // control-time <=> video
             this.$on('control-time', 'change', () => this.video.currentTime = this.controlTime);
             this.video.onTimeUpdate(() => this.controlTimeUnfocused = this.video.currentTime);
-            this.video.onPlaying(() => this.togglePlayPauseIcon())
-            this.video.onPause(() => this.togglePlayPauseIcon())
+            this.video.onPlaying(() => this.togglePlayPauseIcon());
+            this.video.onPause(() => this.togglePlayPauseIcon());
 
             // control-scrubber <=> video
             this.$on('control-scrubber', 'input', () => this.jumpToTimeAndPause(this.controlScrubber));
+            this.$('control-scrubber').on('focus', () => this.$('control-scrubber').blur());
             this.video.onTimeUpdate(() => this.controlScrubberInactive = this.video.currentTime);
 
             // keyframebar => video
@@ -242,6 +243,8 @@ class PlayerView {
             // Keyframe stepping
             $(this).on('keydn-g                ', () => this.stepforward());
             $(this).on('keydn-f                ', () => this.stepbackward());
+            // Keyframe duplication
+            $(this).on('keydn-r                ', () => this.duplicateKeyFrame());
             // video frame stepping - capture the repeat events with the 'r' handler
             $(this).on('keydn-a keydnr-a     ', () => {
                 if (!this.loading)
@@ -428,6 +431,10 @@ class PlayerView {
             btnIcon.addClass('glyphicon-pause');
             btnIcon.removeClass('glyphicon-play');
         }
+    }
+
+    duplicateKeyFrame() {
+        $(this).trigger('duplicate-keyframe');
     }
 
 
