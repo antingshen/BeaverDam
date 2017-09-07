@@ -7,10 +7,11 @@
         var parts = value.split("; " + name + "=");
         if (parts.length == 2) return parts.pop().split(";").shift();
       }
-      {% csrf_token %}
       CSRFToken = getCookie('csrftoken');
       if (CSRFToken === undefined) {
         CSRFToken = '{{ csrf_token }}';
+      } else {
+        CSRFTokenAlt = '{{ csrf_token }}';
       }
     </script>
 
