@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.staticfiles import finders
 
+
 class Label(models.Model):
     """The classes available for workers to choose from for each object."""
     id = models.AutoField(primary_key=True)
@@ -11,6 +12,7 @@ class Label(models.Model):
 
     def __str__(self):
         return self.name
+
 
 class Video(models.Model):
     annotation = models.TextField(blank=True,
