@@ -7,7 +7,7 @@ from mturk.queries import get_active_video_turk_task
 from django.db.models import Count, Sum, Q, Case, When, IntegerField
 import logging
 
-logger = logging.getLogger() 
+logger = logging.getLogger()
 
 def publish_to_turk(modeladmin, request, videos):
     for video in videos:
@@ -29,7 +29,7 @@ class PublishedFilter(SimpleListFilter):
         ("1", 'Yes'),
         ("0", 'No'),
     )
- 
+
     def queryset(self, request, queryset):
         if self.value() is None:
             return queryset
@@ -56,9 +56,10 @@ class PublishedFilter(SimpleListFilter):
         else:
             return queryset
 
+
 class VideoAdmin(admin.ModelAdmin):
-    list_display =('id', 'video_url','filename','verified', 'is_published')
-    list_filter=[PublishedFilter, 'verified']
+    list_display =('id', 'video_url','filename','verified', 'is_published', 'annotation_count')
+    list_filter=[PublishedFilter, 'verified', 'annotation']
     search_fields=['filename', 'id']
     actions=[publish_to_turk]
 
@@ -77,7 +78,11 @@ class VideoAdmin(admin.ModelAdmin):
         return '<a target="_" href="/video/{}/">/video/{}/</a>'.format(obj.id, obj.id)
     video_url.allow_tags = True
     video_url.short_description = 'Video'
-        
-    
+
+    def annotation_count(self, obj):
+        return obj.count_keyframes()
+    annotation_count.short_description = 'Annotated Frames'
+
+
 admin.site.register(Video, VideoAdmin)
 admin.site.register(Label)
