@@ -157,7 +157,7 @@ def video(request, video_id):
     response = render(request, 'video.html', context={
         'label_data': label_data,
         'video_data': video_data,
-        'image_list': json.loads(video.image_list) if video.image_list else 0,
+        'image_list': list(map(urllib.parse.quote, json.loads(video.image_list))) if video.image_list else 0,
         'image_list_path': urllib.parse.quote(video.host),
         'help_url': settings.HELP_URL,
         'help_embed': settings.HELP_EMBED,
