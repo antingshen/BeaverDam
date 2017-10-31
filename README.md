@@ -73,7 +73,7 @@ To add video objects via web UI, navigate to `/admin` and create Video objects.
 Alternatively, use `./manage.py shell`, and create `annotator.Video` objects and call `video.save()`.
 Helper methods exist to create large number of video objects at once, see `annotator/models.py`.
 
-Video objects can either use H.264 encoded video (See `scripts/convert-to-h264`), or a list of frames provided in the attribute `image_list`.
+Video objects can either use H.264 encoded video (See `scripts/convert-to-h264`), or a list of frames provided in the attribute `image_list` in JSON format (e.g. `video.image_list = '["20170728_085435.jpg"]'`). 
 By using single-frame videos, BeaverDam can be used for image annotation.
 
 Video annotations can be accessed via admin, `/annotation/video_id`, or through the Video objects' annotation attribute through the shell.
