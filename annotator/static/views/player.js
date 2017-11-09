@@ -270,6 +270,14 @@ class PlayerView {
                 this.video.fit();
                 this.sizeVideoFrame();
             });
+            $('#guidelines-checkbox').on('click', () => {
+                if (this.creationRect) {
+                    this.creationRect.guideLinesEnabled = !this.creationRect.guideLinesEnabled;
+                    if (!this.creationRect.guideLinesEnabled) {
+                        $(this.creationRect).triggerHandler('clear-lines');
+                    }
+                }
+            });
             this.sizeVideoFrame();
             this.loading = false;
         });
@@ -384,13 +392,28 @@ class PlayerView {
         var rect = new KindOfRect({classBaseName});
         rect.attach(this.$paper, this.metrics.bind(this));
 
+        var removeLines = () => {
+            if (this.creationRect.xline) {
+                this.creationRect.xline.remove();
+                this.creationRect.xline = null;
+            }
+            if (this.creationRect.yline) {
+                this.creationRect.yline.remove();
+                this.creationRect.yline = null;
+            }
+        };
+        // Clear lines trigger handler
+        $(rect).on('clear-lines', () => { removeLines(); });
+
         // In case drag exceeds bounds of object, set it as the cursor of the
         // entire paper
         $(rect).on('change-cursor', (e, cursor) => {
-            if (this.dragInProgress) return;
+            if (this.dragInProgress) {
+                removeLines();
+                return;
+            }
             this.$('paper').css({cursor});
         });
-
         // .. but don't change it if there's we're in the middle of a drag
         $(rect).on('drag-start', () => {
             this.dragInProgress = true;
