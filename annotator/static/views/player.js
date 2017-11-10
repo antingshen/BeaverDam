@@ -270,6 +270,11 @@ class PlayerView {
                 this.video.fit();
                 this.sizeVideoFrame();
             });
+
+            $('#frame-attributes').on('change', () => {
+                $(this).triggerHandler('change-frame-attributes');
+            });
+
             this.sizeVideoFrame();
             this.loading = false;
         });

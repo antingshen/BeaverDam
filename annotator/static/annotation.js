@@ -54,6 +54,7 @@ class Annotation {
             return {
                 time: time,
                 bounds: null,
+                attributes: null,
                 prevIndex: null,
                 nextIndex: null,
                 closestIndex: null,
@@ -107,6 +108,7 @@ class Annotation {
         return {
             time: time,
             bounds: bounds,
+            attributes: null,
             prevIndex: prevIndex,
             nextIndex: nextIndex,
             closestIndex: closestIndex,
