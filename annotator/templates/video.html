@@ -22,117 +22,229 @@
   <script type="text/javascript" src="/static/player.js"></script>
   <script type="text/javascript" src="/static/annotation.js"></script>
   <script type="text/javascript" src="/static/views/keyframebar.js"></script>
+  <script type="text/javascript" src="/static/views/annotationbar.js"></script>
   <script type="text/javascript" src="/static/views/player.js"></script>
   <script type="text/javascript" src="/static/views/rect.js"></script>
+
+  <script type="text/javascript">
+    // set up a new XMLHttpRequest variable
+    var request = false;
+    try {
+        request = new XMLHttpRequest();
+    } catch (trymicrosoft) {
+        try {
+            request = new ActiveXObject("Msxml2.XMLHTTP");
+        } catch (othermicrosoft) {
+            try {
+                request = new ActiveXObject("Microsoft.XMLHTTP");
+            } catch (failed) {
+                request = false;
+            }
+        }
+    }
+     
+    if (!request)
+        alert("Error initializing XMLHttpRequest!");
+
+    function getStates() {
+        var labelName = document.getElementById("labels").value;
+        var url = "/get_states?label_name=" + escape(labelName);
+        request.open("GET", url, true);
+        request.onreadystatechange = updatePage;
+        request.send(null);
+    }
+
+    // what to do when http ready state changes
+    function updatePage() { 
+        if (request.readyState == 4) {
+            if (request.status == 200) {
+      
+                // get response array
+                var data = JSON.parse(request.responseText); 
+                update_select($('select[name=states]'), data);
+            }  
+            // some error checking
+            else if (request.status == 404) {
+                alert("Request url does not exist");
+            }
+            else {
+                alert("Error: status code is " + request.status);
+            }
+        }
+    }   
+     
+    function update_select(select, data) {
+        select.find('option').remove();
+        for (var i=0; i<data.length; i++) {
+            state = data[i]
+            select.append($('<option value="' + state['name'] +'" style="background-color: #' + state['color'] + '">' + state['name'] + '</option>'));
+        }
+    }
+
+    $(document).ready(function () {
+      $("#labels").prop("selectedIndex", 0).change();
+    });
+  </script>
 
 {% endblock %}
 
 {% block body %}
 <div class=" {{ iframe_mode|yesno:'empty, panel panel-default panel-space'}} player-container" id="player">
 
-<div class="panel-body">
+  <div class="row">
 
-  <div class="top-controls">
-    {% for label in label_data %}
-      <label for="object-radio-{{label.name}}" class="label" style="background-color: #{{label.color}}">
-        {{label.name}}
-        <input type="radio" name="object" id="object-radio-{{label.name}}" value="{{label.name}}" {% if forloop.first %} checked {% endif %}>
-      </label>
-    {% endfor %}
-
-    <a class="btn btn-default" target="_blank" style="margin-left: 25px;"
-        {% if help_embed %} id="show-help" {% else %} href="{{help_url}}" {% endif %}>
-      Instructions &amp; Requirements
-    </a>
-
-    <div id="submit-container">
-    {% if mturk_data.preview == False %}
-      {% if mturk_data.authenticated %}
-      <!-- Turker View -->
-        <form method="post" id="turk-form" action="https://{{ mturk_data.sandbox|yesno:'workersandbox,www'}}.mturk.com/mturk/externalSubmit">
-          <input type="hidden" value="{{ mturk_data.assignment_id }}" name="assignmentId">
-          <input type="hidden" value="{{ video_data.id }}" name="video-id">
-          <button id="submit-btn" type="submit"  class="btn btn-primary">Submit</button>
-        </form>
-
-      {% else %}
-      <!-- Admin View -->
-        {% if mturk_data.last_email_sent_date != None %}
-          <i>E-mail sent on {{  mturk_data.last_email_sent_date }}</i>
-        {% endif %}
-        <div id="submit-btn-group" class="btn-group" role="group">
-          {% if request.user.is_staff == False %}
-            <button id="submit-btn" type="button" class="btn btn-primary">Submit</button>
-          {% else %}
-            <button id="submit-btn" type="button" class="btn btn-primary">Save</button>
-
-            {% if mturk_data.status == "Awaiting Approval" or mturk_data.status == "Rejected" %}
-              <button id="btn-show-reject" type="button" class="btn btn-danger">Reject</button>
-              <button id="btn-show-accept" type="button" class="btn btn-success ">Accept</button>
-              {% if mturk_data.has_current_full_video_task %}
-                <button id="btn-show-email" type="button" class="btn">E-mail Worker</button>
-              {% endif %}
-            {% endif %}
-            <button class="btn" disabled>{{ mturk_data.status }}</button>
-          {% endif %}
-        </div>
-      {% endif %}
-    {% else %}
-      <h2>Preview Mode: Please accept HIT before working</h2>
-    {% endif %}
-    </div>
-  </div>
-
-  <div class="player-screen">
-    {% if image_list %}
-      <div class="player-video">
-        {% for image in image_list %}
-          {% if forloop.counter0 < 25 %}
-            <img src="{{image_list_path}}/{{image}}" />
-          {% else %}
-            <img data-src="{{image_list_path}}/{{image}}" />
-          {% endif %}
+    <div class="top-controls">
+      <select id="labels" name="labels" onChange="getStates()">
+        {% for label in label_data %}
+        <option style="background-color: #{{label.color}}" value="{{label.name}}" id="object-radio-{{label.name}}">
+          {{label.name}}
+        </option>
         {% endfor %}
+      </select>
+      
+      <select id="states" name="states"> </select>
+
+      <a class="btn btn-default" target="_blank" style="margin-left: 25px;"
+          {% if help_embed %} id="show-help" {% else %} href="{{help_url}}" {% endif %}>
+        Instructions &amp; Requirements
+      </a>
+
+      <div id="submit-container">
+      {% if mturk_data.preview == False %}
+        {% if mturk_data.authenticated %}
+        <!-- Turker View -->
+          <form method="post" id="turk-form" action="https://{{ mturk_data.sandbox|yesno:'workersandbox,www'}}.mturk.com/mturk/externalSubmit">
+            <input type="hidden" value="{{ mturk_data.assignment_id }}" name="assignmentId">
+            <input type="hidden" value="{{ video_data.id }}" name="video-id">
+            <button id="submit-btn" type="submit"  class="btn btn-primary">Submit</button>
+          </form>
+
+        {% else %}
+        <!-- Admin View -->
+          {% if mturk_data.last_email_sent_date != None %}
+            <i>E-mail sent on {{  mturk_data.last_email_sent_date }}</i>
+          {% endif %}
+          <div id="submit-btn-group" class="btn-group" role="group">
+            {% if request.user.is_staff == False %}
+              <button id="submit-btn" type="button" class="btn btn-primary">Submit</button>
+            {% else %}
+              <button id="submit-btn" type="button" class="btn btn-primary">Save</button>
+
+              {% if mturk_data.status == "Awaiting Approval" or mturk_data.status == "Rejected" %}
+                <button id="btn-show-reject" type="button" class="btn btn-danger">Reject</button>
+                <button id="btn-show-accept" type="button" class="btn btn-success ">Accept</button>
+                {% if mturk_data.has_current_full_video_task %}
+                  <button id="btn-show-email" type="button" class="btn">E-mail Worker</button>
+                {% endif %}
+              {% endif %}
+              <button class="btn" disabled>{{ mturk_data.status }}</button>
+            {% endif %}
+          </div>
+        {% endif %}
+      {% else %}
+        <h2>Preview Mode: Please accept HIT before working</h2>
+      {% endif %}
       </div>
-    {% else %}
-      <div class="player-video-container">
-        <video class="player-video"></video>
-      </div>
-    {% endif %}
-    <div class="player-paper"></div>
-    <div class="player-loader">
-      <div class="bounce1"></div>
-      <div class="bounce2"></div>
-      <div class="bounce3"></div>
     </div>
-  </div>
 
-  <div class="panel panel-primary bottom-controls">
-    <div class="panel-heading">
-      <input class="player-control-scrubber" type="range" min="0" max="10000" value="0" step="1"/>
-      <div class="panel panel-success">
-        <!-- <div class="panel-heading style="background-color: #3A7734"> -->
-          <div class="player-keyframebar"></div>
-        <!-- </div> -->
+    <div class="panel-body col-md-9">
+      <div class="player-screen">
+        {% if image_list %}
+          <div class="player-video">
+            {% for image in image_list %}
+              {% if forloop.counter0 < 25 %}
+                <img src="{{image_list_path}}/{{image}}" />
+              {% else %}
+                <img data-src="{{image_list_path}}/{{image}}" />
+              {% endif %}
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="player-video-container">
+            <video class="player-video"></video>
+          </div>
+        {% endif %}
+        <div class="player-paper"></div>
+        <div class="player-loader">
+          <div class="bounce1"></div>
+          <div class="bounce2"></div>
+          <div class="bounce3"></div>
+        </div>
       </div>
 
-      <span class="noselect">
-        <div class="glyphicon glyphicon-fast-backward player-control-goto-start" title="Go to start"></div>
-        <div class="glyphicon glyphicon-step-backward player-control-step-backward" title="One Frame Backward (shortcut - 'a')"></div>
-        <div class="glyphicon glyphicon-play player-control-play-pause" title="Play / Pause (shortcut - 'space'')"></div>
-        <div class="glyphicon glyphicon-step-forward player-control-step-forward" title="One Frame Forward (shortcut - 's')"></div>
-        <div class="glyphicon glyphicon-fast-forward player-control-goto-end"></div>
-        <div class="glyphicon glyphicon-trash player-control-delete-keyframe" title="Delete selected frame (shortcut - 'delete', 'd')"></div>
-      </span>
-      <input class="form-control player-control-time" id="frame-number" placeholder="0">
-      <div class="pull-right">
-        <input id="scale-checkbox" type="checkbox" />
-        <label for="scale-checkbox">Scale to fit</label>
+      <div class="panel panel-primary bottom-controls">
+        <div class="panel-heading">
+          <input class="player-control-scrubber" type="range" min="0" max="10000" value="0" step="1"/>
+          <div class="panel panel-success">
+            <!-- <div class="panel-heading style="background-color: #3A7734"> -->
+              <div class="player-keyframebar"></div>
+            <!-- </div> -->
+          </div>
+
+          <span class="noselect">
+            <div class="glyphicon glyphicon-fast-backward player-control-goto-start" title="Go to start"></div>
+            <div class="glyphicon glyphicon-step-backward player-control-step-backward" title="One Frame Backward (shortcut - 'a')"></div>
+            <div class="glyphicon glyphicon-play player-control-play-pause" title="Play / Pause (shortcut - 'space'')"></div>
+            <div class="glyphicon glyphicon-step-forward player-control-step-forward" title="One Frame Forward (shortcut - 's')"></div>
+            <div class="glyphicon glyphicon-fast-forward player-control-goto-end"></div>
+            <div class="glyphicon glyphicon-trash player-control-delete-keyframe" title="Delete selected frame (shortcut - 'delete', 'd')"></div>
+          </span>
+          <input class="form-control player-control-time" id="frame-number" placeholder="0">
+          <div class="pull-right">
+            <input id="scale-checkbox" type="checkbox" />
+            <label for="scale-checkbox">Scale to fit</label>
+          </div>
+        </div>
       </div>
     </div>
-  </div>
 
-</div>
+    <div class="player-annotationbar col-md-3 panel-group" id="accordion" style="padding-right: 30px; overflow-y: scroll; height: 100%;">
+    </div>
+
+    <!-- Edit Label Modal -->
+    <div class="modal fade" id="edit-label-modal" tabindex="-1" role="dialog" aria-labelledby="label" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            <h4 class="modal-title" id="label">Edit Annotation Label</h4>
+          </div>
+          <div class="modal-body">
+            <select name="edit-label" id="edit-label">
+              {% for label in label_data %}
+              <option style="background-color: #{{label.color}}" value="{{label.name}}">
+                {{label.name}}
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="modal-footer">
+            <a href="#" class="btn" data-dismiss="modal">Cancel</a>
+            <a href="#" class="btn btn-primary" id="change-label">Change Label</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Edit State Modal -->
+    <div class="modal fade" id="edit-state-modal" tabindex="-1" role="dialog" aria-labelledby="state" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            <h4 class="modal-title" id="state">Edit Keyframe State</h4>
+          </div>
+          <div class="modal-body">
+            <p id="annotation-label"> </p>
+            <select name="edit-state" id="edit-state"> </select>
+          </div>
+          <div class="modal-footer">
+            <a href="#" class="btn" data-dismiss="modal">Cancel</a>
+            <a href="#" class="btn btn-primary" id="change-state">Change State</a>
+          </div>
+        </div>
+      </div>
+    </div>
 
 {% include "modals/generic_modal.html" %}
 {% include "modals/instructions.html" %}

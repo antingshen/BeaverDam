@@ -1,6 +1,13 @@
 "use strict";
 
 
+var ID = function () {
+  // Math.random should be unique because of its seeding algorithm.
+  // Convert it to base 36 (numbers + letters), and grab the first 9 characters
+  // after the decimal.
+  return '_' + Math.random().toString(36).substr(2, 9);
+};
+
 class Annotation {
     // Constants. ES6 doesn't support class constants yet, so we'll declare
     // them this way for now:
@@ -12,13 +19,12 @@ class Annotation {
         return 0.01 /* seconds */;
     }
 
-
-    constructor({fill, id, keyframes, type}) {
+    constructor({fill, keyframes, type}) {
         // Fill of annotation
         this.fill = fill;
 
         // ID of annotation
-        this.id = id;
+        this.id = ID();
 
         // Keyframes of annotation
         this.keyframes = keyframes;
@@ -32,12 +38,11 @@ class Annotation {
 
     // The hacky but only way to make a Annotation right now.
     static newFromCreationRect() {
-        var type = document.querySelector('input[name = "object"]:checked').value;
+        var type = document.querySelector('#labels option:checked').value;
         var fill = Misc.getRandomColor(type);
         return new Annotation({
             keyframes: [],
             fill: fill,
-            id: fill,
             type: type,
         });
     }
@@ -58,9 +63,9 @@ class Annotation {
                 nextIndex: null,
                 closestIndex: null,
                 continueInterpolation: false,
+                state: null,
             };
         }
-
 
         var prevIndex = null;
         var nextIndex = null;
@@ -111,16 +116,36 @@ class Annotation {
             nextIndex: nextIndex,
             closestIndex: closestIndex,
             continueInterpolation: prevIndex != null ? this.keyframes[prevIndex].continueInterpolation : true,
+            state: prevIndex != null ? this.keyframes[prevIndex].state : "None",
         };
+    }
+
+    changeAnnotationLabel(newType) {
+        this.type = newType; 
+
+        // Trigger event
+        $(this).triggerHandler('change');
+    }
+
+    changeKeyframeState(frame, newState) {
+        frame.state = newState;
+
+        // Trigger event
+        $(this).triggerHandler('change');
     }
 
     /* Insert or update keyframe at time. */
     updateKeyframe(frame, usePreciseFrameMatching)  {
-        var {prevIndex, nextIndex, closestIndex} = this.getFrameAtTime(frame.time);
+        var {prevIndex, nextIndex, closestIndex, state} = this.getFrameAtTime(frame.time);
 
         if (frame.continueInterpolation === undefined)
             frame.continueInterpolation = true;
 
+        if (state)
+            frame.state = state;
+        else if (frame.state === undefined)
+            frame.state = document.querySelector('#states option:checked').value;
+            
         // Update the closestIndex-th frame
         if (closestIndex != null) {
             this.keyframes[closestIndex] = frame;
@@ -162,7 +187,8 @@ class Annotation {
             var newFrame = {
                                 time: justBeforeTime, 
                                 bounds: bounds,
-                                continueInterpolation: false
+                                continueInterpolation: false,
+                                state: ""
                             }
             this.updateKeyframe(newFrame, usePreciseFrameMatching);
         }

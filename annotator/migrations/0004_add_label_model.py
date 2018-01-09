@@ -20,10 +20,4 @@ class Migration(migrations.Migration):
                 ('color', models.CharField(blank=True, max_length=6)),
             ],
         ),
-        migrations.RunSQL("INSERT INTO annotator_label (name, color) VALUES ('Car', 'd9534f');"),
-        migrations.RunSQL("INSERT INTO annotator_label (name, color) VALUES ('Pedestrian', '337ab7');"),
-        migrations.RunSQL("INSERT INTO annotator_label (name, color) VALUES ('Bicycle', '5cb85c');"),
-        migrations.RunSQL("INSERT INTO annotator_label (name, color) VALUES ('Traffic Light', '5bc0de');"),
-        migrations.RunSQL("INSERT INTO annotator_label (name, color) VALUES ('Pedestrian Signal', 'f0ad4e');"),
-        migrations.RunSQL("INSERT INTO annotator_label (name, color) VALUES ('Crosswalk', '777777');"),
     ]

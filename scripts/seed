@@ -17,5 +17,8 @@ verbose wget https://s3-us-west-2.amazonaws.com/beaverdam/videos/test_vid2.mp4 -
 
 ./manage.py migrate
 
+pip install pyyaml
+./manage.py loaddata annotator/fixtures/initialdata.yaml
+
 echo "from django.contrib.auth.models import User; User.objects.create_superuser('test', 'test@test.com', 'password')" | python manage.py shell
 echo "Log in with username 'test' and password 'password'"
