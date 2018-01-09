@@ -14,6 +14,19 @@ class Label(models.Model):
         return self.name
 
 
+class State(models.Model):
+    """The states available for each label."""
+    id = models.AutoField(primary_key=True)
+    name = models.CharField(blank=True, max_length=100,
+        help_text="Name of class label option.")
+    color = models.CharField(blank=True, max_length=6,
+        help_text="6 digit hex.")
+    label_name = models.ForeignKey(Label, blank=True, to_field='name')
+
+    def __str__(self):
+        return self.name
+
+
 class Video(models.Model):
     annotation = models.TextField(blank=True,
         help_text="A JSON blob containing all user annotation sent from client.")

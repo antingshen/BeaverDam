@@ -149,6 +149,8 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+STATIC_ROOT = os.path.join(BASE_DIR, "annotator/static/")
+
 try:
     from beaverdam.deploy_settings import *
 except ImportError as e:
