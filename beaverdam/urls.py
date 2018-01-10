@@ -1,4 +1,5 @@
 from django.conf.urls import url
+from django.conf.urls.static import static
 from django.contrib import admin
 from django.contrib.auth.views import login, logout
 from django.views.generic.base import RedirectView
@@ -13,6 +14,8 @@ urlpatterns = [
     url(r'^verify/$', verify_list),
     url(r'^verified/$', verified_list),
     url(r'^readytopay/$', ready_to_pay),
+
+    url(r'^get_states/$', get_states, name='get_states'),
 
     url(r'^video/(\d+)/$', video, name='video'),
     url(r'^video/(\d+)/next/$', next_unannotated),
@@ -29,4 +32,4 @@ urlpatterns = [
     url(r'^logout/$', logout),
     url(r'^accounts/', RedirectView.as_view(url='/')),
     url(r'^admin/', admin.site.urls),
-]
+]  + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

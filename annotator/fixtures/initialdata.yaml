@@ -1,0 +1,119 @@
+- model: annotator.Label 
+  fields:
+    name: "Car"
+    color: ba6cf8
+- model: annotator.State 
+  fields:
+    name: "Red"
+    color: 5865a6
+    label_name: "Car"
+- model: annotator.State 
+  fields:
+    name: "Black"
+    color: 59350a
+    label_name: "Car"
+- model: annotator.State 
+  fields:
+    name: "Grey"
+    color: 483770
+    label_name: "Car"
+- model: annotator.State 
+  fields:
+    name: "Parked"
+    color: 3061c5
+    label_name: "Car"
+- model: annotator.State 
+  fields:
+    name: "Moving"
+    color: 9367f7
+    label_name: "Car"
+- model: annotator.Label 
+  fields:
+    name: "Pedestrian"
+    color: a2bb11
+- model: annotator.State 
+  fields:
+    name: "Man"
+    color: e71506
+    label_name: "Pedestrian"
+- model: annotator.State 
+  fields:
+    name: "Woman"
+    color: ee218c
+    label_name: "Pedestrian"
+- model: annotator.State 
+  fields:
+    name: "Child"
+    color: 4cc67e
+    label_name: "Pedestrian"
+- model: annotator.Label 
+  fields:
+    name: "Bicycle"
+    color: 102b25
+- model: annotator.State 
+  fields:
+    name: "Parked"
+    color: f47b16
+    label_name: "Bicycle"
+- model: annotator.State 
+  fields:
+    name: "Moving"
+    color: 98e9d5
+    label_name: "Bicycle"
+- model: annotator.Label 
+  fields:
+    name: "Traffic Light"
+    color: 0a2ecf
+- model: annotator.State 
+  fields:
+    name: "Red"
+    color: c2800e
+    label_name: "Traffic Light"
+- model: annotator.State 
+  fields:
+    name: "Green"
+    color: 5c729e
+    label_name: "Traffic Light"
+- model: annotator.State 
+  fields:
+    name: "Yellow"
+    color: 5ae867
+    label_name: "Traffic Light"
+- model: annotator.State 
+  fields:
+    name: "Unclear"
+    color: 93af3b
+    label_name: "Traffic Light"
+- model: annotator.Label 
+  fields:
+    name: "Pedestrian Signal"
+    color: c54dff
+- model: annotator.State 
+  fields:
+    name: "Red"
+    color: 66b157
+    label_name: "Pedestrian Signal"
+- model: annotator.State 
+  fields:
+    name: "Green"
+    color: a9c47a
+    label_name: "Pedestrian Signal"
+- model: annotator.State 
+  fields:
+    name: "Unclear"
+    color: 278360
+    label_name: "Pedestrian Signal"
+- model: annotator.Label 
+  fields:
+    name: "Crosswalk"
+    color: 1ebf81
+- model: annotator.State 
+  fields:
+    name: "Empty"
+    color: 4b7523
+    label_name: "Crosswalk"
+- model: annotator.State 
+  fields:
+    name: "Occupied"
+    color: 5b800d
+    label_name: "Crosswalk"

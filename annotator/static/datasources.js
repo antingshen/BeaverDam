@@ -12,6 +12,7 @@ var DataSources = {
                 }),
                 time: json.frame,
                 continueInterpolation: json.continueInterpolation === false ? false : true,
+                state: json.state,
             };
         },
 
@@ -24,6 +25,7 @@ var DataSources = {
                 h: attr.height,
                 continueInterpolation: frame.continueInterpolation,
                 frame: frame.time,
+                state: frame.state,
             };
         },
     },
@@ -34,6 +36,7 @@ var DataSources = {
             annotation.keyframes = json.keyframes.map(DataSources.frame.fromJson);
             annotation.type = json.type;
             annotation.fill = json.color || Misc.getRandomColor();
+            annotation.id = json.id;
             return annotation;
         },
 
@@ -42,6 +45,7 @@ var DataSources = {
                 keyframes: annotation.keyframes.map(DataSources.frame.toJson),
                 type: annotation.type,
                 color: annotation.fill,
+                id: annotation.id,
             };
         },
     },
@@ -57,7 +61,8 @@ var DataSources = {
 
         load: function(id) {
             return fetch(`/annotation/${id}`, {
-                method: 'get'
+                method: 'get',
+                credentials: 'same-origin'
             }).then((response) => {
                 if (!response.ok) {
                     return Promise.reject("DataSources.annotations.load failed: fetch");
