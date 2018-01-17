@@ -78,11 +78,11 @@ class Annotationbar {
             + '</div>'
             + '</div>');
 
-        var editLabel = $("<span class='control-edit-label glyphicon glyphicon-edit' style='float: right;' \
+        var editLabel = $("<span class='control-edit-label glyphicon glyphicon-edit' \
                         role='button' class='btn' data-toggle='modal' data-target='#edit-label-modal'></span>")
                         .click(() => { $(this).triggerHandler('control-edit-label', {"annotation": annotation}); });
 
-        var deleteAnnotation = $("<span class='control-delete-annotation glyphicon glyphicon-trash' style='float: right; padding-right: 10px;' \
+        var deleteAnnotation = $("<span class='control-delete-annotation glyphicon glyphicon-trash' \
                         role='button' class='btn' data-toggle='modal' data-target='#delete-annotation-modal'></span>")
                         .click(() => { $(this).triggerHandler('control-delete-annotation', {"annotation": annotation}); });
 
@@ -90,8 +90,9 @@ class Annotationbar {
         $(html).find('h4').append(deleteAnnotation);
 
         var keyframesList = $(html).find("ul");
+        
         for (let keyframe of annotation.keyframes) {
-            var editState = $("<span class='glyphicon glyphicon-edit' style='float: right;' \
+            var editState = $("<span class='control-edit-state glyphicon glyphicon-edit' \
                         role='button' class='btn' data-toggle='modal' data-target='#edit-state-modal'></span>")
                         .click(() => { $(this).triggerHandler('control-edit-state', {"annotation": annotation, "keyframe": keyframe}); });
             $(keyframesList).append("<li class='list-group-item'>" + keyframe.time + ": " + keyframe.state + "</li>") 
