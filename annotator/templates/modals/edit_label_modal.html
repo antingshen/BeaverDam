@@ -1,0 +1,24 @@
+<!-- Edit Label Modal -->
+    <div class="modal fade" id="edit-label-modal" tabindex="-1" role="dialog" aria-labelledby="label" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            <h4 class="modal-title" id="label">Edit Annotation Label</h4>
+          </div>
+          <div class="modal-body">
+            <select name="edit-label" id="edit-label">
+              {% for label in label_data %}
+              <option style="background-color: #{{label.color}}" value="{{label.name}}">
+                {{label.name}}
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="modal-footer">
+            <a href="#" class="btn" data-dismiss="modal">Cancel</a>
+            <a href="#" class="btn btn-primary" id="change-label">Change Label</a>
+          </div>
+        </div>
+      </div>
+    </div>
