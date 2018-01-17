@@ -229,6 +229,7 @@ class PlayerView {
 
             // keyframebar => video
             $(this.keyframebar).on('jump-to-time', (e, time) => this.jumpToTimeAndPause(time));
+            $(this.annotationbar).on('jump-to-time', (e, time) => this.jumpToTimeAndPause(time));
 
             // edit annotation
             $(this.annotationbar).on('control-edit-label', (e, data) => this.loadEditLabelModal(data));

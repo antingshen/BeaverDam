@@ -95,7 +95,11 @@ class Annotationbar {
             var editState = $("<span class='control-edit-state glyphicon glyphicon-edit' \
                         role='button' class='btn' data-toggle='modal' data-target='#edit-state-modal'></span>")
                         .click(() => { $(this).triggerHandler('control-edit-state', {"annotation": annotation, "keyframe": keyframe}); });
-            $(keyframesList).append("<li class='list-group-item'>" + keyframe.time + ": " + keyframe.state + "</li>") 
+
+            var link = $("<li class='list-group-item'><a>" + keyframe.time + ": " + keyframe.state + "</a></li>")
+                        .click(() => { $(this).triggerHandler('jump-to-time', keyframe.time); console.log(keyframe.time); });
+
+            $(keyframesList).append(link);
             $(keyframesList).find("li:last").append(editState);
         }
 
