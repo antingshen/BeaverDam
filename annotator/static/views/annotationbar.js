@@ -96,8 +96,8 @@ class Annotationbar {
                         role='button' class='btn' data-toggle='modal' data-target='#edit-state-modal'></span>")
                         .click(() => { $(this).triggerHandler('control-edit-state', {"annotation": annotation, "keyframe": keyframe}); });
 
-            var link = $("<li class='list-group-item'><a>" + keyframe.time + ": " + keyframe.state + "</a></li>")
-                        .click(() => { $(this).triggerHandler('jump-to-time', keyframe.time); console.log(keyframe.time); });
+            var link = $("<li class='list-group-item'><a>" + keyframe.time + ": " + keyframe.state + "</a></li>");
+            $(link).find('a').click(() => { $(this).triggerHandler('jump-to-time', keyframe.time); });
 
             $(keyframesList).append(link);
             $(keyframesList).find("li:last").append(editState);
