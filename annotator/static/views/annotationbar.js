@@ -78,11 +78,16 @@ class Annotationbar {
             + '</div>'
             + '</div>');
 
-        var editType = $("<span class='control-edit-label glyphicon glyphicon-edit' style='float: right;' \
+        var editLabel = $("<span class='control-edit-label glyphicon glyphicon-edit' style='float: right;' \
                         role='button' class='btn' data-toggle='modal' data-target='#edit-label-modal'></span>")
                         .click(() => { $(this).triggerHandler('control-edit-label', {"annotation": annotation}); });
 
-        $(html).find('h4').append(editType);
+        var deleteAnnotation = $("<span class='control-delete-annotation glyphicon glyphicon-trash' style='float: right; padding-right: 10px;' \
+                        role='button' class='btn' data-toggle='modal' data-target='#delete-annotation-modal'></span>")
+                        .click(() => { $(this).triggerHandler('control-delete-annotation', {"annotation": annotation}); });
+
+        $(html).find('h4').append(editLabel);
+        $(html).find('h4').append(deleteAnnotation);
 
         var keyframesList = $(html).find("ul");
         for (let keyframe of annotation.keyframes) {

@@ -258,6 +258,17 @@ class Player {
                 $(this).triggerHandler('change-keyframes');
                 $('#edit-state-modal').modal('toggle');
             });
+
+            // Delete Annotation
+
+            $('#delete-annotation').on('click', (e) => {
+                var annotation = $(e.currentTarget).data('annotation');
+                this.deleteAnnotation(annotation);
+                $(this).triggerHandler('change-onscreen-annotations');
+                $(this).triggerHandler('change-keyframes');
+                $('#delete-annotation-modal').modal('toggle');
+            });
+
             
         });
     }
