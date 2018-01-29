@@ -268,8 +268,6 @@ class Player {
                 $(this).triggerHandler('change-keyframes');
                 $('#delete-annotation-modal').modal('toggle');
             });
-
-            
         });
     }
 
