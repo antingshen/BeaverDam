@@ -143,8 +143,14 @@ class Annotation {
 
         if (state)
             frame.state = state;
-        else if (frame.state === undefined)
-            frame.state = document.querySelector('#states option:checked').value;
+        else if (frame.state === undefined){
+            var statesDropdown = document.querySelector('#states option:checked');
+
+            if (statesDropdown != null)
+                frame.state = statesDropdown.value;
+            else
+                frame.state = "";
+        }
             
         // Update the closestIndex-th frame
         if (closestIndex != null) {

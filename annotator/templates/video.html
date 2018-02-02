@@ -47,11 +47,15 @@
         alert("Error initializing XMLHttpRequest!");
 
     function getStates() {
+      var labelsDropdown = document.getElementById("labels");
+      
+      if (labelsDropdown != null) {
         var labelName = document.getElementById("labels").value;
         var url = "/get_states?label_name=" + escape(labelName);
         request.open("GET", url, true);
         request.onreadystatechange = updatePage;
         request.send(null);
+      }       
     }
 
     // what to do when http ready state changes
