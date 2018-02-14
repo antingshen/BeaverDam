@@ -78,18 +78,28 @@ class Annotationbar {
             + '</div>'
             + '</div>');
 
-        var editType = $("<span class='control-edit-label glyphicon glyphicon-edit' style='float: right;' \
+        var editLabel = $("<span class='control-edit-label glyphicon glyphicon-edit' \
                         role='button' class='btn' data-toggle='modal' data-target='#edit-label-modal'></span>")
                         .click(() => { $(this).triggerHandler('control-edit-label', {"annotation": annotation}); });
 
-        $(html).find('h4').append(editType);
+        var deleteAnnotation = $("<span class='control-delete-annotation glyphicon glyphicon-trash' \
+                        role='button' class='btn' data-toggle='modal' data-target='#delete-annotation-modal'></span>")
+                        .click(() => { $(this).triggerHandler('control-delete-annotation', {"annotation": annotation}); });
+
+        $(html).find('h4').append(editLabel);
+        $(html).find('h4').append(deleteAnnotation);
 
         var keyframesList = $(html).find("ul");
+        
         for (let keyframe of annotation.keyframes) {
-            var editState = $("<span class='glyphicon glyphicon-edit' style='float: right;' \
+            var editState = $("<span class='control-edit-state glyphicon glyphicon-edit' \
                         role='button' class='btn' data-toggle='modal' data-target='#edit-state-modal'></span>")
                         .click(() => { $(this).triggerHandler('control-edit-state', {"annotation": annotation, "keyframe": keyframe}); });
-            $(keyframesList).append("<li class='list-group-item'>" + keyframe.time + ": " + keyframe.state + "</li>") 
+
+            var link = $("<li class='list-group-item'><a>" + keyframe.time + ": " + keyframe.state + "</a></li>");
+            $(link).find('a').click(() => { $(this).triggerHandler('jump-to-time', keyframe.time); });
+
+            $(keyframesList).append(link);
             $(keyframesList).find("li:last").append(editState);
         }
 

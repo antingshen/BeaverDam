@@ -229,11 +229,15 @@ class PlayerView {
 
             // keyframebar => video
             $(this.keyframebar).on('jump-to-time', (e, time) => this.jumpToTimeAndPause(time));
+            $(this.annotationbar).on('jump-to-time', (e, time) => this.jumpToTimeAndPause(time));
 
             // edit annotation
             $(this.annotationbar).on('control-edit-label', (e, data) => this.loadEditLabelModal(data));
             $(this.annotationbar).on('control-edit-state', (e, data) => this.loadEditStateModal(data));
-                
+            
+            // delete annotation
+            $(this.annotationbar).on('control-delete-annotation', (e, data) => this.loadDeleteAnnotationModal(data));
+
             // controls => video
             this.$on('control-play-pause', 'click', (event) => {this.playPause()});
             this.$on('control-step-backward', 'click', (event) => {this.video.previousFrame()});
@@ -320,6 +324,11 @@ class PlayerView {
         $('#edit-state-modal').find('#annotation-label').text(type);
         $('#edit-state-modal').find('#change-state').data("annotation", annotation);
         $('#edit-state-modal').find('#change-state').data("keyframe", keyframe);
+    }
+
+    loadDeleteAnnotationModal(data) {
+        var annotation = data.annotation;
+        $('#delete-annotation-modal').find('#delete-annotation').data("annotation", annotation);
     }
 
     // Time control

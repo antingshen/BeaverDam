@@ -47,11 +47,15 @@
         alert("Error initializing XMLHttpRequest!");
 
     function getStates() {
+      var labelsDropdown = document.getElementById("labels");
+      
+      if (labelsDropdown != null) {
         var labelName = document.getElementById("labels").value;
         var url = "/get_states?label_name=" + escape(labelName);
         request.open("GET", url, true);
         request.onreadystatechange = updatePage;
         request.send(null);
+      }       
     }
 
     // what to do when http ready state changes
@@ -201,50 +205,11 @@
     <div class="player-annotationbar col-md-3 panel-group" id="accordion" style="padding-right: 30px; overflow-y: scroll; height: 100%;">
     </div>
 
-    <!-- Edit Label Modal -->
-    <div class="modal fade" id="edit-label-modal" tabindex="-1" role="dialog" aria-labelledby="label" aria-hidden="true">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-            <h4 class="modal-title" id="label">Edit Annotation Label</h4>
-          </div>
-          <div class="modal-body">
-            <select name="edit-label" id="edit-label">
-              {% for label in label_data %}
-              <option style="background-color: #{{label.color}}" value="{{label.name}}">
-                {{label.name}}
-              </option>
-              {% endfor %}
-            </select>
-          </div>
-          <div class="modal-footer">
-            <a href="#" class="btn" data-dismiss="modal">Cancel</a>
-            <a href="#" class="btn btn-primary" id="change-label">Change Label</a>
-          </div>
-        </div>
-      </div>
-    </div>
 
-    <!-- Edit State Modal -->
-    <div class="modal fade" id="edit-state-modal" tabindex="-1" role="dialog" aria-labelledby="state" aria-hidden="true">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-            <h4 class="modal-title" id="state">Edit Keyframe State</h4>
-          </div>
-          <div class="modal-body">
-            <p id="annotation-label"> </p>
-            <select name="edit-state" id="edit-state"> </select>
-          </div>
-          <div class="modal-footer">
-            <a href="#" class="btn" data-dismiss="modal">Cancel</a>
-            <a href="#" class="btn btn-primary" id="change-state">Change State</a>
-          </div>
-        </div>
-      </div>
-    </div>
+{% include "modals/edit_label_modal.html" %}   
+{% include "modals/edit_state_modal.html" %}   
+
+{% include "modals/delete_annotation_modal.html" %}   
 
 {% include "modals/generic_modal.html" %}
 {% include "modals/instructions.html" %}
