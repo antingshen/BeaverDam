@@ -59,24 +59,24 @@ the current timestamp.
 			self.export_annotations(vid, options)
 
 	def export_annotations(self, video, options):		
-		
-		fps = options['fps']
-		if fps is None:
-			print('--Probing video {}'.format(video.id))
-			fps = self.probe_video(video, probesecs=options['probe_seconds'])
-			if fps is None:
-				print('--Failed to probe.')
-				return
-			print('--Estimated fps {:.2f}'.format(fps))
-
-		eps = options['eps']
-		if eps is None:
-			eps = (1 / fps) * 0.5
-			print('--Computing eps as {:.2f}'.format(eps))
-
 		content = json.loads(video.annotation)
 
 		if not options['sparse']:
+		
+			fps = options['fps']
+			if fps is None:
+				print('--Probing video {}'.format(video.id))
+				fps = self.probe_video(video, probesecs=options['probe_seconds'])
+				if fps is None:
+					print('--Failed to probe.')
+					return
+				print('--Estimated fps {:.2f}'.format(fps))
+
+			eps = options['eps']
+			if eps is None:
+				eps = (1 / fps) * 0.5
+				print('--Computing eps as {:.2f}'.format(eps))
+
 			for obj in content:				
 				frames = self.create_dense_annotations(obj, eps, fps)
 				obj[options['field']] = frames
@@ -106,16 +106,23 @@ the current timestamp.
 				'-show_streams', 
 				'-count_frames',
 				'-select_streams', 'v:0'
-				'-i', url]        
-			p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)    
-			out, err =  p.communicate()
-			if p.returncode != 0:
-				print('--Failed to probe video with error {}'.format(err))
+				'-i', url]     
+
+			try:   
+				p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)    
+				out, err =  p.communicate()
+				if p.returncode != 0:
+					print('--Failed to probe video with error {}'.format(err))
+					return None
+				
+				content = json.loads(out.decode('utf-8'))
+				stream = content['streams'][0]
+				return eval(stream['r_frame_rate'])
+			except FileNotFoundError:
+				print('--Failed to find `ffprobe`. Make sure to have `ffmpeg` in your PATH.')
 				return None
 			
-			content = json.loads(out.decode('utf-8'))
-			stream = content['streams'][0]
-			return eval(stream['r_frame_rate'])
+
 
 	def create_dense_annotations(self, obj, eps, fps):
 		'''Creates dense annotations for a BeaverDam JSON object.
