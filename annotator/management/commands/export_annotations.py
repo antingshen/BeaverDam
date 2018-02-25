@@ -81,7 +81,7 @@ the current timestamp.
 				obj[options['field']] = frames
 				print('--Created {} dense annotations for object {}'.format(len(frames), obj['id']))
 		
-		outpath = os.path.join(options['outdir'], str(video.id) + '.json')		
+		outpath = os.path.normpath(os.path.join(options['outdir'], str(video.id) + '.json'))
 		with open(outpath, 'w') as fh:
 			json.dump(content, fh, indent=4)
 		print('--Saved annotations to {}'.format(outpath))
@@ -93,20 +93,17 @@ the current timestamp.
 		if url == 'Image List':
 			return 1 # 1 FPS
 		else:
-			working_dir = os.getcwd()
-			if os.path.basename(working_dir) != 'BeaverDam':
-				print('Make the working directory BeaverDam root. Current working directory is'.format(working_dir))
-
-			if url.startswith('/static/'):
-				url = 'annotator' + url
+			ROOT = os.path.join(os.path.dirname(__file__), '..', '..', '..')
+			if not url.startswith('http'):	
+				# Local file path, relative to serving directory			
+				url = os.path.normpath(os.path.join(ROOT, 'annotator', url.strip('/')))
 			
 			cmd = [
 				'ffprobe', 
 				'-print_format', 'json',
-				'-loglevel', 'fatal',
 				'-show_streams', 
 				'-count_frames',
-				'-select_streams', 'v'
+				'-select_streams', 'v:0'
 				'-i', url]        
 			p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)    
 			out, err =  p.communicate()
