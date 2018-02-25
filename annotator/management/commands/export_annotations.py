@@ -40,6 +40,7 @@ the current timestamp.
 		parser.add_argument('--filter-ids', type=int, nargs='+', help='Only export these video ids.')		
 		parser.add_argument('--filter-verified', action='store_true', help='Only export verified annotations.')		
 		parser.add_argument('--sparse', action='store_true', help='Do not create dense annotations.')
+		parser.add_argument('--probe-seconds', type=int, help='Limit video probing to first n seconds of video.', default=2)
 
 	def handle(self, *args, **options):
 		os.makedirs(options['outdir'], exist_ok=True)
@@ -62,7 +63,7 @@ the current timestamp.
 		fps = options['fps']
 		if fps is None:
 			print('--Probing video {}'.format(video.id))
-			fps = self.probe_video(video)
+			fps = self.probe_video(video, probesecs=options['probe_seconds'])
 			if fps is None:
 				print('--Failed to probe.')
 				return
@@ -86,7 +87,7 @@ the current timestamp.
 			json.dump(content, fh, indent=4)
 		print('--Saved annotations to {}'.format(outpath))
 
-	def probe_video(self, video):
+	def probe_video(self, video, probesecs):
 		'''Probe video file or image directory for FPS and number of frames.'''
 		url = video.url
 
@@ -101,6 +102,7 @@ the current timestamp.
 			cmd = [
 				'ffprobe', 
 				'-print_format', 'json',
+				'-read_intervals', '%+{}'.format(probesecs),
 				'-show_streams', 
 				'-count_frames',
 				'-select_streams', 'v:0'
