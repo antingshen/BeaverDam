@@ -34,7 +34,7 @@ the current timestamp.
 
 	def add_arguments(self, parser):	
 		parser.add_argument('--fps', type=float, help='Number of frames / second. If omitted, video will be probed for fps.')
-		parser.add_argument('--outdir', help='Output directory', default='./exported_annotations')
+		parser.add_argument('--out-dir', help='Output directory', default='./exported_annotations')
 		parser.add_argument('--field', help='JSON field name to hold dense annotations', default='frames')
 		parser.add_argument('--eps', type=float, help='Approximate key frame matching threshold. If omitted will computed based on fps.')
 		parser.add_argument('--filter-ids', type=int, nargs='+', help='Only export these video ids.')		
@@ -43,7 +43,7 @@ the current timestamp.
 		parser.add_argument('--probe-seconds', type=int, help='Limit video probing to first n seconds of video.', default=2)
 
 	def handle(self, *args, **options):
-		os.makedirs(options['outdir'], exist_ok=True)
+		os.makedirs(options['out_dir'], exist_ok=True)
 
 		# Filter videos
 		filter_set = Video.objects.filter(annotation__gt='')
@@ -82,7 +82,7 @@ the current timestamp.
 				obj[options['field']] = frames
 				print('--Created {} dense annotations for object {}'.format(len(frames), obj['id']))
 		
-		outpath = os.path.normpath(os.path.join(options['outdir'], str(video.id) + '.json'))
+		outpath = os.path.normpath(os.path.join(options['out_dir'], str(video.id) + '.json'))
 		with open(outpath, 'w') as fh:
 			json.dump(content, fh, indent=4)
 		print('--Saved annotations to {}'.format(outpath))
