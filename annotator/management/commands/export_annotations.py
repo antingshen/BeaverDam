@@ -99,18 +99,25 @@ the current timestamp.
 			return 1 # 1 FPS
 		else:
 			ROOT = os.path.join(os.path.dirname(__file__), '..', '..', '..')
-			if not url.startswith('http'):	
-				# Local file path, relative to serving directory			
-				url = os.path.normpath(os.path.join(ROOT, 'annotator', url.strip('/')))
 			
 			cmd = [
 				'ffprobe', 
+				'-hide_banner',				
 				'-print_format', 'json',
 				'-read_intervals', '%+{}'.format(probesecs),
 				'-show_streams', 
 				'-count_frames',
 				'-select_streams', 'v:0'
-				'-i', url]     
+			]
+			
+			if not url.startswith('http'):	
+				# Local file path, relative to serving directory			
+				url = os.path.normpath(os.path.join(ROOT, 'annotator', url.strip('/')))
+			else:
+				# Timeout for reaching remote file
+				cmd.extend(['-timeout', str(int(5e6))])
+			
+			cmd.extend(['-i', url])
 
 			try:   
 				p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)    
