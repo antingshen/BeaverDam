@@ -4,3 +4,10 @@ __pycache__
 deploy_settings.py
 static
 s3cfg
+
+#virtuallenv files
+.Python
+bin/
+include/
+lib/
+pip-selfcheck.json
