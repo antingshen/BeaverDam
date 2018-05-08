@@ -170,15 +170,13 @@ def video(request, video_id):
         response['X-Frame-Options'] = 'SAMEORIGIN'
     return response
 
+
 def get_states(request, states=None):
-    if request.GET.get('label_name'):
-        label_name=request.GET.get('label_name').replace("%20", " ")
-    # create an empty list to hold the results
-    state_data = []
-    states = State.objects.filter(label_name=label_name)
-    # iterate over each city and append to results list 
-    for s in states:
-        state_data.append({'name': s.name, 'color': s.color})
+    label_name = request.GET.get('label_name')
+    if label_name:
+        label_name = label_name.replace("%20", " ")
+    # iterate over each city and append to results list
+    state_data = [{'name': s.name, 'color': s.color} for s in State.objects.filter(label_name=label_name)]
     # return JSON object
     return HttpResponse(json.dumps(state_data))
     
