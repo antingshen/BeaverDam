@@ -222,10 +222,14 @@ class ReceiveCommand(View):
             if 'bonus' in data:
                 bonus = data['bonus']
             message = data['message']
-            reopen = data['reopen']
-            delete_boxes = data['deleteBoxes']
-            block_worker = data['blockWorker']
-            updated_annotations = json.dumps(data['updatedAnnotations'])
+            if 'reopen' in data:
+                reopen = data['reopen']
+            if 'deleteBoxes' in data:
+                delete_boxes = data['deleteBoxes']
+            if 'blockWorker' in data:
+                block_worker = data['blockWorker']
+            if 'updatedAnnotations' in data:
+                updated_annotations = json.dumps(data['updatedAnnotations'])
 
             if command_type == "accept":
                 accept_video(request, vid_id, bonus, message, reopen, delete_boxes, block_worker, updated_annotations)
