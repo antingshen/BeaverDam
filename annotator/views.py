@@ -219,22 +219,21 @@ class ReceiveCommand(View):
             vid_id = int(video_id)
             command_type = data['type']
 
-            if 'bonus' in data:
-                bonus = data['bonus']
             message = data['message']
-            if 'reopen' in data:
-                reopen = data['reopen']
-            if 'deleteBoxes' in data:
-                delete_boxes = data['deleteBoxes']
-            if 'blockWorker' in data:
-                block_worker = data['blockWorker']
-            if 'updatedAnnotations' in data:
-                updated_annotations = json.dumps(data['updatedAnnotations'])
 
             if command_type == "accept":
-                accept_video(request, vid_id, bonus, message, reopen, delete_boxes, block_worker, updated_annotations)
+                accept_video(request, vid_id, 
+                             data['bonus'], message, 
+                             data['reopen'], 
+                             data['delete_boxes'], 
+                             data['block_worker'], 
+                             data['updated_annotations'])
             elif command_type == "reject":
-                reject_video(request, vid_id, message, reopen, delete_boxes, block_worker, updated_annotations)
+                reject_video(request, vid_id, message, 
+                             data['reopen'], 
+                             data['delete_boxes'], 
+                             data['block_worker'], 
+                             data['updated_annotations'])
             elif command_type == "email":
                 email_worker(request, vid_id, data['subject'], message)
 
