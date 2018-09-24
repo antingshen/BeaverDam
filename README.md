@@ -91,6 +91,10 @@ For mturk's HIT accepted mode, set url param `mturk=true`.
 
 Example: `localhost:5000/video/0/?mturk=true`
 
+### MacOS uWSGI
+
+For MacOS, you may need to do uWSGI==2.0.17
+
 ### Running tests
 
 Inside venv, run `./manage.py test`
