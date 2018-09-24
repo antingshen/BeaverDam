@@ -124,24 +124,30 @@ class PlayerView {
     initPaper() {
         // Depends on this.videoReady for this.video.videoWidth/Height
         this.videoReady().then(() => {
-            var {videoWidth, videoHeight, viewWidth, viewHeight} = this.video;
-            this.$paper = Raphael(this.$('paper')[0], videoWidth, videoHeight);
+            var {videoWidth, videoHeight} = this.video;
+            let playerPaper = $(".player-paper");
+            let paper_height = playerPaper.outerHeight();
+            let paper_width = playerPaper.outerWidth();
+            this.$paper = Raphael(this.$('paper')[0], paper_width, paper_height);
 
             var css = {
                 position: 'absolute',
                 top: 0,
                 left: 0,
-                'width': `${viewWidth}px`,
-                'height': `${viewHeight}px`,
+                'width': `${paper_width}px`,
+                'height': `${paper_height}px`,
             };
 
+            $(this.video.videoElement).css({top:videoHeight*0.05, left:videoWidth*0.05});
+
             $(this.$paper.canvas).attr({
-                viewBox: `0 0 ${videoWidth} ${videoHeight}`
+                viewBox: `0 0 ${paper_width} ${paper_height}`
             }).removeAttr(
                 'width'
             ).removeAttr(
                 'height'
             ).css(css);
+
             this.creationRect = this.makeAndAttachRect(CreationRect);
             this.rects = [];
 
@@ -171,11 +177,13 @@ class PlayerView {
         // if we just toggled scale to fit the video properties are not up to date yet
         if (this.$paper) {
             setTimeout(() => {
-                var {viewWidth, viewHeight} = this.video;
+                let playerPaper = $(".player-paper");
+                let paper_height = playerPaper.outerHeight();
+                let paper_width = playerPaper.outerWidth();
                 $(this.$paper.canvas)
                 .css({
-                    'width': `${viewWidth}px`,
-                    'height': `${viewHeight}px`,
+                    'width': `${paper_width}px`,
+                    'height': `${paper_height}px`,
                 });
             }, 10);
         }
